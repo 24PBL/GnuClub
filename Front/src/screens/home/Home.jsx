@@ -9,7 +9,7 @@ function MainScreen() {
   return (
     <Back>
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>홈 화면 예정</Text>
+      <Text>홈 화면 예정</Text>{/*커밋 확인용 주석*/}
     </View>
     </Back>
   );
