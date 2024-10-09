@@ -7,20 +7,30 @@ import {Back, Container, Label, Separator} from '../login/LoginScreens'
 
 export default function Verification({navigation}) {
 
+    const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const goToSignupScreens2 = () => {
         navigation.navigate("SignUp")
         console.log("회원가입 화면으로 이동");
   }
 
     const [inputValue, setInputValue] = useState('');
+    const [emailError, setEmailError] = useState('');
+
 
     const handleInputChange = (text) => {
         setInputValue(text);
+
+        setEmailError('');
     };
 
     const handleSubmit = () => {
+        if (!Regex.test(inputValue)){
+            setEmailError('올바른 이메일 형식이 아닙니다.')
+        }
         console.log('입력된 값:', inputValue);
     };
+
   
   return (
     <Back>
@@ -29,7 +39,7 @@ export default function Verification({navigation}) {
         <CustomSep/>
         <Label>이메일</Label>
         <TextAndTouch><SignInputBox placeholder="아이디@gnu.ac.kr" placeholderTextColor = "rgba(0,0,0,0.2)" value={inputValue} onChangeText={handleInputChange}></SignInputBox><TouchbleBox onPress={handleSubmit}><Text style={{color:'#0091DA', fontSize:17}}>요청</Text></TouchbleBox></TextAndTouch>
-        <Separator/>
+        <Text>`{emailError}`</Text>
         <Separator/>
         <Label>인증번호</Label>
         <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
