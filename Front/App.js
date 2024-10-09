@@ -20,11 +20,11 @@ export default function App() {
         <>
           <RootStack.Screen name="Login" options={{headerShown : false}} component={LoginScreens}/>
           <RootStack.Screen name="SignUp" options={{headerShown : false}} component={SignUpScreens}/>
+          <RootStack.Screen name="Verification" options={{headerShown : false}} component={VerificationScreens}/>
         </>
         ) : (
           <>
             <RootStack.Screen name="Home" options={{headerShown : false}} component={HomeScreens}/>
-            <RootStack.Screen name="Verification" options={{headerShown : false}} component={VerificationScreens}/>
             <RootStack.Screen name="Profile" options={{headerShown : false}} component={ProfileScreens} />
         </>
         )}

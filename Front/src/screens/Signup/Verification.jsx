@@ -39,7 +39,7 @@ export default function Verification({navigation}) {
         <CustomSep/>
         <Label>이메일</Label>
         <TextAndTouch><SignInputBox placeholder="아이디@gnu.ac.kr" placeholderTextColor = "rgba(0,0,0,0.2)" value={inputValue} onChangeText={handleInputChange}></SignInputBox><TouchbleBox onPress={handleSubmit}><Text style={{color:'#0091DA', fontSize:17}}>요청</Text></TouchbleBox></TextAndTouch>
-        <Text>`{emailError}`</Text>
+        <Text style={{color : 'red'}}>{emailError}</Text>
         <Separator/>
         <Label>인증번호</Label>
         <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
