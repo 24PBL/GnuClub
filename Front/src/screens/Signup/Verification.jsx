@@ -7,12 +7,12 @@ import {Back, Container, Label, Separator} from '../login/LoginScreens'
 
 export default function Verification({navigation}) {
 
-    const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //이메일 형식 표준
 
     const goToSignupScreens2 = () => {
         navigation.navigate("SignUp")
         console.log("회원가입 화면으로 이동");
-  }
+  } //인증 후 회원가입 화면 이동 함수
 
     const [inputValue, setInputValue] = useState('');
     const [emailError, setEmailError] = useState('');
