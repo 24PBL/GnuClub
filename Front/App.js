@@ -18,8 +18,8 @@ export default function App() {
       <RootStack.Navigator>
         {!isSignedIn ? (
         <>
-          <RootStack.Screen name="SignUp" options={{headerShown : false}} component={SignUpScreens}/>
           <RootStack.Screen name="Login" options={{headerShown : false}} component={LoginScreens}/>
+          <RootStack.Screen name="SignUp" options={{headerShown : false}} component={SignUpScreens}/>
         </>
         ) : (
           <>
