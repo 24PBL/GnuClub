@@ -1,5 +1,5 @@
-import { View, Text, TextInput } from 'react-native'
-import React, {useState} from 'react'
+import { Text, ScrollView } from 'react-native'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import * as Sign from '../login/LoginScreens'
 
@@ -11,12 +11,38 @@ export default function SignUp({navigation}) {
       navigation.navigate("Login")
       console.log("로그인 화면으로 이동");
     }
+    
 
 
     const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //이메일 형식
 
     const [inputValue, setInputValue] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [PW, setPw] = useState("");
+    const [CheckPW, setCheckPw] = useState("");
+    const [PwError, setPwError] = useState("");
+
+    const getPasswordInputStyle = () => {
+        if (PW == CheckPW) {
+          return {color : "blue"}
+      }
+        return {};
+    };
+    
+
+    useEffect(() => {
+        if (PW && CheckPW) {
+          if (PW === CheckPW) {
+            setPwError("비밀번호가 확인되었습니다.");
+          } else {
+            setPwError("비밀번호가 일치하지 않습니다.");
+          }
+        } else {
+          setPwError("");
+        }
+      }, [PW, CheckPW]);
+      //비밀번호 확인
 
 
     const handleInputChange = (text) => {
@@ -31,32 +57,40 @@ export default function SignUp({navigation}) {
         }
         console.log('입력된 값:', inputValue);
     };
+
+    //이메일, 닉네임.
   
   return (
     <Sign.Back>
-    <Sign.Container>
-        <Sign.LoginTitle>회원가입</Sign.LoginTitle>
-        <Sign.Separator/>
-        <Sign.Label>이메일</Sign.Label>
-        <TextAndTouch><SignInputBox placeholder="아이디@gnu.ac.kr" placeholderTextColor = "rgba(0,0,0,0.2)" value={inputValue} onChangeText={handleInputChange}></SignInputBox><TouchbleBox onPress={handleSubmit}><Text style={{color:'#0091DA', fontSize:17}}>요청</Text></TouchbleBox></TextAndTouch>
-        <Text>`{emailError}`</Text>
-        <Sign.Separator/>
-        <Sign.Label>인증번호</Sign.Label>
-        <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
-        <Sign.Label>닉네임</Sign.Label>
-        <Sign.InputBox placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)"></Sign.InputBox>
-        <Sign.Separator/>
-        <Sign.Label>비밀번호</Sign.Label>
-        <Sign.InputBox placeholder="비밀번호" placeholderTextColor = "rgba(0,0,0,0.2)"></Sign.InputBox>
-        <Sign.Separator/>
-        <Sign.Label>비밀번호 확인</Sign.Label>
-        <Sign.InputBox placeholder="비밀번호 확인" placeholderTextColor = "rgba(0,0,0,0.2)"></Sign.InputBox>
-        <Sign.Separator/>
-        <Sign.LoginBox onPress={goToLoginScreen}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
-    </Sign.Container>
+        <Text style={{fontSize : 30, fontWeight : 'bold', textAlign : 'center', marginTop : 70}}>회원가입</Text>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{marginTop : 60}}>
+            <Sign.Container>
+                <Sign.Label>학번</Sign.Label>
+                <SignInputBox2 placeholder="학번" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox2>
+                <Sign.Separator/>
+                <Sign.Separator/>
+                <Sign.Label>이메일</Sign.Label>
+                <TextAndTouch><SignInputBox placeholder="아이디@gnu.ac.kr" placeholderTextColor = "rgba(0,0,0,0.2)" value={inputValue} onChangeText={handleInputChange}></SignInputBox><TouchbleBox onPress={handleSubmit}><Text style={{color:'#0091DA', fontSize:17}}>요청</Text></TouchbleBox></TextAndTouch>
+                <Text style={{color : "red"}}>{emailError}</Text>
+                <Sign.Label>인증번호</Sign.Label>
+                <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
+                <Sign.Separator/>
+                <Sign.Label>닉네임</Sign.Label>
+                <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox2>
+                <Sign.Separator/>
+                <Sign.Label>비밀번호</Sign.Label>
+                <SignInputBox2 placeholder="비밀번호" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setPw} secureTextEntry={true}></SignInputBox2>
+                <Sign.Separator/>
+                <Sign.Label>비밀번호 확인</Sign.Label>
+                <SignInputBox2 placeholder="비밀번호 확인" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setCheckPw} secureTextEntry={true}></SignInputBox2>
+                <Text style={[{color : "red"} , getPasswordInputStyle()]}>{PwError}</Text>
+                <Sign.LoginBox onPress={goToLoginScreen}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
+            </Sign.Container>
+        </ScrollView>
     </Sign.Back>
   )
-}
+ }
+
 
 export const SignInputBox = styled.TextInput`
     border-radius : 10px;
@@ -64,6 +98,16 @@ export const SignInputBox = styled.TextInput`
     height : 45px;
     padding-left : 10px;
     font-size : 16px;
+`
+
+export const SignInputBox2 = styled.TextInput`
+    border-radius : 10px;
+    width : 270px;
+    height : 55px;
+    padding-left : 10px;
+    font-size : 16px;
+    border-width : 1px;
+    border-color : black;
 `
 
 export const SignTitle = styled.Text`
@@ -104,7 +148,4 @@ export const TextAndTouch = styled.View`
     height : 55px;
     justify-content : center;
     align-items : center;
-`
-export const CustomSep = styled(Separator)`
-    margin: 25px 0;
 `
