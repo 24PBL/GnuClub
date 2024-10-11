@@ -8,7 +8,7 @@ export default function LoginScreens({navigation}) {
 
   // 회원가입 화면 이동 함수
   const goToSignupScreens1 = () => {
-        navigation.navigate("Verification")
+        navigation.navigate("SignUp")
         console.log("회원가입 인증 화면으로 이동");
   }
   
