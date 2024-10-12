@@ -2,6 +2,7 @@ import { Text, ScrollView } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import * as Sign from '../login/LoginScreens'
+import axios from 'axios';
 
 
 
@@ -11,15 +12,19 @@ export default function SignUp({navigation}) {
       navigation.navigate("Login")
       console.log("로그인 화면으로 이동");
     }
+
     
 
 
     const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     //이메일 형식
 
+    const [studentId, setStudentId] = useState('');
     const [inputValue, setInputValue] = useState('');
-    const [emailError, setEmailError] = useState('');
     const [PW, setPw] = useState("");
+    const [nickname, setNickname] = useState("");
+
+    const [emailError, setEmailError] = useState('');
     const [CheckPW, setCheckPw] = useState("");
     const [PwError, setPwError] = useState("");
 
@@ -59,6 +64,21 @@ export default function SignUp({navigation}) {
     };
 
     //이메일, 닉네임.
+
+
+    const signUp = async (studentId, email, password, nickname) => {
+      try {
+        const response = await axios.post('http://localhost:3000/signup', {
+          student_id: studentId,
+          email: email,
+          password: password,
+          nickname: nickname
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error('회원가입 실패:', error);
+      }
+    };
   
   return (
     <Sign.Back>
@@ -66,7 +86,7 @@ export default function SignUp({navigation}) {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{marginTop : 60}}>
             <Sign.Container>
                 <Sign.Label>학번</Sign.Label>
-                <SignInputBox2 placeholder="학번" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox2>
+                <SignInputBox2 placeholder="학번" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setStudentId}></SignInputBox2>
                 <Sign.Separator/>
                 <Sign.Separator/>
                 <Sign.Label>이메일</Sign.Label>
@@ -76,7 +96,7 @@ export default function SignUp({navigation}) {
                 <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
                 <Sign.Separator/>
                 <Sign.Label>닉네임</Sign.Label>
-                <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox2>
+                <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setNickname}></SignInputBox2>
                 <Sign.Separator/>
                 <Sign.Label>비밀번호</Sign.Label>
                 <SignInputBox2 placeholder="비밀번호" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setPw} secureTextEntry={true}></SignInputBox2>
@@ -84,7 +104,7 @@ export default function SignUp({navigation}) {
                 <Sign.Label>비밀번호 확인</Sign.Label>
                 <SignInputBox2 placeholder="비밀번호 확인" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setCheckPw} secureTextEntry={true}></SignInputBox2>
                 <Text style={[{color : "red"} , getPasswordInputStyle()]}>{PwError}</Text>
-                <Sign.LoginBox onPress={goToLoginScreen}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
+                <Sign.LoginBox onPress={signUp(studentId, inputValue, PW, nickname)}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
             </Sign.Container>
         </ScrollView>
     </Sign.Back>
