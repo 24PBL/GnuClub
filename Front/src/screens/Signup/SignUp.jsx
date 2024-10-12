@@ -74,7 +74,7 @@ export default function SignUp({navigation}) {
           password: password,
           nickname: nickname
         });
-        console.log(response.data);
+        console.log('서버 응답' , response.data);
         navigation.navigate("Login");
       } catch (error) {
         console.error('회원가입 실패:', error);
