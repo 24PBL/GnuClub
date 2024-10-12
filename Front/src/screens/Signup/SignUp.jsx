@@ -75,10 +75,11 @@ export default function SignUp({navigation}) {
           nickname: nickname
         });
         console.log(response.data);
+        navigation.navigate("Login");
       } catch (error) {
         console.error('회원가입 실패:', error);
       }
-    };
+    }; //서버 <- 데이터 전송 함수
   
   return (
     <Sign.Back>
