@@ -8,10 +8,10 @@ import axios from 'axios';
 
 export default function SignUp({navigation}) {
 
-    const goToLoginScreen = () => {
+    /*const goToLoginScreen = () => {
       navigation.navigate("Login")
       console.log("로그인 화면으로 이동");
-    }
+    }*/
 
     
 
@@ -68,7 +68,7 @@ export default function SignUp({navigation}) {
 
     const signUp = async (studentId, email, password, nickname) => {
       try {
-        const response = await axios.post('http://localhost:3000/signup', {
+        const response = await axios.post('http://10.0.2.2:3000/signup', {
           student_id: studentId,
           email: email,
           password: password,
@@ -104,7 +104,7 @@ export default function SignUp({navigation}) {
                 <Sign.Label>비밀번호 확인</Sign.Label>
                 <SignInputBox2 placeholder="비밀번호 확인" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setCheckPw} secureTextEntry={true}></SignInputBox2>
                 <Text style={[{color : "red"} , getPasswordInputStyle()]}>{PwError}</Text>
-                <Sign.LoginBox onPress={signUp(studentId, inputValue, PW, nickname)}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
+                <Sign.LoginBox onPress={() => signUp(studentId, inputValue, PW, nickname)}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
             </Sign.Container>
         </ScrollView>
     </Sign.Back>
