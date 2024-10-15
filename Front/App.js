@@ -1,17 +1,18 @@
-import { Text } from 'react-native';
 import { useState } from "react"
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreens from "./src/screens/home/Home"
-import ProfileScreens from './src/screens/profile/Profile';
 import LoginScreens from './src/screens/login/LoginScreens';
 import SignUpScreens from './src/screens/Signup/SignUp';
+import mainScreens from './src/screens/mainPage/mainScreen';
+
 
 
 const RootStack = createNativeStackNavigator()
 
 export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
+
   return (
     <NavigationContainer>
       <RootStack.Navigator>
@@ -22,8 +23,8 @@ export default function App() {
         </>
         ) : (
           <>
-            <RootStack.Screen name="Home" options={{headerShown : false}} component={HomeScreens}/>
-            <RootStack.Screen name="Profile" options={{headerShown : false}} component={ProfileScreens} />
+          <RootStack.Screen name="Home" options={{headerShown : false}} component={HomeScreens}/>
+          <RootStack.Screen name="mainPage" options={{headerShown : false}} component={mainScreens}/>
         </>
         )}
       </RootStack.Navigator>

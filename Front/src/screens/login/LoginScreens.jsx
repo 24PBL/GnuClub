@@ -1,4 +1,4 @@
-import { View, Text, TextInput } from 'react-native'
+import {Text} from 'react-native'
 import React from 'react'
 import styled from 'styled-components'
 
