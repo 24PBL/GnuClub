@@ -1,4 +1,4 @@
-import { Text, ScrollView } from 'react-native'
+import { Alert, Text, ScrollView } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import * as Sign from '../login/LoginScreens'
@@ -7,14 +7,6 @@ import axios from 'axios';
 
 
 export default function SignUp({navigation}) {
-
-    /*const goToLoginScreen = () => {
-      navigation.navigate("Login")
-      console.log("로그인 화면으로 이동");
-    }*/
-
-    
-
 
     const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     //이메일 형식
@@ -67,6 +59,7 @@ export default function SignUp({navigation}) {
 
 
     const signUp = async (studentId, email, password, nickname) => {
+      console.log("함수 정상 호출")
       try {
         const response = await axios.post('http://10.0.2.2:3000/signup', {
           student_id: studentId,
@@ -77,9 +70,19 @@ export default function SignUp({navigation}) {
         console.log('서버 응답' , response.data);
         navigation.navigate("Login");
       } catch (error) {
-        console.error('회원가입 실패:', error);
-      }
-    }; //서버 <- 데이터 전송 함수
+        // 서버에서 409 상태 코드 반환
+        if (error.response && error.response.status === 409) {         
+            Alert.alert(
+                "중복된 정보", // 경고창 제목
+                "이미 존재하는 학번 또는 이메일입니다.", // 경고창
+                [{ text: "확인" }] 
+            );
+            console.log(error)
+        } else {
+            console.error('회원가입 실패:', error);
+        }
+    }
+  };
   
   return (
     <Sign.Back>
