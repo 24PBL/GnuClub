@@ -5,7 +5,7 @@ import HomeScreens from "./src/screens/home/Home"
 import LoginScreens from './src/screens/login/LoginScreens';
 import SignUpScreens from './src/screens/Signup/SignUp';
 import mainScreens from './src/screens/mainPage/mainScreen';
-
+import myPageScreens from './src/screens/myPage/myPage'
 
 
 const RootStack = createNativeStackNavigator()
@@ -25,6 +25,7 @@ export default function App() {
           <>
           <RootStack.Screen name="Home" options={{headerShown : false}} component={HomeScreens}/>
           <RootStack.Screen name="mainPage" options={{headerShown : false}} component={mainScreens}/>
+          <RootStack.Screen name="myPage" options={{headerShown : false}} component={myPageScreens}/>
         </>
         )}
       </RootStack.Navigator>
