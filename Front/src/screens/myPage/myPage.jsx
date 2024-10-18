@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import Ionicons from 'react-native-vector-icons/Ionicons'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const MyPage = () => {
   const [avatarUri, setAvatarUri] = useState('https://via.placeholder.com/150'); // Default avatar placeholder
@@ -22,6 +22,15 @@ const MyPage = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Top Section */}
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>마이페이지</Text>
+      </View>
+      <TouchableOpacity style={styles.editButton}>
+        <Text style={styles.editText}>수정</Text>
+      </TouchableOpacity>
+
+      {/* Profile Section */}
       <View style={styles.profileSection}>
         <View style={styles.avatarWrapper}>
           <Image
@@ -32,45 +41,47 @@ const MyPage = () => {
             <Ionicons name="camera-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.nameText}>이름</Text>
+
+        <View style={styles.infoSection}>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>이름:</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>학번:</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>단과대학:</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>학과:</Text>
+          </View>
+        </View>
       </View>
 
-      <View style={styles.infoSection}>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>학번:</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>전화번호:</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>단과대학:</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>학과:</Text>
-        </View>
+      <View style={styles.placeholderSection}>
+        <Text style={styles.placeholderText}>설정 기능장 입력 후 채우기</Text>
       </View>
 
-      {/* Bottom Tab with Icons */}
       <View style={styles.bottomTab}>
-        <View style={styles.tabItem}>
+        <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="home-outline" size={24} color="#888" />
           <Text style={styles.tabText}>홈</Text>
-        </View>
-        <View style={styles.tabItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="search-outline" size={24} color="#888" />
           <Text style={styles.tabText}>찾기</Text>
-        </View>
-        <View style={styles.tabItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tabItem}>
           <Ionicons name="chatbubble-outline" size={24} color="#888" />
           <Text style={styles.tabText}>채팅</Text>
-        </View>
-        <View style={styles.tabItem}>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tabItem}>
           <Image
             style={styles.tabAvatar}
             source={{ uri: avatarUri }} // Use selected avatar image for MyPage icon
           />
           <Text style={styles.tabText}>마이페이지</Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -81,44 +92,72 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     justifyContent: 'space-between',
+    backgroundColor: '#fff',
+  },
+  header: {
+    marginBottom: 1,
+    paddingTop:15,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  editButton: {
+    alignSelf: 'flex-end', 
+    marginBottom: 15, 
+  },
+  editText: {
+    fontSize: 16,
+    color: 'blue',
   },
   profileSection: {
+    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 10,
   },
   avatarWrapper: {
     position: 'relative',
+    marginRight: 20,
   },
   avatar: {
-    bottom: -120,
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
     backgroundColor: '#ddd',
   },
   cameraIcon: {
     position: 'absolute',
-    right: -1,
-    bottom: -120,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 5,
   },
-  nameText: {
-    fontSize: 20,
-    marginTop: 120,
-  },
   infoSection: {
-    marginTop: 20,
+    flex: 1,
   },
   infoItem: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   infoLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    width: 80,
+    marginRight: 10,
+    width: 70,
+  },
+  placeholderSection: {
+    height: 350,
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  placeholderText: {
+    color: '#999',
   },
   bottomTab: {
     flexDirection: 'row',
@@ -131,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#888',
   },
   tabAvatar: {
