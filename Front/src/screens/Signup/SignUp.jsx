@@ -19,6 +19,7 @@ export default function SignUp({navigation}) {
     const [emailError, setEmailError] = useState('');
     const [CheckPW, setCheckPw] = useState("");
     const [PwError, setPwError] = useState("");
+  //Id 이메일 등 중복검사를 위한 상태들
 
     const getPasswordInputStyle = () => {
         if (PW == CheckPW) {
@@ -73,7 +74,7 @@ export default function SignUp({navigation}) {
         // 서버에서 409 상태 코드 반환
         if (error.response && error.response.status === 409) {         
             Alert.alert(
-                "중복된 정보", // 경고창 제목
+                "중복된 정보",
                 "이미 존재하는 학번 또는 이메일입니다.", // 경고창
                 [{ text: "확인" }] 
             );
