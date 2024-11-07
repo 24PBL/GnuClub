@@ -59,7 +59,7 @@ const MyPage = () => {
       </View>
 
       <View style={styles.placeholderSection}>
-        <Text style={styles.placeholderText}>설정 기능장 입력 후 채우기</Text>
+        <Text style={styles.placeholderText}>설정 기능정의 후 채우기</Text>
       </View>
 
       <View style={styles.bottomTab}>
