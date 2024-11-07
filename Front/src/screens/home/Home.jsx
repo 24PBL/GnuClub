@@ -1,8 +1,9 @@
 import {Text, SafeAreaView, Image, View, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
-import MainScreen from "../mainPage/mainScreen"
-import MyPageScreen from '../myPage/myPage'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import MainScreen from "../mainPage/mainScreen";
+import MyPageScreen from '../myPage/myPage';
+import ChatScreen from '../chat/ChatList';
 
 
 
@@ -15,20 +16,6 @@ function ClubScreens(){
       </SafeAreaView>
   )
 }
-
-
-
-function ChatScreen(){
-  return(
-    <SafeAreaView style={{flex : 1}}>
-    <View style={{flex : 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>챗</Text>
-    </View>
-    </SafeAreaView>
-  )
-}
-
-
 
 const Tab = createBottomTabNavigator();
 
