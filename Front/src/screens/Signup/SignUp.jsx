@@ -26,6 +26,9 @@ export default function SignUp({navigation}) {
     const [CheckPW, setCheckPw] = useState("");
     const [PwError, setPwError] = useState("");
     const [HardPwError, setHardPwError] = useState("");
+    const [verificationCode, setVerificationCode] = useState('');
+    const [CodeVerifiedError, setCodeVerifiedError] = useState(true);
+
   //Id 이메일 등 중복검사를 위한 상태들
 
     const getPasswordInputStyle = () => {
@@ -50,7 +53,7 @@ export default function SignUp({navigation}) {
       //비밀번호 확인
 
 
-
+      //닉네임 유효성 검사
       const handleNicknameChange = (text) => {
         setNickname(text);
         if (!nicknameRegex.test(text)) {
@@ -60,6 +63,8 @@ export default function SignUp({navigation}) {
         }
     };
 
+
+    //비밀번호 유효성 검사
     const handlePWChange = (text) => {
       setPw(text);
       if (!passwordRegex.test(text)) {
@@ -74,16 +79,44 @@ export default function SignUp({navigation}) {
 
         setEmailError('');
     };
-    const handleSubmit = () => {
-        if (!Regex.test(inputValue)){
-            setEmailError('올바른 이메일 형식이 아닙니다.')
-        }
-        console.log('입력된 값:', inputValue);
-    };
 
-    //이메일, 닉네임.
+    //이메일 유효성 확인 + 인증 코드 요청
+    const handleSubmit = async () => {
+      if (!Regex.test(inputValue)){
+          setEmailError('올바른 이메일 형식이 아닙니다.');
+          return;
+      }
+  
+      try {
+          const response = await axios.post('http://10.0.2.2:3000/send-verification-code', { email: inputValue });
+          Alert.alert('인증 코드 전송', '인증 코드가 이메일로 전송되었습니다.');
+      } catch (error) {
+          console.error('인증 코드 요청 실패:', error);
+          Alert.alert('오류', '인증 코드 전송에 실패했습니다.');
+      }
+  };
+
+    const verifyCode = async () => {
+      try {
+        // 서버에 인증 코드 확인을 비동기로 요청
+        const response = await axios.post('http://10.0.2.2:3000/verify-code', {
+            email: inputValue,
+            code: verificationCode
+        });
+        Alert.alert('인증 성공', '이메일 인증이 완료되었습니다.');
+        setCodeVerifiedError(false);
+    } catch (error) {
+        console.error('인증 코드 확인 실패:', error);
+        Alert.alert('오류', '유효하지 않은 인증 코드입니다.');
+        setCodeVerifiedError(true);
+    }
+  };
+
+  
+
+    //모든 충족사항 만족 시 회원가입 활성화 
     const isFormValid = () => {
-      return inputValue && PW && CheckPW && nickname && !emailError && PwError === "비밀번호가 확인되었습니다." && !nicknameError && !HardPwError;
+      return inputValue && PW && CheckPW && nickname && !emailError && PwError === "비밀번호가 확인되었습니다." && !nicknameError && !HardPwError && !CodeVerifiedError;
   };
   
 
@@ -127,7 +160,17 @@ export default function SignUp({navigation}) {
                 <TextAndTouch><SignInputBox placeholder="아이디@gnu.ac.kr" placeholderTextColor = "rgba(0,0,0,0.2)" value={inputValue} onChangeText={handleInputChange}></SignInputBox><TouchbleBox onPress={handleSubmit}><Text style={{color:'#0091DA', fontSize:17}}>요청</Text></TouchbleBox></TextAndTouch>
                 <Text style={{color : "red"}}>{emailError}</Text>
                 <Sign.Label>인증번호</Sign.Label>
-                <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
+                <TextAndTouch>
+                    <SignInputBox
+                        placeholder="인증번호"
+                        placeholderTextColor="rgba(0,0,0,0.2)"
+                        value={verificationCode}
+                        onChangeText={setVerificationCode}  // 입력된 값을 상태에 저장
+                    />
+                    <TouchbleBox onPress={verifyCode}>
+                        <Text style={{ color: '#0091DA', fontSize: 17 }}>확인</Text>
+                    </TouchbleBox>
+                </TextAndTouch>
                 <Sign.Separator/>
                 <Sign.Label>닉네임</Sign.Label>
                 <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={handleNicknameChange}></SignInputBox2>
