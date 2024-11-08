@@ -14,7 +14,7 @@ const MyPage = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });햐
+    });
 
     if (!result.canceled) {
       setAvatarUri(result.assets[0].uri); // Update avatar with selected image
