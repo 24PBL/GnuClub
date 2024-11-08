@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+// Temporary change for push
 
 const MyPage = () => {
   const [avatarUri, setAvatarUri] = useState('https://via.placeholder.com/150'); // Default avatar placeholder
@@ -13,7 +14,7 @@ const MyPage = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });
+    });햐
 
     if (!result.canceled) {
       setAvatarUri(result.assets[0].uri); // Update avatar with selected image
@@ -61,28 +62,6 @@ const MyPage = () => {
       <View style={styles.placeholderSection}>
         <Text style={styles.placeholderText}>설정 기능정의 후 채우기</Text>
       </View>
-
-      <View style={styles.bottomTab}>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="home-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>홈</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="search-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>찾기</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="chatbubble-outline" size={24} color="#888" />
-          <Text style={styles.tabText}>채팅</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <Image
-            style={styles.tabAvatar}
-            source={{ uri: avatarUri }} // Use selected avatar image for MyPage icon
-          />
-          <Text style={styles.tabText}>마이페이지</Text>
-        </TouchableOpacity>
-      </View>
     </ScrollView>
   );
 };
@@ -96,7 +75,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 1,
-    paddingTop:15,
+    paddingTop: 15,
   },
   pageTitle: {
     fontSize: 24,
@@ -158,25 +137,6 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: '#999',
-  },
-  bottomTab: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: '#ddd',
-  },
-  tabItem: {
-    alignItems: 'center',
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#888',
-  },
-  tabAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
   },
 });
 
