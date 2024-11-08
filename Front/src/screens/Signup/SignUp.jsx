@@ -11,14 +11,21 @@ export default function SignUp({navigation}) {
     const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     //이메일 형식
 
+    const nicknameRegex = /^[a-zA-Z0-9가-힣]{2,10}$/;
+    //닉네임의 유효성 : 영어 숫자 한글만 가능
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    //비밀번호 강도 8자 이상, 숫자 특수문자 포함.
+
     const [studentId, setStudentId] = useState('');
     const [inputValue, setInputValue] = useState('');
     const [PW, setPw] = useState("");
     const [nickname, setNickname] = useState("");
-
+    const [nicknameError, setNicknameError] = useState('');
     const [emailError, setEmailError] = useState('');
     const [CheckPW, setCheckPw] = useState("");
     const [PwError, setPwError] = useState("");
+    const [HardPwError, setHardPwError] = useState("");
   //Id 이메일 등 중복검사를 위한 상태들
 
     const getPasswordInputStyle = () => {
@@ -43,12 +50,30 @@ export default function SignUp({navigation}) {
       //비밀번호 확인
 
 
+
+      const handleNicknameChange = (text) => {
+        setNickname(text);
+        if (!nicknameRegex.test(text)) {
+            setNicknameError('닉네임은 2~10자의 영어, 숫자, 한글만 가능합니다.');
+        } else {
+            setNicknameError('');
+        }
+    };
+
+    const handlePWChange = (text) => {
+      setPw(text);
+      if (!passwordRegex.test(text)) {
+          setHardPwError('비밀번호는 8자 이상 숫자, 특수문자를 포함해야 합니다.');
+      } else {
+          setHardPwError('');
+      }
+  };
+
     const handleInputChange = (text) => {
         setInputValue(text);
 
         setEmailError('');
     };
-
     const handleSubmit = () => {
         if (!Regex.test(inputValue)){
             setEmailError('올바른 이메일 형식이 아닙니다.')
@@ -57,6 +82,10 @@ export default function SignUp({navigation}) {
     };
 
     //이메일, 닉네임.
+    const isFormValid = () => {
+      return inputValue && PW && CheckPW && nickname && !emailError && PwError === "비밀번호가 확인되었습니다." && !nicknameError && !HardPwError;
+  };
+  
 
 
     const signUp = async (studentId, email, password, nickname) => {
@@ -101,15 +130,22 @@ export default function SignUp({navigation}) {
                 <TextAndTouch><SignInputBox placeholder="인증번호" placeholderTextColor = "rgba(0,0,0,0.2)"></SignInputBox><TouchbleBox><Text style={{color:'#0091DA', fontSize:17}}>확인</Text></TouchbleBox></TextAndTouch>
                 <Sign.Separator/>
                 <Sign.Label>닉네임</Sign.Label>
-                <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setNickname}></SignInputBox2>
+                <SignInputBox2 placeholder="홍길동" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={handleNicknameChange}></SignInputBox2>
+                <Text style={{color : "red"}}>{nicknameError}</Text>
                 <Sign.Separator/>
                 <Sign.Label>비밀번호</Sign.Label>
-                <SignInputBox2 placeholder="비밀번호" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setPw} secureTextEntry={true}></SignInputBox2>
-                <Sign.Separator/>
+                <SignInputBox2 placeholder="비밀번호" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={handlePWChange} secureTextEntry={true}></SignInputBox2>
+                <Text style={{color : "red"}}>{HardPwError}</Text>
                 <Sign.Label>비밀번호 확인</Sign.Label>
                 <SignInputBox2 placeholder="비밀번호 확인" placeholderTextColor = "rgba(0,0,0,0.2)" onChangeText={setCheckPw} secureTextEntry={true}></SignInputBox2>
                 <Text style={[{color : "red"} , getPasswordInputStyle()]}>{PwError}</Text>
-                <Sign.LoginBox onPress={() => signUp(studentId, inputValue, PW, nickname)}><Sign.LoginText>회원가입</Sign.LoginText></Sign.LoginBox>
+                <Sign.LoginBox 
+                  onPress={() => signUp(studentId, inputValue, PW, nickname)} 
+                  disabled={!isFormValid()} 
+                  style={{ opacity: isFormValid() ? 1 : 0.5 }} 
+>
+                  <Sign.LoginText>회원가입</Sign.LoginText>
+                </Sign.LoginBox>
             </Sign.Container>
         </ScrollView>
     </Sign.Back>
