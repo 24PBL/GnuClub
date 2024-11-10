@@ -88,7 +88,7 @@ export default function SignUp({navigation}) {
       }
   
       try {
-          const response = await axios.post('http://10.0.2.2:3000/send-verification-code', { email: inputValue });
+          const response = await axios.post('http://192.168.0.7:3000/send-verification-code', { email: inputValue });
           Alert.alert('인증 코드 전송', '인증 코드가 이메일로 전송되었습니다.');
       } catch (error) {
           console.error('인증 코드 요청 실패:', error);
@@ -99,7 +99,7 @@ export default function SignUp({navigation}) {
     const verifyCode = async () => {
       try {
         // 서버에 인증 코드 확인을 비동기로 요청
-        const response = await axios.post('http://10.0.2.2:3000/verify-code', {
+        const response = await axios.post('http://192.168.0.7:3000/verify-code', {
             email: inputValue,
             code: verificationCode
         });
@@ -124,7 +124,7 @@ export default function SignUp({navigation}) {
     const signUp = async (studentId, email, password, nickname) => {
       console.log("함수 정상 호출")
       try {
-        const response = await axios.post('http://10.0.2.2:3000/signup', {
+        const response = await axios.post('http://192.168.0.7:3000/signup', {
           student_id: studentId,
           email: email,
           password: password,

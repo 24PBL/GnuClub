@@ -2,6 +2,7 @@ import { Text, Alert } from 'react-native';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreens({ navigation, setIsSignedIn }) {
     const [email, setEmail] = useState('');
@@ -16,15 +17,19 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
     // 로그인 요청을 처리하는 함수
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://10.0.2.2:3000/login", {
+            const response = await axios.post("http://192.168.0.7:3000/login", {
                 email,
                 password,
             });
             // 로그인 성공 시 토큰 저장 및 상태 업데이트
             const { token } = response.data;
             console.log("로그인 성공:", token);
+
+            await AsyncStorage.setItem('jwtToken', token);
+            //토큰 저장
+
             setIsSignedIn(true); // 로그인 상태를 업데이트
-            // 여기서 AsyncStorage에 토큰을 저장할 수 있습니다.
+            
         } catch (error) {
             // 에러 발생 시 알림 표시
             Alert.alert("로그인 실패", "이메일이나 비밀번호가 올바르지 않습니다.");
