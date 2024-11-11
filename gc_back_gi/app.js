@@ -9,7 +9,7 @@ const session = require('express-session');
 const dotenv = require('dotenv');
 
 dotenv.config();
-const pageRouter = require('./routes/page');
+//const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 
 // 테스트를 위한 라우터(값 확인)
@@ -44,7 +44,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/', pageRouter);
+// app.use('/', pageRouter);
 app.use('/auth', authRouter);
 
 // 테스트를 위한 라우터(값 확인)
@@ -60,7 +60,8 @@ app.use((err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
     res.status(err.status || 500);
-    res.render('error');
+    res.send({success:500, result: "error"});
+    //res.render('error');
 });
 
 app.listen(app.get('port'), function(req, res) {

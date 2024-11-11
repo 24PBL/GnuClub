@@ -16,8 +16,20 @@ sequelize = new Sequelize("DB이름", "root", "DB비밀번호", {
 
 var db = {};
 
-db.users = sequelize.import(__dirname + "/users.js")
-db.tempUsers = sequelize.import(__dirname + "/temp_users.js")
+db.user = sequelize.import(__dirname + "/user.js")
+db.tempUser = sequelize.import(__dirname + "/tempuser.js")
+db.chatMessage = sequelize.import(__dirname + "/chatmessage.js")
+db.clan = sequelize.import(__dirname + "/clan.js")
+db.clanChatRoom = sequelize.import(__dirname + "/clanchatroom.js")
+db.class = sequelize.import(__dirname + "/class.js")
+db.collage = sequelize.import(__dirname + "/collage.js")
+db.comment = sequelize.import(__dirname + "/comment.js")
+db.post = sequelize.import(__dirname + "/post.js")
+db.postImg = sequelize.import(__dirname + "/postimg.js")
+db.notice = sequelize.import(__dirname + "/notice.js")
+db.noticeImg = sequelize.import(__dirname + "/noticeImg.js")
+db.userInClan = sequelize.import(__dirname + "/userinclan.js")
+db.user4fpw = sequelize.import(__dirname + "/user4fpw.js")
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

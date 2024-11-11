@@ -11,7 +11,7 @@ module.exports = () => {
 
     // 요청이 있을 때마다 실행됨. passport.session 미들웨어가 이 메소드를 호출함.
     passport.deserializeUser((id, done) => {
-        db.users.findOne({ where: { email: id } })
+        db.user.findOne({ where: { email: id } })
             .then(user => done(null, user))
             .catch(error => done(err));
     });
