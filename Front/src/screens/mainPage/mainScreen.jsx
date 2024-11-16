@@ -3,14 +3,37 @@ import { View, Text, ScrollView, Image, StyleSheet} from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
+
+
+
 
 const MainScreen = () => {
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('jwtToken'); // 저장된 JWT 토큰 삭제
+      console.log('Logged out and updating state to navigate to Login screen');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('로그아웃 중 오류 발생:', error);
+    }
+  };
+
   return (
     <SafeAreaProvider>
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
     <View style={styles.logocontainer}>
     <Image style={styles.logo} source={require('../../logo/GC_LOGO.png')} />
     <View style={{ position: 'relative', alignItems: 'center', marginLeft: 'auto', marginRight : 10}}>
+    <View>
+      {/* 로그아웃 버튼 */}
+      <Button title="로그아웃" onPress={handleLogout} />
+    </View>
         <Ionicons name="notifications-outline" style={{ fontSize: 35, marginTop : 10 }} />
         <Badge 
             value="1" 
@@ -58,6 +81,7 @@ const MainScreen = () => {
     </SafeAreaProvider>
   );
 };
+
 
 const styles = StyleSheet.create({
   logo :{

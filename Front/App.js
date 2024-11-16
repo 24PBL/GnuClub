@@ -2,7 +2,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreens from "./src/screens/home/Home";
 import LoginScreens from './src/screens/login/LoginScreens';
-import SignUpScreens from './src/screens/Signup/SignUp';
+import SignUpEmailScreens from './src/screens/Signup/SignUpEmail';
+import SignUpDetailScreens from './src/screens/Signup/SignUpDetails';
 import MainScreens from './src/screens/mainPage/mainScreen';
 import MyPageScreens from './src/screens/myPage/myPage';
 import ChatList from './src/screens/chat/ChatList';
@@ -36,15 +37,20 @@ export default function App() {
               children={(props) => <LoginScreens {...props} setIsSignedIn={setIsSignedIn} />} 
             />
             <RootStack.Screen 
-              name="SignUp" 
+              name="SignUpEmail" 
               options={{ headerShown: false }} 
-              component={SignUpScreens} 
+              component={SignUpEmailScreens} 
+            />
+            <RootStack.Screen 
+              name="SignUpDetail" 
+              options={{ headerShown: false }} 
+              component={SignUpDetailScreens} 
             />
           </>
         ) : (
           <>
             <RootStack.Screen name="Home" options={{ headerShown: false }} component={HomeScreens} />
-            <RootStack.Screen name="mainPage" options={{ headerShown: false }} component={MainScreens} />
+            <RootStack.Screen name="mainPage" options={{ headerShown: false }} component={MainScreens}/>
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
             <RootStack.Screen name="ChatList" options={{ headerShown: false }} component={ChatList} />
             <RootStack.Screen name="Chat" options={{ headerShown: false }} component={Chat} />
