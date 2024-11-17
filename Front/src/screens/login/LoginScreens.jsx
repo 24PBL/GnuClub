@@ -11,7 +11,10 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
     // 회원가입 화면으로 이동하는 함수
     const goToSignupScreens = () => {
         navigation.navigate("SignUpEmail");
-        console.log("회원가입 인증 화면으로 이동");
+    };
+
+    const goTofindPW = () => {
+        navigation.navigate("findPW1");
     };
 
     // 로그인 요청을 처리하는 함수
@@ -58,7 +61,7 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
                     value={password} 
                     onChangeText={setPassword} // 비밀번호 상태 업데이트
                 />
-                <FindPW>
+                <FindPW onPress={goTofindPW}>
                     <Text style={{ fontSize: 13 }}>비밀번호 찾기</Text>
                 </FindPW>
                 <Separator />

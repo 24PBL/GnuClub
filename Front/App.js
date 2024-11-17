@@ -10,6 +10,8 @@ import ChatList from './src/screens/chat/ChatList';
 import Chat from './src/screens/chat/Chat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState, useEffect} from 'react'
+import findPW1 from './src/screens/findPW/findPW1';
+import findPW2 from './src/screens/findPW/findPW2';
 
 const RootStack = createNativeStackNavigator();
 
@@ -36,16 +38,10 @@ export default function App() {
               // setIsSignedIn을 LoginScreens에 전달
               children={(props) => <LoginScreens {...props} setIsSignedIn={setIsSignedIn} />} 
             />
-            <RootStack.Screen 
-              name="SignUpEmail" 
-              options={{ headerShown: false }} 
-              component={SignUpEmailScreens} 
-            />
-            <RootStack.Screen 
-              name="SignUpDetail" 
-              options={{ headerShown: false }} 
-              component={SignUpDetailScreens} 
-            />
+            <RootStack.Screen name="SignUpEmail" options={{ headerShown: false }} component={SignUpEmailScreens}/>
+            <RootStack.Screen name="SignUpDetail" options={{ headerShown: false }} component={SignUpDetailScreens}/>
+            <RootStack.Screen name="findPW1" options={{headerShown : false}} component={findPW1}/>
+            <RootStack.Screen name="findPW2" options={{headerShown : false}} component={findPW2}/>
           </>
         ) : (
           <>

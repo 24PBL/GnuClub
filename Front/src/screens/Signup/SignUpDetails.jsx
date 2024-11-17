@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, Alert, TouchableOpacity, FlatList, Switch, StyleSheet, View, ScrollView} from "react-native";
+import { Text, Alert, TouchableOpacity, FlatList, Switch, StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -117,7 +117,7 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
   const handleToggle = () => {
     setIsMale(previousState => {
       const newValue = !previousState;
-      setsex(newValue ? '남' : '여');
+      setsex(newValue ? 1 : 2);
       return newValue;
   });
   };
