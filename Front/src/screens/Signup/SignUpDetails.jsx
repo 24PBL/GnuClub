@@ -18,6 +18,8 @@ export default function SignUpDetails({ route, navigation }) {
   const [isCollegeListOpen, setIsCollegeListOpen] = useState(false); 
   const [major, setmajor] = useState(""); 
   const [sex, setsex] = useState(""); 
+  const [PError, setPError] = useState(""); 
+  
 
   const colleges = [
     '인문대학',
@@ -79,7 +81,7 @@ export default function SignUpDetails({ route, navigation }) {
   const signUp = async (name, email, studentId, PNumber, college, major, sex, defaultImg, PW) => {
     console.log("함수 정상 호출")
     try {
-      const response = await axios.post('http://172.30.1.85:3000/signup', {
+      const response = await axios.post('http://192.168.0.7:3000/signup', {
         userName: name,
         userEmail: email,
         userNum: studentId,
@@ -122,6 +124,16 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
   });
   };
 
+  // 비밀번호 유효성 검사
+  const PNumberError = (text) => {
+    setPNumber(text);
+    const PNumberRegex = /^010\d{8}$/;
+    if (!PNumberRegex.test(text)) {
+      setPError('잘못된 전화번호 형식입니다.');
+    } else {
+      setPError('');
+    }
+  };
   return (
     <SafeAreaProvider>
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
@@ -151,7 +163,8 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
       <StyledLabel>이름</StyledLabel>
       <SignInputBox2 placeholder="이름" placeholderTextColor="rgba(0,0,0,0.2)" onChangeText={setname} />
       <StyledLabel>전화번호</StyledLabel>
-      <SignInputBox2 placeholder="전화번호를 - 없이 입력하세요." placeholderTextColor="rgba(0,0,0,0.2)" onChangeText={setPNumber} />
+      <SignInputBox2 placeholder="전화번호를 - 없이 입력하세요." placeholderTextColor="rgba(0,0,0,0.2)" onChangeText={PNumberError} />
+      <Text style={{ color: "red" , marginLeft:50, marginTop:5}}>{PError}</Text>
 
       {/* 토글 버튼 */}
       <StyledLabel>단과 대학</StyledLabel>

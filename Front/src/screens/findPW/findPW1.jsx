@@ -23,7 +23,7 @@ export default function SignUpEmail({ navigation }) {
     }
 
     try {
-      await axios.post('http://172.30.1.85:3000/send-verification-code', { email: inputValue });
+      await axios.post('http://192.168.0.7:3000/send-verification-code', { email: inputValue });
       Alert.alert('인증 코드 전송', '인증 코드가 이메일로 전송되었습니다.');
     } catch (error) {
       console.error('인증 코드 요청 실패:', error);
@@ -37,7 +37,7 @@ export default function SignUpEmail({ navigation }) {
 
   const verifyCode = async () => {
     try {
-      await axios.post('http://172.30.1.85:3000/verify-code', {
+      await axios.post('http://192.168.0.7:3000/verify-code', {
         email: inputValue,
         code: verificationCode,
       });

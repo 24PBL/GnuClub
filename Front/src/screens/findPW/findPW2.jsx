@@ -40,7 +40,7 @@ useEffect(() => {
 
     try {
       // 이메일과 새 비밀번호를 서버로 보냄
-      const response = await axios.post('http://172.30.1.85:3000/update-password', {
+      const response = await axios.post('http://192.168.0.7:3000/update-password', {
         email,
         newPassword: PW
       });
