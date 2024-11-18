@@ -10,7 +10,7 @@ const ChatRoom = () => {
 
   useEffect(() => {
     // 서버와 연결
-    socket.current = io('http://192.168.0.7:3000');
+    socket.current = io('http://172.30.1.85:3000');
 
     // 서버로부터 메시지를 수신할 때
     socket.current.on('message', (message) => {
@@ -39,7 +39,7 @@ const ChatRoom = () => {
   const fetchUserInfo = async (token) => {
     // 여기에 사용자 정보를 가져오는 API를 호출하는 코드 추가
     // 예시: 서버에 JWT 토큰을 보내고 사용자 정보를 받아오는 API
-    const response = await fetch('http://192.168.0.7:3000/getUserInfo', {
+    const response = await fetch('http://172.30.1.85:3000/getUserInfo', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ const ChatRoom = () => {
     <GiftedChat
       messages={messages}
       onSend={(messages) => onSend(messages)}
-      user={user} // 동적으로 사용자 정보를 user prop에 전달
+      user={user}
     />
   );
 };

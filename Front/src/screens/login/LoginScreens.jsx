@@ -10,14 +10,17 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
 
     // 회원가입 화면으로 이동하는 함수
     const goToSignupScreens = () => {
-        navigation.navigate("SignUp");
-        console.log("회원가입 인증 화면으로 이동");
+        navigation.navigate("SignUpEmail");
+    };
+
+    const goTofindPW = () => {
+        navigation.navigate("findPW1");
     };
 
     // 로그인 요청을 처리하는 함수
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://192.168.0.7:3000/login", {
+            const response = await axios.post("http://172.30.1.85:3000/login", {
                 email,
                 password,
             });
@@ -58,7 +61,7 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
                     value={password} 
                     onChangeText={setPassword} // 비밀번호 상태 업데이트
                 />
-                <FindPW>
+                <FindPW onPress={goTofindPW}>
                     <Text style={{ fontSize: 13 }}>비밀번호 찾기</Text>
                 </FindPW>
                 <Separator />
