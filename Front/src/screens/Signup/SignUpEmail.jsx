@@ -84,8 +84,7 @@ const Container = styled.View`
   flex: 1;
   padding: 20px;
   justify-content: center;
-  border-width : 1px;
-  border-color : black;
+  background-color : white;
 `;
 
 const Label = styled.Text`
