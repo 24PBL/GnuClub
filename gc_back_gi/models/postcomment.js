@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('comment', {
+  return sequelize.define('postcomment', {
     commentId: {
       type: DataTypes.BIGINT,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true
     },
@@ -20,11 +21,12 @@ module.exports = function(sequelize, DataTypes) {
     },
     createAt: {
       type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'comment',
+    tableName: 'postcomment',
     timestamps: false,
     indexes: [
       {

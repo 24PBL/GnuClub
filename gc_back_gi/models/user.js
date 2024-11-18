@@ -27,25 +27,31 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    /*
     collage: {
       type: DataTypes.BIGINT,
-      //allowNull: false
+      allowNull: true
     },
     userLesson: {
       type: DataTypes.STRING(20),
-      //allowNull: false
+      allowNull: true
     },
+    */
     Field: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    /*
     userImg: {
       type: DataTypes.TEXT,
-      //allowNull: false
+      allowNull: true
     },
+    */
     createAt: {
       type: DataTypes.DATE,
-      allowNull: false
+      // 생성일자 자동 생성
+      defaultValue: Sequelize.NOW,
+      allowNull: true
     }
   }, {
     sequelize,

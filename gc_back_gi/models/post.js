@@ -3,6 +3,7 @@ module.exports = function(sequelize, DataTypes) {
   return sequelize.define('post', {
     postId: {
       type: DataTypes.BIGINT,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true
     },
@@ -24,6 +25,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     createAt: {
       type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW,
       allowNull: false
     }
   }, {

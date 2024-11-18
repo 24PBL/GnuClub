@@ -4,6 +4,7 @@ module.exports = function(sequelize, DataTypes) {
     clanId: {
       type: DataTypes.BIGINT,
       allowNull: false,
+      autoIncrement: true,
       primaryKey: true
     },
     clanName: {
@@ -20,6 +21,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     createAt: {
       type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW,
       allowNull: false
     }
   }, {

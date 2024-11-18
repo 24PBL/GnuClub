@@ -9,6 +9,18 @@ router.get("/user/data/read", function(req, res) {
     })
 })
 
+router.get("/club/data/read", function(req, res) {
+    db.clan.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
+router.get("/user-in-clan/data/read", function(req, res) {
+    db.userInClan.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
 router.get("/tempuser/data/read", function(req, res) {
     db.tempUser.findAll().then(function(result) {
         res.send({success:200, data:result});
