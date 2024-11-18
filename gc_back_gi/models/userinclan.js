@@ -12,18 +12,22 @@ module.exports = function(sequelize, DataTypes) {
     },
     clanId: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'clan',
+        key: 'clanId'
+      }
     },
-    memberId: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      allowNull: false
+    part: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   }, {
     sequelize,
     tableName: 'userinclan',
     timestamps: false,
-    indexes: [
+    id: false,
+    /*indexes: [
       {
         name: "PRIMARY",
         unique: true,
@@ -32,6 +36,6 @@ module.exports = function(sequelize, DataTypes) {
           { name: "userId" },
         ]
       },
-    ]
+    ]*/
   });
 };

@@ -35,14 +35,14 @@ exports.check_email = async (req, res, next) => {
                 host: "stmp.gmail.com",
                 port: 58184,
                 auth: {
-                    user: "발신 이메일 주소",
-                    pass: "앱비밀번호(계정비밀번호 아니고 앱 비밀번호입니다)"
+                    user: "clubgnu1@gmail.com",
+                    pass: "gnfugmuuufidmgow"
                 }
             });
 
-            var senderName = "gc Customer Center"
+            var senderName = "clubgnu1"
             await transporter.sendMail({
-                from: '"'+senderName+'" '+"발신 이메일 주소",
+                from: '"'+senderName+'" '+"clubgnu1@gmail.com",
                 to: [`${input_email}`],
                 subject: "gc앱 이메일 인증코드입니다.",
                 html: `<p>인증코드는 ${authentiCode}입니다.`,
@@ -95,10 +95,10 @@ exports.check_auth_code = async (req, res, next) => {
 // Field 필드의 경우 임시로 남자는 3, 여자는 4(주민번호 뒷부분 첫자리 규율대로 임시 테스트 예정.).
 // 비밀번호와 비밀번호 확인의 값이 같은지는 프론트에서 검증해주세요.)
 exports.fill_user_info = async (req, res, next) => {
-    const { nick, email, password } = req.body;
+    const { userName, email, password, userNum, userPhone, Field } = req.body;
     try {
         const hash = await bcrypt.hash(password, 12);
-        db.user.create({ userName: userName, email: email, password: hash, userNum: userNum, userPhone: userPhone, Field: field }).then(function(result){
+        db.user.create({ userName: userName, email: email, password: hash, userNum: userNum, userPhone: userPhone, Field: Field }).then(function(result){
             res.send({success:201, result:"회원가입성공"});
             //return res.redirect('/');
         })
@@ -132,14 +132,14 @@ exports.check_email_4_fpw = async (req, res, next) => {
                     host: "stmp.gmail.com",
                     port: 58184,
                     auth: {
-                        user: "발신 이메일 주소",
-                        pass: "앱비밀번호(계정비밀번호 아니고 앱 비밀번호입니다)"
+                        user: "clubgnu1@gmail.com",
+                        pass: "gnfugmuuufidmgow"
                     }
                 });
     
-                var senderName = "gc Customer Center"
+                var senderName = "clubgnu1"
                 await transporter.sendMail({
-                    from: '"'+senderName+'" '+"발신 이메일 주소",
+                    from: '"'+senderName+'" '+"clubgnu1@gmail.com",
                     to: [`${input_email}`],
                     subject: "gc앱 이메일 인증코드입니다.",
                     html: `<p>인증코드는 ${authentiCode}입니다.`,
@@ -215,13 +215,14 @@ exports.login = (req, res, next) => {
         }
         if (!user) {
             //return res.redirect(`/?error=${info.message}`);
+            return res.send({success:401, result: info.message});
         }
         return req.login(user, (loginError) => {
             if (loginError) {
                 console.error(loginError);
                 return next(loginError);
             }
-            //return res.redirect('/');
+            res.send({success:200, result: "로그인 성공"});
         });
     })(req, res, next);
 };
@@ -229,6 +230,6 @@ exports.login = (req, res, next) => {
 // 로그아웃 컨트롤러
 exports.logout = (req, res) => {
     req.logout(() => {
-        //res.redirect('/');
+        res.send({success:200, result: "로그아웃 성공"});
     });
 };

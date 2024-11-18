@@ -15,6 +15,8 @@ const authRouter = require('./routes/auth');
 // 테스트를 위한 라우터(값 확인)
 const testRouter = require('./routes/test');
 
+const clubRouter = require('./routes/club');
+
 const db = require('./models/db') 
 const passportConfig = require('./passport');
 
@@ -25,7 +27,7 @@ app.set('port', process.env.PORT || 8001);
 app.set('view engine', 'ejs');
 app.set('views', './views');
 
-app.use(helmet());
+//app.use(helmet());
 app.use(morgan('dev'));
 app.use('/public', express.static(__dirname + './public'));
 app.use(express.json());
@@ -50,6 +52,8 @@ app.use('/auth', authRouter);
 // 테스트를 위한 라우터(값 확인)
 app.use('/test', testRouter);
 
+app.use('/club', clubRouter);
+
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
     error.status = 404;
@@ -60,7 +64,8 @@ app.use((err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
     res.status(err.status || 500);
-    res.send({success:500, result: "error"});
+    //res.send({success:500, result: "error"});
+    res.send({success:500, result: err.message});
     //res.render('error');
 });
 
