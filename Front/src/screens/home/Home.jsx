@@ -19,13 +19,26 @@ function ClubScreens(){
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeScreens() {
+export default function HomeScreens({ setIsSignedIn }) {
   return (
       <Tab.Navigator>
-        <Tab.Screen name="Main" component={MainScreen} options={{tabBarIcon: ({ color, size}) => (<Ionicons name="home-outline" size={size} color = {color}/>), tabBarLabel : () => null, headerShown : false}}/>
+        <Tab.Screen name="Main" options={{ tabBarIcon: ({ color, size }) => (<Ionicons name="home-outline" size={size} color={color} />), tabBarLabel: () => null, headerShown: false }}>
+  {(props) => <MainScreen {...props} setIsSignedIn={setIsSignedIn} />}
+</Tab.Screen>
         <Tab.Screen name="Club" component={ClubScreens} options={{tabBarIcon: ({ color, size}) => (<Ionicons name="search-outline" size={size} color = {color}/>), tabBarLabel : () => null, headerShown : false}}/>
         <Tab.Screen name="ChatView" component={ChatScreen} options={{tabBarIcon: ({ color, size}) => (<Ionicons name="chatbubbles-outline" size={size} color = {color}/>), tabBarLabel : () => null, headerShown : false}}/>
-        <Tab.Screen name="MyPage" component={MyPageScreen} options={{tabBarIcon: ({ color, size}) => (<Ionicons name="ellipsis-horizontal-outline" size={size} color = {color}/>), tabBarLabel : () => null, headerShown : false}}/>
+        <Tab.Screen 
+          name="MyPage" 
+          options={{ 
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="ellipsis-horizontal-outline" size={size} color={color} />
+            ), 
+            tabBarLabel: () => null, 
+            headerShown: false 
+          }}
+        >
+          {(props) => <MyPageScreen {...props} setIsSignedIn={setIsSignedIn} />}
+        </Tab.Screen>
       </Tab.Navigator>
   );
 } 

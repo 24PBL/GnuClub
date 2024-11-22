@@ -19,6 +19,10 @@ export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
+    console.log('Current sign-in state:', isSignedIn);
+  }, [isSignedIn]);
+
+  useEffect(() => {
     // 토큰 확인
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('jwtToken');
@@ -45,8 +49,15 @@ export default function App() {
           </>
         ) : (
           <>
-            <RootStack.Screen name="Home" options={{ headerShown: false }} component={HomeScreens} />
-            <RootStack.Screen name="mainPage" options={{ headerShown: false }} component={MainScreens}/>
+            <RootStack.Screen 
+              name="home" 
+              options={{ headerShown: false }} 
+              children={(props) => <HomeScreens {...props} setIsSignedIn={setIsSignedIn} />} 
+            />
+            <RootStack.Screen 
+              name="mainPage" 
+              options={{ headerShown: false }} 
+              component={MainScreens} />
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
             <RootStack.Screen name="ChatList" options={{ headerShown: false }} component={ChatList} />
             <RootStack.Screen name="Chat" options={{ headerShown: false }} component={Chat} />

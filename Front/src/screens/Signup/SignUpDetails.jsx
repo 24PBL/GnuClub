@@ -17,7 +17,7 @@ export default function SignUpDetails({ route, navigation }) {
   const [college, setCollege] = useState(""); 
   const [isCollegeListOpen, setIsCollegeListOpen] = useState(false); 
   const [major, setmajor] = useState(""); 
-  const [sex, setsex] = useState(""); 
+  {/*const [sex, setsex] = useState(""); */}
   const [PError, setPError] = useState(""); 
   const [filteredMajors, setFilteredMajors] = useState([]); 
   const [isMajorListOpen, setIsMajorListOpen] = useState(false);
@@ -207,7 +207,7 @@ export default function SignUpDetails({ route, navigation }) {
     }
   };
 
-  const signUp = async (name, email, studentId, PNumber, college, major, sex, defaultImg, PW) => {
+  const signUp = async (name, email, studentId, PNumber, college, major, defaultImg, PW) => {
     console.log("함수 정상 호출")
     try {
       const response = await axios.post('http://192.168.0.7:3000/signup', {
@@ -217,7 +217,6 @@ export default function SignUpDetails({ route, navigation }) {
         userPhone: PNumber,
         college: college,
         userLesson : major,
-        Field : sex,
         userImg : defaultImg,
         userPW : PW
       });
@@ -243,7 +242,7 @@ const isFormValid = () => {
   return PW && CheckPW && name && (PW === CheckPW) && !HardPwError && studentId && PNumber && major && college;
 };
 
-const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
+{/*const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
 
   const handleToggle = () => {
     setIsMale(previousState => {
@@ -251,7 +250,7 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
       setsex(newValue ? 1 : 2);
       return newValue;
   });
-  };
+  };*/}
 
   // 비밀번호 유효성 검사
   const PNumberError = (text) => {
@@ -273,7 +272,7 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
     <Container>
       <Text style={{ fontSize: 30, fontWeight: 'bold', marginBottom: 20, paddingLeft: 50 }}>회원가입</Text>
 
-      <View style={styles2.container}>
+      {/*<View style={styles2.container}>
       <View style={styles2.toggleContainer}>
         <Switch
           value={isMale}
@@ -285,7 +284,7 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
       <Text style={styles2.selectedGender}>
         성별: {isMale ? '남' : '여'}
       </Text>
-      </View>
+      </View>*/}
 
       <StyledLabel>학번</StyledLabel>
       <SignInputBox2 placeholder="학번" placeholderTextColor="rgba(0,0,0,0.2)" onChangeText={setStudentId} />
@@ -358,7 +357,7 @@ const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
       />
       <Text style={[{color : "red", marginLeft:50, marginTop:5}, getPasswordInputStyle()]}>{PwError}</Text>
       <SignUpBox 
-                  onPress={() => signUp(name, email, studentId, PNumber,college,major,sex, defaultImg,PW )} 
+                  onPress={() => signUp(name, email, studentId, PNumber,college,major, defaultImg,PW )} 
                   disabled={!isFormValid()} 
                   style={{ opacity: isFormValid() ? 1 : 0.5 }} 
 >
