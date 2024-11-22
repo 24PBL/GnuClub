@@ -126,10 +126,10 @@ const uploadAvatar = async (imageUri) => {
             <Text style={styles.infoLabel}>학번: {userInfo.userNum}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>단과대학: {userInfo.userLesson}</Text>
+            <Text style={styles.infoLabel}>단과대학: {userInfo.college}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>학과: {userInfo.college}</Text>
+            <Text style={styles.infoLabel}>학과: {userInfo.userLesson}</Text>
           </View>
         </View>
       </View>
