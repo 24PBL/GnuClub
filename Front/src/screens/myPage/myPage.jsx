@@ -8,9 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyPage = ({ setIsSignedIn, navigation }) => {
 
-  const [avatarUri, setAvatarUri] = useState('https://via.placeholder.com/150'); // Default avatar placeholder
+  const [avatarUri, setAvatarUri] = useState(null); // Default avatar placeholder
   const [userInfo, setUserInfo] = useState(null);
-
 
   const goToAppList = () => {
     navigation.navigate("AppList");
@@ -53,8 +52,9 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
             const response = await axios.get('http://192.168.0.7:3000/user-info', {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            console.log('User Info:', response.data);
             setUserInfo(response.data); // 사용자 정보를 상태로 저장
-            setAvatarUri(response.data.userImg || 'https://via.placeholder.com/150');
+            setAvatarUri(response.data.userImg);
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         }
@@ -91,7 +91,10 @@ const uploadAvatar = async (imageUri) => {
 
       if (response.status === 200) {
           console.log('업로드 성공:', response.data);
-          setAvatarUri(response.data.imageUrl); // 새로운 이미지 URL로 업데이트
+
+          const newImageUrl = response.data.imageUrl;
+          setAvatarUri(newImageUrl);
+          await fetchUserInfo();
       } else {
           console.error('업로드 실패:', response.data);
       }
@@ -116,7 +119,7 @@ const uploadAvatar = async (imageUri) => {
         <View style={styles.avatarWrapper}>
           <Image
             style={styles.avatar}
-            source={{ uri: avatarUri }} // Updated to use selected image
+            source={{ uri: `${avatarUri}?t=${new Date().getTime()}` }} // Updated to use selected image
           />
           <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
             <Ionicons name="camera-outline" size={24} color="black" />
@@ -139,7 +142,6 @@ const uploadAvatar = async (imageUri) => {
         </View>
       </View>
 
-      <View style={{borderWidth:1, bordercolor:'gray', position:'absolute', left:0, right:0}}></View>
 
       <View style={styles.placeholderSection}>
         <Text style={{fontWeight:"bold", fontSize:18, marginLeft:20, marginBottom:12}}>내 동아리</Text>
