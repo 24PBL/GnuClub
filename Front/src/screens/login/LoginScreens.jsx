@@ -25,7 +25,7 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
                 password,
             });
             // 로그인 성공 시 토큰 저장 및 상태 업데이트
-            const { token } = response.data;
+            const { token} = response.data;
             console.log("로그인 성공:", token);
 
             await AsyncStorage.setItem('jwtToken', token);

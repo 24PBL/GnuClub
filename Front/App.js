@@ -12,6 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState, useEffect} from 'react'
 import findPW1 from './src/screens/findPW/findPW1';
 import findPW2 from './src/screens/findPW/findPW2';
+import AppList from './src/screens/myPage/AppList';
+import Notice from './src/screens/myPage/Notice';
+
 
 const RootStack = createNativeStackNavigator();
 
@@ -61,6 +64,8 @@ export default function App() {
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
             <RootStack.Screen name="ChatList" options={{ headerShown: false }} component={ChatList} />
             <RootStack.Screen name="Chat" options={{ headerShown: false }} component={Chat} />
+            <RootStack.Screen name="AppList" options={{ headerShown: false }} component={AppList} />
+            <RootStack.Screen name="Notice" options={{ headerShown: false }} component={Notice} />
           </>
         )}
       </RootStack.Navigator>

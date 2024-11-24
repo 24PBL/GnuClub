@@ -6,12 +6,20 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Temporary change for push
 
-const MyPage = ({ setIsSignedIn }) => {
+const MyPage = ({ setIsSignedIn, navigation }) => {
 
   const [avatarUri, setAvatarUri] = useState('https://via.placeholder.com/150'); // Default avatar placeholder
   const [userInfo, setUserInfo] = useState(null);
 
 
+  const goToAppList = () => {
+    navigation.navigate("AppList");
+  };
+
+
+  const goToNotice = () => {
+    navigation.navigate("Notice");
+  };
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('jwtToken');
@@ -94,14 +102,11 @@ const uploadAvatar = async (imageUri) => {
 
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       {/* Top Section */}
       <View style={styles.header}>
         <Text style={styles.pageTitle}>마이페이지</Text>
       </View>
-      <TouchableOpacity onPress={handleLogout}>
-          <Text style={{ color: 'red' }}>로그아웃</Text>
-        </TouchableOpacity>
       <TouchableOpacity style={styles.editButton}>
         <Text style={styles.editText}>수정</Text>
       </TouchableOpacity>
@@ -134,10 +139,38 @@ const uploadAvatar = async (imageUri) => {
         </View>
       </View>
 
+      <View style={{borderWidth:1, bordercolor:'gray', position:'absolute', left:0, right:0}}></View>
+
       <View style={styles.placeholderSection}>
-        <Text style={styles.placeholderText}>설정 기능정의 후 채우기</Text>
+        <Text style={{fontWeight:"bold", fontSize:18, marginLeft:20, marginBottom:12}}>내 동아리</Text>
+        <ScrollView style={{maxHeight:55}}horizontal contentContainerStyle={{ flexDirection: 'row' }}>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+          <TouchableOpacity style={styles.clanBox}/>
+        </ScrollView>
+        <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:25}} onPress={goToAppList}>
+          <Text style={{fontSize:18, fontWeight:'regular', width:107}}>신청내역확인</Text>
+          <Ionicons name="chevron-forward-outline" size={24} color="gray" />
+        </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}} onPress={goToNotice}>
+          <Text style={{fontSize:18, fontWeight:'regular', width:107}}>공지사항</Text>
+          <Ionicons name="chevron-forward-outline" size={24} color="gray" />
+        </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}}>
+          <Text style={{fontSize:18, fontWeight:'regular', width:107}}>알림</Text>
+          <Ionicons name="chevron-forward-outline" size={24} color="gray" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout} style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}}>
+          <Text style={{fontSize:18, fontWeight:'regular', width:107}}>로그아웃</Text>
+          <Ionicons name="log-out-outline" size={24}/>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -147,6 +180,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'space-between',
     backgroundColor: '#fff',
+    width : '100%'
   },
   header: {
     marginBottom: 1,
@@ -155,29 +189,30 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginLeft:20,
+    marginTop:25
   },
   editButton: {
     alignSelf: 'flex-end', 
     marginBottom: 15, 
   },
   editText: {
-    fontSize: 16,
-    color: 'blue',
+    fontSize: 14,
+    color: '#0091da',
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
     paddingBottom: 10,
   },
   avatarWrapper: {
     position: 'relative',
     marginRight: 20,
+    marginLeft: 28
   },
   avatar: {
-    width: 100,
+    width:100,
     height: 100,
     borderRadius: 60,
     backgroundColor: '#ddd',
@@ -198,20 +233,24 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   infoLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: 'bold',
     marginRight: 10
   },
   placeholderSection: {
-    height: 350,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
+    height : 480
   },
   placeholderText: {
     color: '#999',
   },
+  clanBox:{
+    borderRadius : 10,
+    width : 50,
+    height : 50,
+    marginLeft : 20,
+    backgroundColor : "#d9d9d9" 
+  },
+
 });
 
 export default MyPage;
