@@ -14,10 +14,12 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   const [userInfo, setUserInfo] = useState(null); //사용자 정보를 위한 상태
   const [isModalVisible, setIsModalVisible] = useState(false); //팝업창 상태
   const [college, setCollege] = useState(''); //단과대학 상태
-  const [major, setmajor] = useState(""); 
-  const [isCollegeListOpen, setIsCollegeListOpen] = useState(false);
+  const [major, setmajor] = useState(""); //학과 상태
+  const [isCollegeListOpen, setIsCollegeListOpen] = useState(false); //밑으로 쭉 토글 상태
   const [filteredMajors, setFilteredMajors] = useState([]);
   const [isMajorListOpen, setIsMajorListOpen] = useState(false);
+
+  const [originalUserInfo, setOriginalUserInfo] = useState(userInfo); // 수정 창에서 취소를 대비한 상태
 
 
   const colleges = [
@@ -169,6 +171,11 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
     '본부대학':[
     "휴먼헬스케어학과"]
     }
+  
+    const handleCancel = () => {
+      setUserInfo(originalUserInfo); // 취소 시 수정 전 정보 복원
+      closeModal();
+    };
 
   //선택 학과 업데이트
   const handleMajorSelect = (selectedMajor) => {
@@ -340,7 +347,7 @@ const uploadAvatar = async (imageUri) => {
   visible={isModalVisible}
   animationType="slide"
   transparent={true}
-  onRequestClose={closeModal} // 뒤로가기 누르면 모달 닫기
+  onRequestClose={handleCancel} //
 >
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
