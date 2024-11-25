@@ -172,10 +172,6 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
     "휴먼헬스케어학과"]
     }
   
-    const handleCancel = () => {
-      setUserInfo(originalUserInfo); // 취소 시 수정 전 정보 복원
-      closeModal();
-    };
 
   //선택 학과 업데이트
   const handleMajorSelect = (selectedMajor) => {
@@ -347,7 +343,7 @@ const uploadAvatar = async (imageUri) => {
   visible={isModalVisible}
   animationType="slide"
   transparent={true}
-  onRequestClose={handleCancel} //
+  onRequestClose={closeModal} //
 >
   <View style={styles.modalOverlay}>
     <View style={styles.modalContainer}>
