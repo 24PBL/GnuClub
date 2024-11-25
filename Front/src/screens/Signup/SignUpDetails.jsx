@@ -42,7 +42,8 @@ export default function SignUpDetails({ route, navigation }) {
     '본부대학',
   ];
 
-  const majors = [
+  const collegeMajorsMap = {
+    '인문대학':[
     "영어영문학부 영어영문학전공",
     "영어영문학부 영어전공",
     "국어국문학과",
@@ -53,7 +54,8 @@ export default function SignUpDetails({ route, navigation }) {
     "사학과",
     "중어중문학과",
     "철학과",
-    "한문학과",
+    "한문학과"],
+    '사회과학대학':[
     "경제학부",
     "사회복지학부",
     "미디어커뮤니케이션학과",
@@ -61,7 +63,8 @@ export default function SignUpDetails({ route, navigation }) {
     "심리학과",
     "아동가족학과",
     "정치외교학과",
-    "행정학과",
+    "행정학과"],
+    '자연과학대학':[
     "생명과학부",
     "물리학과",
     "수학과",
@@ -71,13 +74,15 @@ export default function SignUpDetails({ route, navigation }) {
     "제약공학과",
     "지질과학과",
     "항노화신소재과학과",
-    "화학과",
+    "화학과"],
+    '경영대학':[
     "경영학부",
     "회계세무학부",
     "경영정보학과",
     "국제통상학과",
     "산업경영학과",
-    "스마트유통물류학과",
+    "스마트유통물류학과"],
+    '공과대학':[
     "건축공학부",
     "기계공학부",
     "나노 신소재공학부 고분자공학전공",
@@ -90,7 +95,8 @@ export default function SignUpDetails({ route, navigation }) {
     "미래자동차공학과",
     "에너지공학과",
     "토목공학과",
-    "화학공학과",
+    "화학공학과"],
+    'IT공과대학':[
     "메카트로닉스공학부",
     "전자공학부",
     "반도체공학과",
@@ -98,8 +104,10 @@ export default function SignUpDetails({ route, navigation }) {
     "전기공학과",
     "제어로봇공학과",
     "컴퓨터공학과",
-    "AI정보공학과",
-    "항공우주공학부",
+    "AI정보공학과"],
+    '우주항공대학':[
+    "항공우주공학부"],
+    '농업생명과학대학':[
     "식품자원경제학과",
     "동물생명융합학부",
     "식품공학과",
@@ -112,8 +120,10 @@ export default function SignUpDetails({ route, navigation }) {
     "환경생명화학과",
     "환경재료과학과",
     "생물산업기계공학과",
-    "지역시스템공학과",
-    "법학과",
+    "지역시스템공학과"],
+    '법과대학':[
+    "법학과"],
+    '사범대학':[
     "교육학과",
     "국어교육과",
     "역사교육과",
@@ -129,12 +139,16 @@ export default function SignUpDetails({ route, navigation }) {
     "화학교육과",
     "미술교육과",
     "음악교육과",
-    "체육교육과",
+    "체육교육과"],
+    '수의과대학':[
     "수의예과",
-    "수의학과",
+    "수의학과"],
+    '의과대학':[
     "의예과",
-    "의학과",
-    "간호학과",
+    "의학과"],
+    '간호대학':[
+    "간호학과"],
+    '해양과학대학':[
     "해양수산경영학과",
     "미래산업융합학과",
     "수산생명의학과",
@@ -145,29 +159,44 @@ export default function SignUpDetails({ route, navigation }) {
     "조선해양공학과",
     "해양식품공학과",
     "해양토목공학과",
-    "해양환경공학과",
-    "약학과",
+    "해양환경공학과"],
+    '약학대학':[
+    "약학과"],
+    '건설환경공학대학':[
     "건설시스템공학과",
     "인테리어재료공학과",
     "조경학과",
     "환경공학과",
-    "디자인비즈니스학과",
-    "휴먼헬스케어학과"
-]
-  const handleMajorChange = (text) => {
-    setmajor(text);
-    if (text) {
-      const filtered = majors.filter((major) => major.includes(text)); 
-      setFilteredMajors(filtered);
-      setIsMajorListOpen(filtered.length > 0); 
-    } else {
-      setIsMajorListOpen(false); 
+    "디자인비즈니스학과"],
+    '본부대학':[
+    "휴먼헬스케어학과"]
     }
-  };
+
+    //선택 학과 업데이트
   const handleMajorSelect = (selectedMajor) => {
-    setmajor(selectedMajor);
-    setIsMajorListOpen(false); // 선택 후 토글 닫기
-  };
+      setmajor(selectedMajor); 
+      setIsMajorListOpen(false);
+    };
+
+  // 단과대학 선택 처리
+  const handleCollegeSelect = (selectedCollege) => {
+    setCollege(selectedCollege);
+    setFilteredMajors(collegeMajorsMap[selectedCollege] || []); // 선택된 단과 대학의 학과 리스트로 업데이트
+    setIsCollegeListOpen(false); 
+    setIsMajorListOpen(false); 
+};
+
+
+// 학과 필터링 (자동완성)
+const handleMajorChange = (text) => {
+  setmajor(text);
+  const filtered = (collegeMajorsMap[college] || []).filter((major) =>
+      major.includes(text)
+  );
+  setFilteredMajors(filtered); // 필터링된 리스트로 업데이트
+  setIsMajorListOpen(filtered.length > 0); // 자동완성 목록 표시
+};
+
 
 
   const getPasswordInputStyle = () => {
@@ -189,12 +218,6 @@ export default function SignUpDetails({ route, navigation }) {
     }
   }, [PW, CheckPW]);
   //비밀번호 확인
-
-  // 단과 대학 선택 처리
-  const handleCollegeSelect = (selectedCollege) => {
-    setCollege(selectedCollege);
-    setIsCollegeListOpen(false); // 선택 후 토글 닫기
-  };
 
   // 비밀번호 유효성 검사
   const handlePWChange = (text) => {
