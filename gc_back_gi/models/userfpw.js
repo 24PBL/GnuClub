@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('tempuser', {
+  return sequelize.define('userfpw', {
     idx: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'tempuser',
+    tableName: 'userfpw',
     timestamps: false,
     indexes: [
       {

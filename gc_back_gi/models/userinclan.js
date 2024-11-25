@@ -3,8 +3,8 @@ module.exports = function(sequelize, DataTypes) {
   return sequelize.define('userinclan', {
     userId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
       primaryKey: true,
+      allowNull: false,
       references: {
         model: 'user',
         key: 'userId'
@@ -20,22 +20,27 @@ module.exports = function(sequelize, DataTypes) {
     },
     part: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+      allowNull: false
+    }
   }, {
     sequelize,
     tableName: 'userinclan',
     timestamps: false,
-    id: false,
-    /*indexes: [
+    indexes: [
       {
-        name: "PRIMARY",
-        unique: true,
+        name: "FK_Clan_TO_UserInClan_1",
+        using: "BTREE",
+        fields: [
+          { name: "clanId" },
+        ]
+      },
+      {
+        name: "FK_User_TO_UserInClan_1",
         using: "BTREE",
         fields: [
           { name: "userId" },
         ]
       },
-    ]*/
+    ]
   });
 };

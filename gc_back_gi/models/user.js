@@ -2,18 +2,10 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('user', {
     userId: {
-      type: DataTypes.BIGINT,
       autoIncrement: true,
+      type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
-    },
-    email: {
-      type: DataTypes.STRING(250),
-      allowNull: false
-    },
-    password: {
-      type: DataTypes.STRING(250),
-      allwNull: false
     },
     userName: {
       type: DataTypes.STRING(10),
@@ -23,35 +15,39 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    userPhone: {
-      type: DataTypes.INTEGER,
+    userEmail: {
+      type: DataTypes.STRING(250),
       allowNull: false
     },
-    /*
-    collage: {
-      type: DataTypes.BIGINT,
-      allowNull: true
+    userPassword: {
+      type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    userPhone: {
+      type: DataTypes.STRING(13),
+      allowNull: false
     },
     userLesson: {
       type: DataTypes.STRING(20),
-      allowNull: true
+      allowNull: false
     },
-    */
     Field: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    /*
     userImg: {
       type: DataTypes.TEXT,
-      allowNull: true
+      defaultValue: "/public/default_profile.png",
+      allowNull: false
     },
-    */
     createAt: {
       type: DataTypes.DATE,
-      // 생성일자 자동 생성
       defaultValue: Sequelize.NOW,
-      allowNull: true
+      allowNull: false
+    },
+    collage: {
+      type: DataTypes.BIGINT,
+      allowNull: false
     }
   }, {
     sequelize,

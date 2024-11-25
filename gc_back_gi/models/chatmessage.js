@@ -39,6 +39,13 @@ module.exports = function(sequelize, DataTypes) {
           { name: "messageId" },
         ]
       },
+      {
+        name: "FK_User_TO_ChatMessage_1",
+        using: "BTREE",
+        fields: [
+          { name: "userId" },
+        ]
+      },
     ]
   });
 };

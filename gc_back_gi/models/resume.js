@@ -1,19 +1,27 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('post', {
-    postId: {
+  return sequelize.define('resume', {
+    idx: {
       autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
-    userId: {
+    userName: {
+      type: DataTypes.STRING(10),
+      allowNull: false
+    },
+    collage: {
       type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: 'user',
-        key: 'userId'
-      }
+      allowNull: false
+    },
+    userLesson: {
+      type: DataTypes.STRING(20),
+      allowNull: false
+    },
+    etc: {
+      type: DataTypes.TEXT,
+      allowNull: false
     },
     clanId: {
       type: DataTypes.BIGINT,
@@ -23,26 +31,17 @@ module.exports = function(sequelize, DataTypes) {
         key: 'clanId'
       }
     },
-    postHead: {
-      type: DataTypes.STRING(20),
+    userId: {
+      type: DataTypes.BIGINT,
       allowNull: false
     },
-    postBody: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
-    createAt: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW,
-      allowNull: false
-    },
-    isPublic: {
+    userPhone: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'post',
+    tableName: 'resume',
     timestamps: false,
     indexes: [
       {
@@ -50,18 +49,11 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "postId" },
+          { name: "idx" },
         ]
       },
       {
-        name: "FK_User_TO_post_1",
-        using: "BTREE",
-        fields: [
-          { name: "userId" },
-        ]
-      },
-      {
-        name: "FK_Clan_TO_post_1",
+        name: "FK_Clan_TO_resume_1",
         using: "BTREE",
         fields: [
           { name: "clanId" },

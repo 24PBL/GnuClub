@@ -2,9 +2,9 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('clan', {
     clanId: {
+      autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true
     },
     clanName: {
@@ -35,6 +35,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "clanId" },
+        ]
+      },
+      {
+        name: "FK_Class_TO_Clan_1",
+        using: "BTREE",
+        fields: [
+          { name: "clanclass" },
         ]
       },
     ]

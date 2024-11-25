@@ -27,4 +27,22 @@ router.get("/tempuser/data/read", function(req, res) {
     })
 })
 
+router.get("/resume/data/read", function(req, res) {
+    db.resume.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
+router.get("/postimg/data/read", function(req, res) {
+    db.postImg.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
+router.get("/post/data/read", function(req, res) {
+    db.post.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
 module.exports = router;

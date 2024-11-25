@@ -1,7 +1,7 @@
 var Sequelize = require("sequelize");
 var sequelize;
 
-sequelize = new Sequelize("DB이름", "root", "비밀번호", {
+sequelize = new Sequelize("db이름", "root", "db비밀번호", {
     host: "localhost",
     port: 3306,
     dialect: "mysql",
@@ -25,12 +25,12 @@ db.class = sequelize.import(__dirname + "/class.js")
 db.collage = sequelize.import(__dirname + "/collage.js")
 db.post = sequelize.import(__dirname + "/post.js")
 db.postImg = sequelize.import(__dirname + "/postimg.js")
-db.postComment = sequelize.import(__dirname + "/postcomment.js")
+db.comment = sequelize.import(__dirname + "/comment.js")
 db.notice = sequelize.import(__dirname + "/notice.js")
-db.noticeImg = sequelize.import(__dirname + "/noticeImg.js")
-db.noticeComment = sequelize.import(__dirname + "/noticecomment.js")
+db.noticeImg = sequelize.import(__dirname + "/noticeimg.js")
 db.userInClan = sequelize.import(__dirname + "/userinclan.js")
-db.user4fpw = sequelize.import(__dirname + "/user4fpw.js")
+db.user4fpw = sequelize.import(__dirname + "/userFpw.js")
+db.resume = sequelize.import(__dirname + "/resume.js")
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

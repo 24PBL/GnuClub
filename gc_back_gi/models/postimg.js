@@ -2,16 +2,29 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('postimg', {
     imgId: {
+      autoIncrement: true,
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
     postId: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: true,
+      references: {
+        model: 'post',
+        key: 'postId'
+      }
     },
     img: {
       type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    userId: {
+      type: DataTypes.BIGINT,
+      allowNull: false
+    },
+    clanId: {
+      type: DataTypes.BIGINT,
       allowNull: false
     }
   }, {
@@ -25,6 +38,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "imgId" },
+        ]
+      },
+      {
+        name: "FK_post_TO_postimg_1",
+        using: "BTREE",
+        fields: [
+          { name: "postId" },
         ]
       },
     ]

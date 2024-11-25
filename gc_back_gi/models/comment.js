@@ -1,19 +1,27 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('postcomment', {
+  return sequelize.define('comment', {
     commentId: {
-      type: DataTypes.BIGINT,
       autoIncrement: true,
+      type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true
     },
     postId: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'post',
+        key: 'postId'
+      }
     },
     userId: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'user',
+        key: 'userId'
+      }
     },
     comment: {
       type: DataTypes.STRING(255),
@@ -26,7 +34,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'postcomment',
+    tableName: 'comment',
     timestamps: false,
     indexes: [
       {
@@ -35,6 +43,20 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "commentId" },
+        ]
+      },
+      {
+        name: "FK_User_TO_comment_1",
+        using: "BTREE",
+        fields: [
+          { name: "userId" },
+        ]
+      },
+      {
+        name: "FK_post_TO_comment_1",
+        using: "BTREE",
+        fields: [
+          { name: "postId" },
         ]
       },
     ]
