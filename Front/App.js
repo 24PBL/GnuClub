@@ -12,10 +12,10 @@ import findPW1 from './src/screens/findPW/findPW1';
 import findPW2 from './src/screens/findPW/findPW2';
 import AppList from './src/screens/myPage/AppList';
 import Notice from './src/screens/myPage/Notice';
-import ClubDetail from './src/screens/clubDetail/clubDetail';
-import Board from './src/screens/clubDetail/board';
+import ClubDetail from './src/screens/clubDetail/ClubDetail';
+import Board from './src/screens/clubDetail/Board';
 import Application from './src/screens/clubDetail/Application';
-import CreatePost from './src/screens/clubDetail/createPost';
+import CreatePost from './src/screens/clubDetail/CreatePost';
 
 
 const RootStack = createNativeStackNavigator();
