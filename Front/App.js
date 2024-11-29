@@ -12,7 +12,6 @@ import findPW1 from './src/screens/findPW/findPW1';
 import findPW2 from './src/screens/findPW/findPW2';
 import AppList from './src/screens/myPage/AppList';
 import Notice from './src/screens/myPage/Notice';
-import ClubScreens from './src/screens/club/club';
 
 
 const RootStack = createNativeStackNavigator();
@@ -63,7 +62,6 @@ export default function App() {
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
             <RootStack.Screen name="AppList" options={{ headerShown: false }} component={AppList} />
             <RootStack.Screen name="Notice" options={{ headerShown: false }} component={Notice} />
-            <RootStack.Screen name="club" options={{ headerShown: false }} component={ClubScreens} />
           </>
         )}
       </RootStack.Navigator>
