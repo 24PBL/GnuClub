@@ -6,14 +6,13 @@ import SignUpEmailScreens from './src/screens/Signup/SignUpEmail';
 import SignUpDetailScreens from './src/screens/Signup/SignUpDetails';
 import MainScreens from './src/screens/mainPage/mainScreen';
 import MyPageScreens from './src/screens/myPage/myPage';
-import ChatList from './src/screens/chat/ChatList';
-import Chat from './src/screens/chat/Chat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState, useEffect} from 'react'
 import findPW1 from './src/screens/findPW/findPW1';
 import findPW2 from './src/screens/findPW/findPW2';
 import AppList from './src/screens/myPage/AppList';
 import Notice from './src/screens/myPage/Notice';
+import ClubScreens from './src/screens/club/club';
 
 
 const RootStack = createNativeStackNavigator();
@@ -62,10 +61,9 @@ export default function App() {
               options={{ headerShown: false }} 
               component={MainScreens} />
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
-            <RootStack.Screen name="ChatList" options={{ headerShown: false }} component={ChatList} />
-            <RootStack.Screen name="Chat" options={{ headerShown: false }} component={Chat} />
             <RootStack.Screen name="AppList" options={{ headerShown: false }} component={AppList} />
             <RootStack.Screen name="Notice" options={{ headerShown: false }} component={Notice} />
+            <RootStack.Screen name="club" options={{ headerShown: false }} component={ClubScreens} />
           </>
         )}
       </RootStack.Navigator>

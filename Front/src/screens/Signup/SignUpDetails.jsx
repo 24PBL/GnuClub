@@ -331,6 +331,7 @@ const isFormValid = () => {
     style={styles.dropdown}
     contentContainerStyle={{ paddingVertical: 10 }}
     nestedScrollEnabled={true} // 이 속성 추가
+    showsVerticalScrollIndicator={false}
   >
     {colleges.map((item, index) => (
       <TouchableOpacity
@@ -352,6 +353,8 @@ const isFormValid = () => {
         style={styles3.dropdown}
         contentContainerStyle={{ paddingVertical: 10 }}
         nestedScrollEnabled={true}
+        showsVerticalScrollIndicator={false} 
+
       >
         {filteredMajors.map((item, index) => (
           <TouchableOpacity

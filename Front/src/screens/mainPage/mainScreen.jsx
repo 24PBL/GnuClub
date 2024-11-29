@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, StyleSheet} from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,50 +10,103 @@ const MainScreen = () => {
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
     <View style={styles.logocontainer}>
     <Image style={styles.logo} source={require('../../logo/GC_LOGO.png')} />
-    <View style={{ position: 'relative', alignItems: 'center', marginLeft: 'auto', marginRight : 10}}>
+      <View style={{ position: 'relative', alignItems: 'center', marginLeft: 'auto', marginRight : 10, marginTop:5}}>
         <Ionicons name="notifications-outline" style={{ fontSize: 35, marginTop : 10 }} />
         <Badge 
             value="1" 
             status="error" 
             containerStyle={{ position: 'absolute', top: 5, right: -2 }}
         />
+      </View>
     </View>
-</View>
-
-    <ScrollView style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <View style={styles.banner}>
-        <Text style={styles.bannerText}>배너</Text>
+        <Text style={styles.bannerText}>배너자리</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>내 동아리</Text>
-        <View style={styles.clubContainer}>
-          <View style={styles.clubBox}>
-            <Text>동아리 사진</Text>
+        <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>동아리명</Text>
           </View>
-          <View style={styles.clubBox}>
-            <Text>동아리 사진</Text>
+          
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>동아리명</Text>
           </View>
-        </View>
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>동아리명</Text>
+          </View>
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>동아리명</Text>
+          </View>
+        </ScrollView>
       </View>
 
+      <View style={{height:10, backgroundColor:'#d9d9d9'}}></View>
 
       <View style={styles.section}>
+        <View style={{justifyContent:'space-between', flexDirection:'row'}}>
         <Text style={styles.sectionTitle}>홍보글</Text>
-        <View style={styles.promoContainer}>
-          <Image style={styles.promoImage} source={{ uri: 'https://example.com/image.jpg' }} />
-          <Text>홍보글 내용</Text>
+        <TouchableOpacity><Text style={{color:"#0091da", marginTop:10}}>더 보기</Text></TouchableOpacity></View>
+
+        <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>홍보글 제목</Text>
+          </View>
+          
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>홍보글 제목</Text>
+          </View>
+
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>홍보글 제목</Text>
+          </View>
+
+          <View style={{marginRight:20}}>
+          <TouchableOpacity style={styles.clubBox}>
+          </TouchableOpacity>
+          <Text style={{textAlign:'center'}}>홍보글 제목</Text>
+          </View>
+        </ScrollView>
         </View>
-      </View>
 
       <View style={styles.section}>
+      <View style={{justifyContent:'space-between', flexDirection:'row'}}>
         <Text style={styles.sectionTitle}>동아리 이모저모</Text>
-        <View style={styles.clubPhotoContainer}>
-          <Text>동아리 활동사진</Text>
-          <Text>동아리 활동사진</Text>
+        <TouchableOpacity><Text style={{color:"#0091da", marginLeft:-40, marginTop:10}}>더 보기</Text></TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={{justifyContent:'center', alignItems:'center', marginTop:12, marginBottom:10}}>
+          <Image style={styles.clubPhoto}></Image>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{justifyContent:'center', alignItems:'center', marginTop:12, marginBottom:10}}>
+          <Image style={styles.clubPhoto}></Image>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{justifyContent:'center', alignItems:'center', marginTop:12, marginBottom:10}}>
+          <Image style={styles.clubPhoto}></Image>
+        </TouchableOpacity>
+
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -69,6 +122,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#fff',
+    height : '91%'
   },
   banner: {
     height: 150,
@@ -84,20 +138,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 10
   },
   clubContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  clubBox: {
-    width: '48%',
-    height: 100,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: 'row'
   },
   promoContainer: {
     flexDirection: 'row',
@@ -108,10 +154,19 @@ const styles = StyleSheet.create({
     height: 100,
     marginRight: 10,
   },
-  clubPhotoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  clubBox:{
+    width:80, 
+    height:80, 
+    borderRadius:10, 
+    backgroundColor:'#d9d9d9'
   },
+  clubPhoto:{
+    width : 300,
+    height : 120,
+    borderRadius : 10,
+    backgroundColor : '#d9d9d9'
+  }
+
 });
 
 export default MainScreen;
