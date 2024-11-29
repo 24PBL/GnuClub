@@ -12,6 +12,10 @@ import findPW1 from './src/screens/findPW/findPW1';
 import findPW2 from './src/screens/findPW/findPW2';
 import AppList from './src/screens/myPage/AppList';
 import Notice from './src/screens/myPage/Notice';
+import ClubDetail from './src/screens/clubDetail/clubDetail';
+import Board from './src/screens/clubDetail/board';
+import Application from './src/screens/clubDetail/Application';
+import CreatePost from './src/screens/clubDetail/createPost';
 
 
 const RootStack = createNativeStackNavigator();
@@ -62,6 +66,10 @@ export default function App() {
             <RootStack.Screen name="myPage" options={{ headerShown: false }} component={MyPageScreens} />
             <RootStack.Screen name="AppList" options={{ headerShown: false }} component={AppList} />
             <RootStack.Screen name="Notice" options={{ headerShown: false }} component={Notice} />
+            <RootStack.Screen name="ClubDetail" options={{ headerShown: false }} component={ClubDetail} />
+            <RootStack.Screen name="Board" options={{ headerShown: false }} component={Board} />
+            <RootStack.Screen name="Application" options={{ headerShown: false }} component={Application} />
+            <RootStack.Screen name="CreatePost" options={{ headerShown: false }} component={CreatePost} />
           </>
         )}
       </RootStack.Navigator>
