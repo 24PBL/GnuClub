@@ -19,6 +19,8 @@ const clubRouter = require('./routes/club');
 
 const postRouter = require('./routes/post');
 
+const noticeRouter = require('./routes/notice');
+
 const db = require('./models/db') 
 const passportConfig = require('./passport');
 
@@ -49,6 +51,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+/*
 app.use(session({
     resave: false,
     saveUninitialized: false,
@@ -58,9 +61,10 @@ app.use(session({
         secure: false,
     },
 }));
+*/
 
 app.use(passport.initialize());
-app.use(passport.session());
+//app.use(passport.session());
 
 // app.use('/', pageRouter);
 app.use('/auth', authRouter);
@@ -71,6 +75,8 @@ app.use('/test', testRouter);
 app.use('/club', clubRouter);
 
 app.use('/post', postRouter);
+
+app.use('/notice', noticeRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

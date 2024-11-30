@@ -5,6 +5,7 @@ const db = require('../models/db');
 
 module.exports = () => {
     // 로그인 시 실행됨
+    /*
     passport.serializeUser((user, done) => {
         done(null, user.userId);
     });
@@ -16,7 +17,7 @@ module.exports = () => {
             .then(user => done(null, user))
             .catch(err => done(err));
     });
-
+    */
     local();
     //kakao();
 };

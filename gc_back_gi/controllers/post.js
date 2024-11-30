@@ -152,7 +152,14 @@ exports.sendPostData = async (req, res, next) => {
         }
 
         // 4. 존재하는 포스팅인지 확인
-        const exPost = await db.post.findOne({ where: { postId: reqPostID } });
+        const exPost = await db.post.findOne({ where: { postId: reqPostID },
+                                               include: [
+                                                {
+                                                    model: db.user,
+                                                    attributes: ['userId', 'username', 'userImg']
+                                                }
+                                            ] });
+                                            
         if ( !exPost ) {
             return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
         }
@@ -173,8 +180,18 @@ exports.sendPostData = async (req, res, next) => {
             exPost.dataValues.postImg = exPostImg;
         }
 
+        // 7. 포스트와 연동된 comment 객체들의 리스트를 추가
+        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+                                                        where: { postId: reqPostID },
+                                                        include: [
+                                                            {
+                                                                model: db.user,
+                                                                attributes: ['userId', 'username', 'userImg']
+                                                            }
+                                                        ]});
+
         // 7. 모든 무결성 검증 후 이상 없으면 프론트에 해당 포스트 데이터 전달
-        return res.status(200).send({ success: 200, result: exPost });
+        return res.status(200).send({ success: 200, resultPost: exPost, resultComment: commentList });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -376,6 +393,183 @@ exports.deletePost = async (req, res, next) => {
         await db.post.destroy({ where: { postId: reqPostID } });
 
         return res.status(200).send({ success: 200, result: "포스팅 삭제 성공" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.uploadComment = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+    const reqPostID = req.url.split("/")[3];
+
+    const comment = req.body.comment
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId !== req.user.userId) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 존재하는 포스팅인지 확인
+        const exPost = await db.post.findOne({ where: { postId: reqPostID } });
+        if ( !exPost ) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
+        }
+
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        // 5. 포스팅이 전체 공개인지 부원 공개인지 확인 후 부원 공개면 부원인지 아닌지 판정
+        if( exPost.isPublic === 0 && !memPart ) {
+            return res.status(403).send({ success: 403, result: "해당 게시글 열람 권한 없음" });
+        }
+
+        // 6. 모든 무결성 검증 후 comment 테이블 생성
+        const commentResult = await db.comment.create({
+            userId: reqUserID,
+            // clanId: reqClanID,
+            postId: reqPostID,
+            comment: comment
+        })
+
+        return res.status(201).send({ success: 201, result: "댓글 작성 성공" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.modifyComment = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+    const reqPostID = req.url.split("/")[3];
+    const reqCommentID = req.url.split("/")[4];
+
+    const comment = req.body.comment;
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId !== req.user.userId) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 존재하는 포스팅인지 확인
+        const exPost = await db.post.findOne({ where: { postId: reqPostID } });
+        if ( !exPost ) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
+        }
+
+        // 5. 존재하는 댓글인지 확인
+        const exComment = await db.comment.findOne({ where: { commentId: reqCommentID } });
+        if ( !exComment ) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 댓글" });
+        }
+
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        // 6. 포스팅이 전체 공개인지 부원 공개인지 확인 후 부원 공개면 부원인지 아닌지 판정
+        if( exPost.isPublic === 0 && !memPart ) {
+            return res.status(403).send({ success: 403, result: "해당 게시글 열람 권한 없음" });
+        }
+
+        // 7. 수정하려는 댓글에 대한 권한을 가지고 있는지 확인
+        if (exComment.userId !== parseInt(reqUserID) || exComment.commentId !== parseInt(reqCommentID)) {
+            return res.status(403).send({ success: 403, result: "해당 댓글 수정 권한 없음" });
+        }
+
+        // 8. 모든 무결성 검증 후 이상 없으면 포스팅 수정
+        const commentResult = await db.comment.update({ comment: comment }, {where: { commentId: reqCommentID }});
+
+
+        return res.status(200).send({ success: 200, result: "댓글 수정 성공" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.deleteComment = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+    const reqPostID = req.url.split("/")[3];
+    const reqCommentID = req.url.split("/")[4];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId !== req.user.userId) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 존재하는 포스팅인지 확인
+        const exPost = await db.post.findOne({ where: { postId: reqPostID } });
+        if ( !exPost ) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
+        }
+
+        // 5. 존재하는 댓글인지 확인
+        const exComment = await db.comment.findOne({ where: { commentId: reqCommentID } });
+        if ( !exComment ) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 댓글" });
+        }
+
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        // 6. 포스팅이 전체 공개인지 부원 공개인지 확인 후 부원 공개면 부원인지 아닌지 판정
+        if( exPost.isPublic === 0 && !memPart ) {
+            return res.status(403).send({ success: 403, result: "해당 게시글 열람 권한 없음" });
+        }
+
+        // 7. 삭제하려는 댓글에 대한 권한을 가지고 있는지 확인
+        if (exComment.userId !== parseInt(reqUserID) || exComment.commentId !== parseInt(reqCommentID)) {
+            return res.status(403).send({ success: 403, result: "해당 댓글 수정 권한 없음" });
+        }
+
+        await db.comment.destroy({ where: { commentId: reqCommentID } });
+
+        return res.status(200).send({ success: 200, result: "댓글 삭제 성공" });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
