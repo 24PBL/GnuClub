@@ -21,7 +21,7 @@ exports.afterUploadImage = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -69,7 +69,7 @@ exports.uploadPost = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -141,7 +141,7 @@ exports.sendPostData = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -211,7 +211,7 @@ exports.modifyImg = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -266,7 +266,7 @@ exports.modifyPost = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -354,7 +354,7 @@ exports.deletePost = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -414,7 +414,7 @@ exports.uploadComment = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -470,7 +470,7 @@ exports.modifyComment = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -531,7 +531,7 @@ exports.deleteComment = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 

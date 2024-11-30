@@ -21,7 +21,7 @@ exports.afterUploadImage = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -69,7 +69,7 @@ exports.uploadNotice = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -141,7 +141,7 @@ exports.sendNoticeData = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -201,7 +201,7 @@ exports.modifyImg = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -256,7 +256,7 @@ exports.modifyNotice = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -342,7 +342,7 @@ exports.deleteNotice = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 

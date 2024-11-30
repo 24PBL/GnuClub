@@ -14,7 +14,7 @@ exports.createClub = async (req, res, next) => {
             return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
         }
 
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -51,7 +51,7 @@ exports.applyClub = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -110,7 +110,7 @@ exports.applyList = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -154,7 +154,7 @@ exports.resumeInfo = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
@@ -205,7 +205,7 @@ exports.decideResume = async (req, res, next) => {
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
-        if (user.userId !== req.user.userId) {
+        if (user.userId.toString() !== req.user.id.toString()) {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
