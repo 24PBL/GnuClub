@@ -93,7 +93,7 @@ router.delete('/:userId/:clanId/:postId/delete-post', verifyJWT, deletePost);
 
 // 댓글 작성 라우터
 // POST /post/:userId/:clanId/:postId/upload-comment
-router.post('/:userId/:clanId/create-post/upload-comment', verifyJWT, upload2.none(), uploadComment);
+router.post('/:userId/:clanId/:postId/upload-comment', verifyJWT, upload2.none(), uploadComment);
 
 // 댓글 수정을 위한 라우터
 // PUT /post/:userId/:clanId/:postId/:commentId/modify-comment
@@ -101,6 +101,6 @@ router.put('/:userId/:clanId/:postId/:commentId/modify-comment', verifyJWT, uplo
 
 // 댓글을 삭제하는 라우터
 // delete /post/:userId/:clanId/:postId/delete-comment
-router.delete('/:userId/:clanId/:postId/:commentId/delete-post', verifyJWT, deleteComment);
+router.delete('/:userId/:clanId/:postId/:commentId/delete-comment', verifyJWT, deleteComment);
 
 module.exports = router;

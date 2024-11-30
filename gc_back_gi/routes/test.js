@@ -45,4 +45,9 @@ router.get("/post/data/read", function(req, res) {
     })
 })
 
+router.get("/comment/data/read", function(req, res) {
+    db.comment.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
 module.exports = router;
