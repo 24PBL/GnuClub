@@ -19,6 +19,27 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(225),
       allowNull: false
     },
+    clanImg: {
+      type: DataTypes.TEXT,
+      defaultValue: "/public/default_club_image.png",
+      allowNull: false
+    },
+    recruitPeriod: {
+      type: DataTypes.STRING(60),
+      allowNull: false
+    },
+    people: {
+      type: DataTypes.STRING(10),
+      allowNull: false
+    },
+    fee: {
+      type: DataTypes.STRING(10),
+      allowNull: false
+    },
+    interview: {
+      type: DataTypes.STRING(30),
+      allowNull: false
+    },
     createAt: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW,

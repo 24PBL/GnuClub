@@ -9,6 +9,43 @@ const path = require('path');
 // 사용할 때는 db 파일에 연결된 변수를 사용(db.user, db.tempUser 등) 이때 db.user, db.tempUser에는 각 DB 테이블에 해당하는 js파일이 연결됨.
 const db = require('../models/db');
 
+exports.beforeNotice = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 해당 동아리의 부원인지 검증
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+        if (!memPart) {
+            return res.status(403).send({ success: 403, result: "부원만 작성할 수 있음" });
+        }
+
+        // 4. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        return res.status(200).send({ success: 200, result: "공지사항 작성 가능" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
 exports.afterUploadImage = async (req, res, next) => {
     const reqUserID = req.url.split("/")[1];
     const reqClanID = req.url.split("/")[2];

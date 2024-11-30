@@ -3,7 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const { afterUploadImage, uploadPost, sendPostData, modifyImg, modifyPost, deletePost, uploadComment, modifyComment, deleteComment } = require('../controllers/post');
+const { beforePost, afterUploadImage, uploadPost, sendPostData, modifyImg, modifyPost, deletePost, uploadComment, modifyComment, deleteComment } = require('../controllers/post');
 const { isLoggedIn, verifyJWT } = require('../middlewares');
 
 const router = express.Router();
@@ -44,6 +44,10 @@ const upload = multer({
 });
 
 const upload2 = multer();
+
+// 게시글 작성 버튼 눌렀을 때 게시글 작성 가능한지 검증
+// GET /post/:userId/:clanId/before-post
+router.get('/:userId/:clanId/before-post', verifyJWT, beforePost);
 
 // 글 작성 중 이미지 업로드 요청 시 업로드된 이미지에 대한 정보를 클라이언트로 보냄
 // POST /post/:userId/:clanId/create-post/upload-image

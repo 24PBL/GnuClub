@@ -38,6 +38,16 @@ module.exports = function(sequelize, DataTypes) {
     userPhone: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    result: {
+      type: DataTypes.INTEGER,
+      defaultValue: 3,
+      allowNull: false
+    },
+    createAt: {
+      type: DataTypes.DATE,
+      defaultValue: Sequelize.NOW,
+      allowNull: false
     }
   }, {
     sequelize,
