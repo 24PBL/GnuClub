@@ -21,6 +21,8 @@ const postRouter = require('./routes/post');
 
 const noticeRouter = require('./routes/notice');
 
+const pageRouter = require('./routes/page');
+
 const db = require('./models/db') 
 const passportConfig = require('./passport');
 
@@ -77,6 +79,8 @@ app.use('/club', clubRouter);
 app.use('/post', postRouter);
 
 app.use('/notice', noticeRouter);
+
+app.use('/page', pageRouter);
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
