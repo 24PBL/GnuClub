@@ -40,9 +40,9 @@ useEffect(() => {
 
     try {
       // 이메일과 새 비밀번호를 서버로 보냄
-      const response = await axios.post('http://192.168.0.7:3000/update-password', {
-        email,
-        newPassword: PW
+      const response = await axios.put('http://10.0.2.2:8001/auth/find-password/modify-password', {
+        userEmail : email,
+        userPassword : PW
       });
 
       // 비밀번호 변경 성공 시 알림

@@ -45,7 +45,7 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: Sequelize.NOW,
       allowNull: false
     },
-    collage: {
+    college: {
       type: DataTypes.BIGINT,
       allowNull: false
     }

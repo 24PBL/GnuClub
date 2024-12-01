@@ -12,7 +12,7 @@ exports.check_email = async (req, res, next) => {
     try {
 
         // 중복 확인
-        const exUser = await db.user.findOne({ where: { email: input_email } });
+        const exUser = await db.user.findOne({ where: { userEmail: input_email } }); //email로 되있던거 userEmail로 수정
         if (exUser) {
             return res.status(403).send({ success: 403, result: "이미 가입한 유저" });
         }
@@ -75,6 +75,9 @@ exports.check_auth_code = async (req, res, next) => {
     const authCode = req.body.authCode;
 
     try {
+        console.log('요청 받은 이메일:', input_email);
+        console.log('요청 받은 인증 코드:', authCode);
+
         // 최대 4번까지 요청할 수 있는 이메일 요청 데이터를 일단 리스트로 모두 들고옴.
         const target_email = await db.tempUser.findAll({ where: { email: input_email } });
 
@@ -103,11 +106,13 @@ exports.check_auth_code = async (req, res, next) => {
 // 인증 코드 검증 완료 후 회원 가입 페이지(userId와 createAt 필드는 자동 생성, 현재 collage, userLesson, userImg 필드만 Null 허용,
 // Field 필드의 경우 임시로 남자는 3, 여자는 4(주민번호 뒷부분 첫자리 규율대로 임시 테스트 예정.).
 // 비밀번호와 비밀번호 확인의 값이 같은지는 프론트에서 검증해주세요.)
+
+//collage -> college로 수정**
 exports.fill_user_info = async (req, res, next) => {
-    const { userName, userEmail, userPassword, userNum, userPhone, collage, Field, userLesson } = req.body;
+    const { userName, userEmail, userPassword, userNum, userPhone, college, Field, userLesson } = req.body;
     try {
         const hash = await bcrypt.hash(userPassword, 12);
-        await db.user.create({ userName: userName, userEmail: userEmail, userPassword: hash, userNum: userNum, userPhone: userPhone, collage: collage, Field: Field, userLesson: userLesson });
+        await db.user.create({ userName: userName, userEmail: userEmail, userPassword: hash, userNum: userNum, userPhone: userPhone, college: college, Field: Field, userLesson: userLesson });
         return res.status(201).send({success:201, result:"회원가입성공"});
     } catch (error) {
         console.error(error);
@@ -120,7 +125,7 @@ exports.check_email_4_fpw = async (req, res, next) => {
     const input_email = req.body.email;
     try {
         // 존재하는 회원인지 확인
-        const exUser = await db.user.findOne({ where: { email: input_email } });
+        const exUser = await db.user.findOne({ where: { userEmail: input_email } }); //위와 동일하게 수정
         if (!exUser) {
             return res.status(403).send({ success: 403, result: "존재하지 않는 회원입니다." });
         }

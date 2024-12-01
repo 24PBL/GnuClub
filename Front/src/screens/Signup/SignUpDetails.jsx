@@ -230,10 +230,11 @@ const handleMajorChange = (text) => {
     }
   };
 
-  const signUp = async (name, email, studentId, PNumber, college, major, defaultImg, PW) => {
+  const signUp = async (name, email, studentId, PNumber, college, major, defaultImg, PW, sex) => {
     console.log("함수 정상 호출")
+    console.log(college)
     try {
-      const response = await axios.post('http://192.168.0.7:3000/signup', {
+      const response = await axios.post('http://10.0.2.2:8001/auth/join/fill-user-info', {
         userName: name,
         userEmail: email,
         userNum: studentId,
@@ -241,7 +242,8 @@ const handleMajorChange = (text) => {
         college: college,
         userLesson : major,
         userImg : defaultImg,
-        userPW : PW
+        userPassword : PW,
+        Field : sex
       });
       console.log('서버 응답' , response.data);
       navigation.navigate("Login");
@@ -265,16 +267,6 @@ const isFormValid = () => {
   return PW && CheckPW && name && (PW === CheckPW) && !HardPwError && studentId && PNumber && major && college;
 };
 
-{/*const [isMale, setIsMale] = useState(true); // 기본값을 '남'으로 설정
-
-  const handleToggle = () => {
-    setIsMale(previousState => {
-      const newValue = !previousState;
-      setsex(newValue ? 1 : 2);
-      return newValue;
-  });
-  };*/}
-
   // 비밀번호 유효성 검사
   const PNumberError = (text) => {
     setPNumber(text);
@@ -294,21 +286,6 @@ const isFormValid = () => {
   renderItem={() => (
     <Container>
       <Text style={{ fontSize: 30, fontWeight: 'bold', marginBottom: 20, paddingLeft: 50 }}>회원가입</Text>
-
-      {/*<View style={styles2.container}>
-      <View style={styles2.toggleContainer}>
-        <Switch
-          value={isMale}
-          onValueChange={handleToggle} // 토글 스위치 값 변경 시 호출되는 함수
-          trackColor={{ false: '#FF69B4', true: '#1E90FF' }} // 배경 색상 (여: 분홍, 남: 파랑)
-          thumbColor={isMale ? '#1E90FF' : '#FF69B4'} // 핸들 색상 (남: 파랑, 여: 분홍)
-        />
-      </View>
-      <Text style={styles2.selectedGender}>
-        성별: {isMale ? '남' : '여'}
-      </Text>
-      </View>*/}
-
       <StyledLabel>학번</StyledLabel>
       <SignInputBox2 placeholder="학번" placeholderTextColor="rgba(0,0,0,0.2)" onChangeText={setStudentId} />
       <StyledLabel>이름</StyledLabel>
@@ -383,7 +360,7 @@ const isFormValid = () => {
       />
       <Text style={[{color : "red", marginLeft:50, marginTop:5}, getPasswordInputStyle()]}>{PwError}</Text>
       <SignUpBox 
-                  onPress={() => signUp(name, email, studentId, PNumber,college,major, defaultImg,PW )} 
+                  onPress={() => signUp(name, email, studentId, PNumber,college,major, defaultImg,PW, 3 )} 
                   disabled={!isFormValid()} 
                   style={{ opacity: isFormValid() ? 1 : 0.5 }} 
 >

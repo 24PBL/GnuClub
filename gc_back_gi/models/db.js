@@ -1,7 +1,7 @@
 var Sequelize = require("sequelize");
 var sequelize;
 
-sequelize = new Sequelize("db이름", "root", "db비밀번호", {
+sequelize = new Sequelize("gc2", "root", "1234", {
     host: "localhost",
     port: 3306,
     dialect: "mysql",

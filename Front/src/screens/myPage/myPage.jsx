@@ -52,7 +52,7 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
     console.log('Token:', token); 
     if (token) {
         try {
-            const response = await axios.get('http://192.168.0.7:3000/user-info', {
+            const response = await axios.get('http://10.0.2.2:3000/user-info', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             console.log('User Info:', response.data);
@@ -88,7 +88,7 @@ const uploadAvatar = async (imageUri) => {
   console.log('FormData to upload:', formData)
 
   try {
-      const response = await axios.post('http://192.168.0.7:3000/update-avatar', formData, {
+      const response = await axios.post('http://10.0.2.2:3000/update-avatar', formData, {
           headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
