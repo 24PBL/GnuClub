@@ -3,7 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MainScreen from "../mainPage/mainScreen";
 import MyPageScreen from '../myPage/myPage';
-import ClubScreen from '../club/club';
+import ClubDetail from '../clubDetail/Application';
+import CreatePost from '../clubDetail/CreatePost';
 
 
 
@@ -23,21 +24,27 @@ const Tab = createBottomTabNavigator();
 export default function HomeScreens({ setIsSignedIn }) {
   return (
       <Tab.Navigator screenOptions={{tabBarStyle:{height:60}}}>
+
         <Tab.Screen name="Main" options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="home-outline" size={size} color={color} />
           <Text style={{ color, fontSize: 12, marginBottom : 4 }}>홈</Text>
         </View>), tabBarLabel: () => null, headerShown: false }}>
         {(props) => <MainScreen {...props} setIsSignedIn={setIsSignedIn} />}
       </Tab.Screen>
-        <Tab.Screen name="Search" component={SearchScreens} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
+
+      <Tab.Screen name="ClubDetail" options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="search-outline" size={size} color={color} />
-          <Text style={{ color, fontSize: 12, marginBottom : 4 }} numberOfLines={1}>찾기</Text>
-        </View>), tabBarLabel : () => null, headerShown : false}}/>
-        <Tab.Screen name="ClubScreen" component={ClubScreen} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
+          <Text style={{ color, fontSize: 12, marginBottom : 4 }}>찾기</Text>
+        </View>), tabBarLabel: () => null, headerShown: false }}>
+        {(props) => <ClubDetail {...props} setIsSignedIn={setIsSignedIn} />}
+      </Tab.Screen>
+
+        <Tab.Screen name="CreatePost" component={CreatePost} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
           <Ionicons style={{}}name="albums-outline" size={size} color={color} />
           <Text style={{color,fontSize: 12  , textAlign:'center', marginBottom:4}}>동아리
           </Text>
         </View>), tabBarLabel : () => null, headerShown : false}}/>
+
         <Tab.Screen 
           name="MyPage" 
           options={{ 

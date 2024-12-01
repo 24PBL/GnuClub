@@ -44,7 +44,7 @@ export default function SignUpEmail({ navigation }) {
     }
 
     try {
-      await axios.post('http://192.168.0.7:3000/send-verification-code', { email: inputValue });
+      await axios.post('http://10.0.2.2:8001/auth/join/check-email', { email: inputValue });
       Alert.alert('인증 코드 전송', '인증 코드가 이메일로 전송되었습니다.');
       setTimer(180); // 3분(180초) 설정
       setIsRequestDisabled(true); // 요청 버튼 비활성화
@@ -60,12 +60,12 @@ export default function SignUpEmail({ navigation }) {
 
   const verifyCode = async () => {
     try {
-      await axios.post('http://192.168.0.7:3000/verify-code', {
+      await axios.post('http://10.0.2.2:8001/auth/join/check-auth-code', {
         email: inputValue,
-        code: verificationCode,
+        authCode: verificationCode,
       });
-      Alert.alert('인증 성공', '이메일 인증이 완료되었습니다.');
-      setIsCodeVerified(true); // 이메일을 다음 화면으로 전달
+        Alert.alert('인증 성공', '이메일 인증이 완료되었습니다.');
+        setIsCodeVerified(true);
     } catch (error) {
       console.error('인증 코드 확인 실패:', error);
       Alert.alert('오류', '유효하지 않은 인증 코드입니다.');

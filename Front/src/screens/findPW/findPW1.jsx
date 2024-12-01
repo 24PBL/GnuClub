@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Alert, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, Text} from 'react-native';
 import styled from 'styled-components';
 import axios from 'axios';
 
-export default function SignUpEmail({ navigation }) {
+export default function findPW1({ navigation }) {
   const [inputValue, setInputValue] = useState('');
   const [emailError, setEmailError] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
+  const [timer, setTimer] = useState(0); // 타이머 (초 단위)
 
   const Regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -16,6 +17,24 @@ export default function SignUpEmail({ navigation }) {
     setEmailError('');
   };
 
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // 타이머 로직
+  useEffect(() => {
+    if (timer > 0) {
+      const countdown = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(countdown); // 컴포넌트 언마운트 시 클리어
+    } else if (timer === 0) {
+      setIsCodeVerified(false); // 타이머가 끝나면 버튼 비활성화
+    }
+  }, [timer]);
+
   const handleSubmit = async () => {
     if (!Regex.test(inputValue)) {
       setEmailError('올바른 이메일 형식이 아닙니다.');
@@ -23,8 +42,9 @@ export default function SignUpEmail({ navigation }) {
     }
 
     try {
-      await axios.post('http://192.168.0.7:3000/send-verification-code', { email: inputValue });
+      await axios.post('http://10.0.2.2:8001/auth/find-password/check-email-4-fpw', { email: inputValue });
       Alert.alert('인증 코드 전송', '인증 코드가 이메일로 전송되었습니다.');
+      setTimer(180); // 3분(180초) 설정
     } catch (error) {
       console.error('인증 코드 요청 실패:', error);
       Alert.alert('오류', '인증 코드 전송에 실패했습니다.');
@@ -37,9 +57,9 @@ export default function SignUpEmail({ navigation }) {
 
   const verifyCode = async () => {
     try {
-      await axios.post('http://192.168.0.7:3000/verify-code', {
+      await axios.post('http://10.0.2.2:8001/auth/find-password/check-auth-code-4-fpw', {
         email: inputValue,
-        code: verificationCode,
+        authCode: verificationCode,
       });
       Alert.alert('인증 성공', '이메일 인증이 완료되었습니다.');
       setIsCodeVerified(true); // 이메일을 다음 화면으로 전달
@@ -70,6 +90,7 @@ export default function SignUpEmail({ navigation }) {
                         <Text style={{ color: '#0091DA', fontSize: 17 }}>확인</Text>
                     </TouchbleBox>
                 </TextAndTouch>
+                {timer > 0 && <TimerText style={{}}>인증시간 : {formatTime(timer)}</TimerText>}
                 <SignBox
                     onPress={nextSign}
                     disabled={!isCodeVerified} // 인증 여부에 따라 비활성화
@@ -145,3 +166,10 @@ export const SignText = styled.Text`
     color: white;
     font-weight: bold;
 `;
+
+const TimerText = styled.Text`
+  color: red;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
+`

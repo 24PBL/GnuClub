@@ -20,7 +20,7 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
     // 로그인 요청을 처리하는 함수
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://192.168.0.7:3000/login", {
+            const response = await axios.post("http://10.0.2.2:3000/login", {
                 email,
                 password,
             });

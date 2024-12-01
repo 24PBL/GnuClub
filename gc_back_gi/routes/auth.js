@@ -13,7 +13,7 @@ router.get('/verify-login-status', verifyLoginStatus);
 router.post('/join/check-email', isNotLoggedIn, check_email);
 
 // POST /auth/join/check-auth-code
-router.post('/join/check_auth_code', isNotLoggedIn, check_auth_code);
+router.post('/join/check-auth-code', isNotLoggedIn, check_auth_code); //언더바로 되있던거 -로 수정
 
 // POST /auth/join/fill-user-info
 router.post('/join/fill-user-info', isNotLoggedIn, fill_user_info);
@@ -22,10 +22,10 @@ router.post('/join/fill-user-info', isNotLoggedIn, fill_user_info);
 router.post('/find-password/check-email-4-fpw', isNotLoggedIn, check_email_4_fpw);
 
 // POST /auth/find-password/check-auth-code-4-fpw
-router.post('/find-password/check-auth-code-4-fpw', isNotLoggedIn, check_auth_code_4_fpw);
+router.post('/find-password/check-auth-code-4-fpw', isNotLoggedIn, check_auth_code_4_fpw); 
 
 // PUT /auth/find-password/modify-password
-router.post('/find-password/modify-password', isNotLoggedIn, modify_user_pw);
+router.put('/find-password/modify-password', isNotLoggedIn, modify_user_pw); //주석은 put 라우터 경로는 post라고 되어있길래 일단 수정
 
 // POST /auth/login
 router.post('/login', isNotLoggedIn, login);
