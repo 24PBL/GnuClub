@@ -395,9 +395,11 @@ exports.deleteNotice = async (req, res, next) => {
             return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
         }
 
-        // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인
+        // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인(리더는 모든 글 삭제 가능)
         if (exNotice.userId !== parseInt(reqUserID) || exNotice.clanId !== parseInt(reqClanID)) {
-            return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음" });
+            if(memPart !== 1) {
+                return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음" });
+            }
         }
 
         // 6. 포스팅에 이미지가 포함되어 있는지 확인 후 있으면 noticeImg 테이블과 이미지 파일 삭제

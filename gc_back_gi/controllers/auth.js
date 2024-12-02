@@ -66,7 +66,7 @@ exports.check_email = async (req, res, next) => {
         }
 
         // 인증코드 6자리 생성(10만 단위의 랜덤 수를 생성함.)
-        let authentiCode = parseInt(Math.random() * 900000);
+        let authentiCode = parseInt(Math.random() * 999999);
 
         async function sendMail() {
             var transporter =  nodemailer.createTransport({
@@ -174,7 +174,7 @@ exports.check_email_4_fpw = async (req, res, next) => {
         }
 
         // 인증코드 6자리 생성(10만 단위의 랜덤 수를 생성함.)
-        let authentiCode = parseInt(Math.random() * 900000);
+        let authentiCode = parseInt(Math.random() * 99999);
 
         async function sendMail4fpw() {
             var transporter =  nodemailer.createTransport({
