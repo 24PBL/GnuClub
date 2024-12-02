@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, Alert, TouchableOpacity, FlatList, Switch, StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform} from "react-native";
+import { Text, Alert, TouchableOpacity, FlatList, StyleSheet, View, ScrollView} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -14,15 +14,16 @@ export default function SignUpDetails({ route, navigation }) {
   const [HardPwError, setHardPwError] = useState("");
   const [PNumber, setPNumber] = useState("");
   const [PwError, setPwError] = useState("");
-  const [college, setCollege] = useState(""); 
-  const [isCollegeListOpen, setIsCollegeListOpen] = useState(false); 
+  const [collage, setcollage] = useState(""); 
+  const [iscollageListOpen, setIscollageListOpen] = useState(false); 
   const [major, setmajor] = useState(""); 
   {/*const [sex, setsex] = useState(""); */}
   const [PError, setPError] = useState(""); 
   const [filteredMajors, setFilteredMajors] = useState([]); 
   const [isMajorListOpen, setIsMajorListOpen] = useState(false);
+  const [collageNum, setcollageNum] = useState(false);
 
-  const colleges = [
+  const collages = [
     '인문대학',
     '사회과학대학',
     '자연과학대학',
@@ -42,7 +43,7 @@ export default function SignUpDetails({ route, navigation }) {
     '본부대학',
   ];
 
-  const collegeMajorsMap = {
+  const collageMajorsMap = {
     '인문대학':[
     "영어영문학부 영어영문학전공",
     "영어영문학부 영어전공",
@@ -179,10 +180,12 @@ export default function SignUpDetails({ route, navigation }) {
     };
 
   // 단과대학 선택 처리
-  const handleCollegeSelect = (selectedCollege) => {
-    setCollege(selectedCollege);
-    setFilteredMajors(collegeMajorsMap[selectedCollege] || []); // 선택된 단과 대학의 학과 리스트로 업데이트
-    setIsCollegeListOpen(false); 
+  const handlecollageSelect = (selectedcollage) => {
+    const selectedIndex = collages.indexOf(selectedcollage);
+    setcollage(selectedcollage)
+    setcollageNum(selectedIndex);
+    setFilteredMajors(collageMajorsMap[selectedcollage] || []); // 선택된 단과 대학의 학과 리스트로 업데이트
+    setIscollageListOpen(false); 
     setIsMajorListOpen(false); 
 };
 
@@ -190,7 +193,7 @@ export default function SignUpDetails({ route, navigation }) {
 // 학과 필터링 (자동완성)
 const handleMajorChange = (text) => {
   setmajor(text);
-  const filtered = (collegeMajorsMap[college] || []).filter((major) =>
+  const filtered = (collageMajorsMap[collage] || []).filter((major) =>
       major.includes(text)
   );
   setFilteredMajors(filtered); // 필터링된 리스트로 업데이트
@@ -230,20 +233,19 @@ const handleMajorChange = (text) => {
     }
   };
 
-  const signUp = async (name, email, studentId, PNumber, college, major, defaultImg, PW, sex) => {
+  const signUp = async (name, email, PW, studentId, PNumber, collage, sex, major) => {
     console.log("함수 정상 호출")
-    console.log(college)
+    console.log(collage)
     try {
       const response = await axios.post('http://10.0.2.2:8001/auth/join/fill-user-info', {
         userName: name,
         userEmail: email,
+        userPassword : PW,
         userNum: studentId,
         userPhone: PNumber,
-        college: college,
-        userLesson : major,
-        userImg : defaultImg,
-        userPassword : PW,
-        Field : sex
+        collage: collage,
+        Field : sex,
+        userLesson : major
       });
       console.log('서버 응답' , response.data);
       navigation.navigate("Login");
@@ -264,7 +266,7 @@ const handleMajorChange = (text) => {
 const defaultImg = 'https://s3-alpha-sig.figma.com/img/3c10/d706/e1dde50927ea1403189349f292313bd2?Expires=1732492800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=lvuUK2DIXm70dWGPhnxMXLc7xLZL~S1idKyJWkZaktXElDK~UbVTzB6R3mtGP9ZZFlaXn2RWGBi3yZ53QLyH3OzSs2FANSbUpkCcuu8D-VZM9uFmP9RoEF5M-~6VqKMsOKdszMTqY3jhrxwAZ6mmFDUJHuEnnAV6qg4dFYJe3s5-J94bt-8AlMayuc1HSWlEdN1rvsarkHwy-zVtCly1o35xNUeUlIDF3A-Xf8sCxQLpiV7jVd7KlEEcgOVtxz8Zf1xT5iuFzVa6-s3OWddnwJO6sFY4xFwl8zK-StoEW~l-j2E2wSST1Fm5FAqgE1m2ZErKY65rd0J7dhF35-qeQA__';
 
 const isFormValid = () => {
-  return PW && CheckPW && name && (PW === CheckPW) && !HardPwError && studentId && PNumber && major && college;
+  return PW && CheckPW && name && (PW === CheckPW) && !HardPwError && studentId && PNumber && major && collage;
 };
 
   // 비밀번호 유효성 검사
@@ -296,25 +298,25 @@ const isFormValid = () => {
 
       {/* 토글 버튼 */}
       <StyledLabel>단과 대학</StyledLabel>
-      <TouchableOpacity onPress={() => setIsCollegeListOpen(!isCollegeListOpen)} style={styles.toggleButton}>
+      <TouchableOpacity onPress={() => setIscollageListOpen(!iscollageListOpen)} style={styles.toggleButton}>
         <Text style={styles.toggleButtonText}>
-          {college ? college : '단과 대학 선택'}
+          {collage ? collage : '단과 대학 선택'}
         </Text>
       </TouchableOpacity>
 
       {/* 단과 대학 리스트 */}
-      {isCollegeListOpen && (
+      {iscollageListOpen && (
   <ScrollView
     style={styles.dropdown}
     contentContainerStyle={{ paddingVertical: 10 }}
     nestedScrollEnabled={true} // 이 속성 추가
     showsVerticalScrollIndicator={false}
   >
-    {colleges.map((item, index) => (
+    {collages.map((item, index) => (
       <TouchableOpacity
         key={index}
         style={[styles.listItem, { width: 270 }]}
-        onPress={() => handleCollegeSelect(item)}
+        onPress={() => handlecollageSelect(item)}
       >
         <Text style={styles.listItemText}>{item}</Text>
       </TouchableOpacity>
@@ -360,7 +362,7 @@ const isFormValid = () => {
       />
       <Text style={[{color : "red", marginLeft:50, marginTop:5}, getPasswordInputStyle()]}>{PwError}</Text>
       <SignUpBox 
-                  onPress={() => signUp(name, email, studentId, PNumber,college,major, defaultImg,PW, 3 )} 
+                  onPress={() => signUp(name, email, PW, studentId, PNumber, collageNum ,3 , major )} 
                   disabled={!isFormValid()} 
                   style={{ opacity: isFormValid() ? 1 : 0.5 }} 
 >

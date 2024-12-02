@@ -1,8 +1,8 @@
-import { Text, Alert } from 'react-native';
+import { Text, Alert} from 'react-native';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreens({ navigation, setIsSignedIn }) {
     const [email, setEmail] = useState('');
@@ -20,17 +20,31 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
     // 로그인 요청을 처리하는 함수
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://10.0.2.2:3000/login", {
-                email,
-                password,
+            const TokenResponse = await axios.post("http://10.0.2.2:8001/auth/login", {
+                userEmail : email,
+                userPassword : password,
             });
             // 로그인 성공 시 토큰 저장 및 상태 업데이트
-            const { token} = response.data;
+            const token = TokenResponse.data.accessToken
             console.log("로그인 성공:", token);
 
-            await AsyncStorage.setItem('jwtToken', token);
+            await SecureStore.setItem('jwtToken', token);
+            const jwtToken = await SecureStore.getItem('jwtToken')
             //토큰 저장
+            const res1 = await axios.get("http://10.0.2.2:8001/auth/verify-login-status",{
+                headers: {
+                    Authorization: `Bearer ${jwtToken}`,  // 'Bearer ' + 토큰
+                }
+            });
 
+            console.log(res1.data.user.id)
+            
+            const res2 = await axios.get(`http://10.0.2.2:8001/page/home/${res1.data.user.id}`,{
+                headers: {
+                    Authorization: `Bearer ${jwtToken}`, 
+                }
+            });
+            console.log('토큰 반환 응답',res2.data)
             setIsSignedIn(true); // 로그인 상태를 업데이트
             
         } catch (error) {

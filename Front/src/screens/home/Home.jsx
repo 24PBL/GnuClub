@@ -39,7 +39,7 @@ export default function HomeScreens({ setIsSignedIn }) {
         {(props) => <ClubDetail {...props} setIsSignedIn={setIsSignedIn} />}
       </Tab.Screen>
 
-        <Tab.Screen name="CreatePost" component={CreatePost} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
+        <Tab.Screen name="CreatePost" component={SearchScreens} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
           <Ionicons style={{}}name="albums-outline" size={size} color={color} />
           <Text style={{color,fontSize: 12  , textAlign:'center', marginBottom:4}}>동아리
           </Text>

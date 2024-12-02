@@ -148,12 +148,12 @@ exports.check_auth_code = async (req, res, next) => {
 // Field 필드의 경우 임시로 남자는 3, 여자는 4(주민번호 뒷부분 첫자리 규율대로 임시 테스트 예정.).
 // 비밀번호와 비밀번호 확인의 값이 같은지는 프론트에서 검증해주세요.)
 
-//collage -> college로 수정**
+
 exports.fill_user_info = async (req, res, next) => {
-    const { userName, userEmail, userPassword, userNum, userPhone, college, Field, userLesson } = req.body;
+    const { userName, userEmail, userPassword, userNum, userPhone, collage, Field, userLesson } = req.body;
     try {
         const hash = await bcrypt.hash(userPassword, 12);
-        await db.user.create({ userName: userName, userEmail: userEmail, userPassword: hash, userNum: userNum, userPhone: userPhone, college: college, Field: Field, userLesson: userLesson });
+        await db.user.create({ userName: userName, userEmail: userEmail, userPassword: hash, userNum: userNum, userPhone: userPhone, collage: collage, Field: Field, userLesson: userLesson });
         return res.status(201).send({success:201, result:"회원가입성공"});
     } catch (error) {
         console.error(error);

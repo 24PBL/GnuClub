@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView} from 'reac
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import styled from 'styled-components/native';
 
 
@@ -23,7 +23,7 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   };
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('jwtToken');
+      await SecureStore.removeItem('jwtToken');
       setIsSignedIn(false);
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
@@ -48,11 +48,11 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   
   //토큰 기반 사용자 정보 가져오기
   const fetchUserInfo = async () => {
-    const token = await AsyncStorage.getItem('jwtToken');
+    const token = await SecureStore.getItem('jwtToken');
     console.log('Token:', token); 
     if (token) {
         try {
-            const response = await axios.get('http://10.0.2.2:3000/user-info', {
+            const response = await axios.get('http://10.0.2.2:8001/page/mypage/:userId', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             console.log('User Info:', response.data);
@@ -76,7 +76,7 @@ if (!userInfo) {
 
 //서버에 프로필 사진 전송
 const uploadAvatar = async (imageUri) => {
-  const token = await AsyncStorage.getItem('jwtToken');
+  const token = await SecureStore.getItem('jwtToken');
   const formData = new FormData();
 
   formData.append('avatar', {
@@ -88,7 +88,7 @@ const uploadAvatar = async (imageUri) => {
   console.log('FormData to upload:', formData)
 
   try {
-      const response = await axios.post('http://10.0.2.2:3000/update-avatar', formData, {
+      const response = await axios.post('http://10.0.2.2:8001/update-avatar', formData, {
           headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
