@@ -4,7 +4,10 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Badge } from '@rneui/themed';
 import { Ionicons } from '@expo/vector-icons';
 
+
 const MainScreen = () => {
+
+
   return (
     <SafeAreaProvider>
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
@@ -22,7 +25,7 @@ const MainScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <View style={styles.banner}>
-        <Text style={styles.bannerText}>배너자리</Text>
+        <Text style={styles.bannerText}>userData.user</Text>
       </View>
 
       <View style={styles.section}>

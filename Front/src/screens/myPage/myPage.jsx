@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 
 
@@ -12,6 +15,8 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
 
   const [avatarUri, setAvatarUri] = useState(null); //프로필 설정을 위한 상태
   const [userInfo, setUserInfo] = useState(null); //사용자 정보를 위한 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
+
 
   const goToAppList = () => {
     navigation.navigate("AppList");
@@ -20,15 +25,17 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
 
   const goToNotice = () => {
     navigation.navigate("Notice");
-  };
+  };//공지사항 이동
+
+
   const handleLogout = async () => {
     try {
-      await SecureStore.removeItem('jwtToken');
+      await AsyncStorage.removeItem('jwtToken');
       setIsSignedIn(false);
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
     }
-  }; //공지사항 이동
+  }; 
 
   //프로필 사진 설정
   const pickImage = async () => {
@@ -48,18 +55,21 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   
   //토큰 기반 사용자 정보 가져오기
   const fetchUserInfo = async () => {
-    const token = await SecureStore.getItem('jwtToken');
+    const token = await AsyncStorage.getItem('jwtToken');
     console.log('Token:', token); 
     if (token) {
         try {
-            const response = await axios.get('http://10.0.2.2:8001/page/mypage/:userId', {
+            const response = await axios.get('http://10.0.2.2:8001/page/mypage/1', { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('User Info:', response.data);
-            setUserInfo(response.data); // 사용자 정보를 상태로 저장
-            setAvatarUri(response.data.userImg);
+            console.log('User Info:', response.data.result.user);
+            console.log('img', response.data.result.user.userImg)
+            setUserInfo(response.data.result.user); // 사용자 정보를 상태로 저장
+            setAvatarUri(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
         } catch (err) {
             console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
         }
     }
 };
@@ -70,13 +80,12 @@ useEffect(() => {
 
 
 
-if (!userInfo) {
-  return <Text>Loading...</Text>;
-}
+
+
 
 //서버에 프로필 사진 전송
 const uploadAvatar = async (imageUri) => {
-  const token = await SecureStore.getItem('jwtToken');
+  const token = await AsyncStorage.getItem('jwtToken');
   const formData = new FormData();
 
   formData.append('avatar', {
@@ -109,6 +118,22 @@ const uploadAvatar = async (imageUri) => {
   }
 };
 
+if (loading) {
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="#0000ff" />
+      <Text>로딩 중...</Text>
+    </View>
+  );
+}
+
+if (!userInfo) {
+  return (
+    <View style={styles.container}>
+      <Text>사용자 정보를 불러오는 데 실패했습니다.</Text>
+    </View>
+  );
+}
 
   return (
     <View style={styles.container}>
@@ -137,7 +162,7 @@ const uploadAvatar = async (imageUri) => {
             <Text style={styles.infoLabel}>학번: {userInfo.userNum}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>단과대학: {userInfo.college}</Text>
+            <Text style={styles.infoLabel}>단과대학: {userInfo.collage}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>학과: {userInfo.userLesson}</Text>
@@ -263,32 +288,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
     marginBottom: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.0)',
-  },
-  modalContainer: {
-    width: 300,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
-    alignItems: 'center',
-    borderWidth : 1,
-    borderColor : '#d9d9d9',
-    height : 500
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    marginTop: 20,
-    justifyContent: 'space-between',
   },
   cancelButton: {
     backgroundColor: '#ddd',

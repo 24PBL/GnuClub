@@ -3,7 +3,7 @@ import { Alert, Text} from 'react-native';
 import styled from 'styled-components';
 import axios from 'axios';
 
-export default function findPW1({ navigation }) {
+export default function FindPW1({ navigation }) {
   const [inputValue, setInputValue] = useState('');
   const [emailError, setEmailError] = useState('');
   const [verificationCode, setVerificationCode] = useState('');

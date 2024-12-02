@@ -18,6 +18,8 @@ import Application from './src/screens/clubDetail/Application';
 import CreatePost from './src/screens/clubDetail/CreatePost';
 
 
+
+
 const RootStack = createNativeStackNavigator();
 
 export default function App() {
@@ -30,13 +32,14 @@ export default function App() {
   useEffect(() => {
     // 토큰 확인
     const checkToken = async () => {
-      const token = await AsyncStorage.getItem('jwtToken');
+      const token = await  AsyncStorage.getItem('jwtToken');
       setIsSignedIn(!!token); // 토큰이 있으면 true, 없으면 false
     };
     checkToken();
   }, []);
 
   return (
+
     <NavigationContainer>
       <RootStack.Navigator>
         {!isSignedIn ? (
@@ -55,8 +58,8 @@ export default function App() {
         ) : (
           <>
             <RootStack.Screen 
-              name="home" 
-              options={{ headerShown: false }} 
+              name="homeScreen" 
+              options={{ headerShown: false }}
               children={(props) => <HomeScreens {...props} setIsSignedIn={setIsSignedIn} />} 
             />
             <RootStack.Screen 
@@ -74,5 +77,6 @@ export default function App() {
         )}
       </RootStack.Navigator>
     </NavigationContainer>
+
   );
 }

@@ -5,41 +5,48 @@ import MainScreen from "../mainPage/mainScreen";
 import MyPageScreen from '../myPage/myPage';
 import ClubDetail from '../clubDetail/Application';
 import CreatePost from '../clubDetail/CreatePost';
+import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Club from '../club/club';
 
 
 
 
-function SearchScreens(){
-  return(
-      <SafeAreaView style={{flex : 1}}>
-      <View style={{flex : 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>검색 화면 예정</Text>
-      </View>
-      </SafeAreaView>
-  )
-}
 
-const Tab = createBottomTabNavigator();
 
-export default function HomeScreens({ setIsSignedIn }) {
+
+export default function HomeScreens({setIsSignedIn}){
+
+  function SearchScreens(){
+    return(
+        <SafeAreaView style={{flex : 1}}>
+        <View style={{flex : 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>검색 화면 예정</Text>
+        </View>
+        </SafeAreaView>
+    )
+  }
+  
+  const Tab = createBottomTabNavigator();
+
+
+
   return (
       <Tab.Navigator screenOptions={{tabBarStyle:{height:60}}}>
 
-        <Tab.Screen name="Main" options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
+        <Tab.Screen name="Main" component={MainScreen}options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="home-outline" size={size} color={color} />
           <Text style={{ color, fontSize: 12, marginBottom : 4 }}>홈</Text>
         </View>), tabBarLabel: () => null, headerShown: false }}>
-        {(props) => <MainScreen {...props} setIsSignedIn={setIsSignedIn} />}
       </Tab.Screen>
 
-      <Tab.Screen name="ClubDetail" options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
+      <Tab.Screen name="clubDetail" component={ClubDetail} options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="search-outline" size={size} color={color} />
           <Text style={{ color, fontSize: 12, marginBottom : 4 }}>찾기</Text>
         </View>), tabBarLabel: () => null, headerShown: false }}>
-        {(props) => <ClubDetail {...props} setIsSignedIn={setIsSignedIn} />}
       </Tab.Screen>
 
-        <Tab.Screen name="CreatePost" component={SearchScreens} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
+        <Tab.Screen name="club" component={Club} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
           <Ionicons style={{}}name="albums-outline" size={size} color={color} />
           <Text style={{color,fontSize: 12  , textAlign:'center', marginBottom:4}}>동아리
           </Text>

@@ -36,11 +36,10 @@ exports.afterUploadImage = async (req, res, next) => {
 }
 
 exports.createClub = async (req, res, next) => {
-    const { clanName, clanIntro, clanclass, imgPath, recruitPeriod, people, fee, interview } = req.body;
+    let { clanName, clanIntro, clanclass, imgPath, recruitPeriod, people, fee, interview } = req.body;
     try {
         // 요청 url에서 user-id 추출
         const reqUserID = req.url.split("/")[1];
-
         const user = await db.user.findOne({ where: { userId: reqUserID } });
         if (!user) {
             return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });

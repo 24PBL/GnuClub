@@ -1,8 +1,13 @@
 import { Text, Alert} from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+
 
 export default function LoginScreens({ navigation, setIsSignedIn }) {
     const [email, setEmail] = useState('');
@@ -17,35 +22,42 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
         navigation.navigate("findPW1");
     };
 
+
     // 로그인 요청을 처리하는 함수
     const handleLogin = async () => {
         try {
+
             const TokenResponse = await axios.post("http://10.0.2.2:8001/auth/login", {
                 userEmail : email,
                 userPassword : password,
             });
+
             // 로그인 성공 시 토큰 저장 및 상태 업데이트
             const token = TokenResponse.data.accessToken
-            console.log("로그인 성공:", token);
+            console.log("로그인 성공");
 
-            await SecureStore.setItem('jwtToken', token);
-            const jwtToken = await SecureStore.getItem('jwtToken')
-            //토큰 저장
+            await AsyncStorage.setItem('jwtToken', token);
+            const jwtToken = await AsyncStorage.getItem('jwtToken')
+
             const res1 = await axios.get("http://10.0.2.2:8001/auth/verify-login-status",{
                 headers: {
                     Authorization: `Bearer ${jwtToken}`,  // 'Bearer ' + 토큰
                 }
             });
 
-            console.log(res1.data.user.id)
-            
             const res2 = await axios.get(`http://10.0.2.2:8001/page/home/${res1.data.user.id}`,{
                 headers: {
                     Authorization: `Bearer ${jwtToken}`, 
                 }
             });
-            console.log('토큰 반환 응답',res2.data)
-            setIsSignedIn(true); // 로그인 상태를 업데이트
+
+            setIsSignedIn(true);
+            console.log('토큰 반환 응답 : ', res2.data.result.user)
+
+
+        
+
+            //토큰 저장
             
         } catch (error) {
             // 에러 발생 시 알림 표시
@@ -53,6 +65,8 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
             console.error("로그인 실패:", error);
         }
     };
+
+
 
     return (
         <Back>
