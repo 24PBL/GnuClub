@@ -9,65 +9,68 @@ var _notice = require("./notice");
 var _noticeimg = require("./noticeimg");
 var _post = require("./post");
 var _postimg = require("./postimg");
+var _resume = require("./resume");
 var _tempuser = require("./tempuser");
 var _user = require("./user");
 var _userfpw = require("./userfpw");
 var _userinclan = require("./userinclan");
 
 function initModels(sequelize) {
-  var chatmessage = _chatmessage(sequelize, DataTypes);
+  var chatMessage = _chatmessage(sequelize, DataTypes);
   var clan = _clan(sequelize, DataTypes);
-  var clanchatroom = _clanchatroom(sequelize, DataTypes);
+  var clanChatRoom = _clanchatroom(sequelize, DataTypes);
   var class_ = _class_(sequelize, DataTypes);
   var collage = _collage(sequelize, DataTypes);
   var comment = _comment(sequelize, DataTypes);
   var notice = _notice(sequelize, DataTypes);
-  var noticeimg = _noticeimg(sequelize, DataTypes);
+  var noticeImg = _noticeimg(sequelize, DataTypes);
   var post = _post(sequelize, DataTypes);
-  var postimg = _postimg(sequelize, DataTypes);
-  var tempuser = _tempuser(sequelize, DataTypes);
+  var postImg = _postimg(sequelize, DataTypes);
+  var resume = _resume(sequelize, DataTypes);
+  var tempUser = _tempuser(sequelize, DataTypes);
   var user = _user(sequelize, DataTypes);
-  var userfpw = _userfpw(sequelize, DataTypes);
-  var userinclan = _userinclan(sequelize, DataTypes);
+  var user4fpw = _userfpw(sequelize, DataTypes);
+  var userInClan = _userinclan(sequelize, DataTypes);
 
   notice.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
   clan.hasMany(notice, { as: "notices", foreignKey: "clanId"});
   post.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
   clan.hasMany(post, { as: "posts", foreignKey: "clanId"});
-  userinclan.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
-  clan.hasMany(userinclan, { as: "userinclans", foreignKey: "clanId"});
-  clan.belongsTo(class, { as: "clanclass_class", foreignKey: "clanclass"});
-  class.hasMany(clan, { as: "clans", foreignKey: "clanclass"});
-  noticeimg.belongsTo(notice, { as: "notice", foreignKey: "noticeId"});
-  notice.hasMany(noticeimg, { as: "noticeimgs", foreignKey: "noticeId"});
+  resume.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
+  clan.hasMany(resume, { as: "resumes", foreignKey: "clanId"});
+  userInClan.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
+  clan.hasMany(userInClan, { as: "userinclans", foreignKey: "clanId"});
+  noticeImg.belongsTo(notice, { as: "notice", foreignKey: "noticeId"});
+  notice.hasMany(noticeImg, { as: "noticeimgs", foreignKey: "noticeId"});
   comment.belongsTo(post, { as: "post", foreignKey: "postId"});
   post.hasMany(comment, { as: "comments", foreignKey: "postId"});
-  postimg.belongsTo(post, { as: "post", foreignKey: "postId"});
-  post.hasMany(postimg, { as: "postimgs", foreignKey: "postId"});
+  postImg.belongsTo(post, { as: "post", foreignKey: "postId"});
+  post.hasMany(postImg, { as: "postimgs", foreignKey: "postId"});
   comment.belongsTo(user, { as: "user", foreignKey: "userId"});
   user.hasMany(comment, { as: "comments", foreignKey: "userId"});
   notice.belongsTo(user, { as: "user", foreignKey: "userId"});
   user.hasMany(notice, { as: "notices", foreignKey: "userId"});
   post.belongsTo(user, { as: "user", foreignKey: "userId"});
   user.hasMany(post, { as: "posts", foreignKey: "userId"});
-  userinclan.belongsTo(user, { as: "user", foreignKey: "userId"});
-  user.hasMany(userinclan, { as: "userinclans", foreignKey: "userId"});
+  userInClan.belongsTo(user, { as: "user", foreignKey: "userId"});
+  user.hasMany(userInClan, { as: "userinclans", foreignKey: "userId"});
 
   return {
-    chatmessage,
+    chatMessage,
     clan,
-    clanchatroom,
+    clanChatRoom,
     class_,
     collage,
     comment,
     notice,
-    noticeimg,
+    noticeImg,
     post,
-    postimg,
-    tempuser,
+    postImg,
+    resume,
+    tempUser,
     user,
-    userfpw,
-    userinclan,
+    user4fpw,
+    userInClan,
   };
 }
 module.exports = initModels;

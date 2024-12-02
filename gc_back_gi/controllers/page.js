@@ -2,6 +2,7 @@
 // 사용할 때는 db 파일에 연결된 변수를 사용(db.user, db.tempUser 등) 이때 db.user, db.tempUser에는 각 DB 테이블에 해당하는 js파일이 연결됨.
 const db = require('../models/db');
 const { Op } = require('sequelize');
+const Sequelize = require('sequelize');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -25,6 +26,7 @@ exports.sendHomeData = async (req, res, next) => {
             where: { userId: reqUserID },
             include: [{
                 model: db.clan, // 조인된 clan 데이터 가져오기
+                as: 'clan'
             }]
         });
 
@@ -36,6 +38,7 @@ exports.sendHomeData = async (req, res, next) => {
             include: [{
                 model: db.noticeImg, // 연결된 noticeImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                as: 'noticeimgs'
             }],
             order: Sequelize.literal('RAND()'), // 랜덤 정렬
             limit: 8, // 최대 8개의 레코드 가져오기
@@ -49,6 +52,7 @@ exports.sendHomeData = async (req, res, next) => {
             include: [{
                 model: db.postImg, // 연결된 noticeImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                as: 'postimgs'
             }],
             order: Sequelize.literal('RAND()'), // 랜덤 정렬
             limit: 8, // 최대 8개의 레코드 가져오기
@@ -97,6 +101,7 @@ exports.sendMoreAdData = async (req, res, next) => {
             include: [{
                 model: db.noticeImg, // 연결된 noticeImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                as: 'noticeimgs'
             }],
             order: Sequelize.literal('RAND()'),
             limit: 8,
@@ -141,6 +146,7 @@ exports.sendMoreAnythingData = async (req, res, next) => {
             include: [{
                 model: db.postImg, // 연결된 postImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                as: 'postimgs'
             }],
             order: Sequelize.literal('RAND()'),
             limit: 8,
@@ -183,11 +189,13 @@ exports.sendFeedData = async (req, res, next) => {
                 model: db.clan, // clan 테이블 데이터
                 include: [{
                     model: db.post, // clan과 연결된 post 테이블 데이터
+                    as: 'posts',
                     where: {
                         id: { [Sequelize.Op.notIn]: selectedIds }, // 중복 방지 조건
                     },
                     include: [{
-                        model: db.postImg // post와 연결된 postImg 테이블 데이터
+                        model: db.postImg, // post와 연결된 postImg 테이블 데이터
+                        as: 'postimgs'
                     }]
                 }]
             }],
@@ -228,6 +236,7 @@ exports.sendMypageData = async (req, res, next) => {
             where: { userId: reqUserID },
             include: [{
                 model: db.clan, // 조인된 clan 데이터 가져오기
+                as: 'clan'
             }]
         });
 
@@ -264,11 +273,44 @@ exports.checkApply = async (req, res, next) => {
             where: { userId: reqUserID },
             include: [{
                 model: db.clan, // clan 테이블 데이터
+                as: 'clan'
             }],
         });
 
         // 4. 프론트에 데이터 전송
         return res.status(200).send({ success: 200, result: myResumeList });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.modifyProfile = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 프로필 사진 수정(테이블 수정)
+        if(!req.file) {
+            res.status(400).send({ success: 400, result: "이미지 없음" });
+        } else {
+            const imgInfo = await db.user.update({
+                userImg: `/uploads3/${reqUserID}/${req.file.filename}`,
+            }, {where: { userId: reqUserID }} );
+        }
+
+        // 4. 프론트로 전달
+        return res.status(200).send({ success: 200, result: "프로필 수정 성공", imgPath: `/uploads3/${reqUserID}/${req.file.filename}` });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
