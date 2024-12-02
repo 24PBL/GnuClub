@@ -409,9 +409,15 @@ exports.deletePost = async (req, res, next) => {
             return res.status(404).send({ success: 404, result: "존재하지 않는 포스팅" });
         }
 
-        // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인(리더는 모든 글 삭제 가능)
         if (exPost.userId !== parseInt(reqUserID) || exPost.clanId !== parseInt(reqClanID)) {
-            return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음" });
+            if(memPart !== 1) {
+                return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음" });
+            }
         }
 
         // 6. 포스팅에 이미지가 포함되어 있는지 확인 후 있으면 postImg 테이블과 이미지 파일 삭제
@@ -601,9 +607,11 @@ exports.deleteComment = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "해당 게시글 열람 권한 없음" });
         }
 
-        // 7. 삭제하려는 댓글에 대한 권한을 가지고 있는지 확인
+        // 7. 삭제하려는 댓글에 대한 권한을 가지고 있는지 확인(리더는 모든 댓글 삭제 가능 + 포스팅 작성자도 댓글 삭제 가능)
         if (exComment.userId !== parseInt(reqUserID) || exComment.commentId !== parseInt(reqCommentID)) {
-            return res.status(403).send({ success: 403, result: "해당 댓글 수정 권한 없음" });
+            if(memPart !== 1 && exPost.userId !== parseInt(reqUserID)) {
+                return res.status(403).send({ success: 403, result: "해당 댓글 삭제 권한 없음" });
+            }
         }
 
         await db.comment.destroy({ where: { commentId: reqCommentID } });

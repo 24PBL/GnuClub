@@ -73,7 +73,7 @@ exports.createClub = async (req, res, next) => {
         await db.userInClan.create({
             userId: reqUserID,
             clanId: newClub.clanId,
-            part: 0
+            part: 1
         });
 
         return res.status(201).send({ success: 201, result: "동아리 생성 성공" });
@@ -114,7 +114,7 @@ exports.modifyClubInfo = async (req, res, next) => {
         if (!memPart) {
             return res.status(403).send({ success: 403, result: "리더만 수정 가능." });
         }
-        if (memPart.part !== 0) {
+        if (memPart.part !== 1) {
             return res.status(403).send({ success: 403, result: "리더만 수정 가능." });
         }
 
@@ -262,7 +262,7 @@ exports.applyList = async (req, res, next) => {
         if (!memPart) {
             return res.status(403).send({ success: 403, result: "리더만 볼 수 있음." });
         }
-        if (memPart.part !== 0) {
+        if (memPart.part !== 1) {
             return res.status(403).send({ success: 403, result: "리더만 볼 수 있음." });
         }
 
@@ -326,7 +326,7 @@ exports.resumeInfo = async (req, res, next) => {
         if (!memPart) {
             return res.status(403).send({ success: 403, result: "리더만 볼 수 있음." });
         }
-        if (memPart.part !== 0) {
+        if (memPart.part !== 1) {
             return res.status(403).send({ success: 403, result: "리더만 볼 수 있음." });
         }
 
@@ -377,7 +377,7 @@ exports.decideResume = async (req, res, next) => {
         if (!memPart) {
             return res.status(403).send({ success: 403, result: "리더만 승인 가능" });
         }
-        if (memPart.part !== 0) {
+        if (memPart.part !== 1) {
             return res.status(403).send({ success: 403, result: "리더만 승인 가능" });
         }
 
@@ -398,7 +398,7 @@ exports.decideResume = async (req, res, next) => {
             await db.userInClan.create({
                 userId: resume.userId,
                 clanId: resume.clanId,
-                part: 3
+                part: 4
             });
 
             //await db.resume.destroy({ where: { idx: resumeID } });

@@ -98,13 +98,21 @@ exports.sendMoreAdData = async (req, res, next) => {
                 isPublic: 1,
                 id: { [Sequelize.Op.notIn]: selectedIds }, // 이전에 선택된 ID 제외
             },
-            include: [{
-                model: db.noticeImg, // 연결된 noticeImg 모델 포함
-                attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                as: 'noticeimgs'
-            }],
+            include: [
+                {
+                    model: db.clan,
+                    attributes: ['clanclass'],
+                    as: 'clan',
+                },
+                {
+                    model: db.noticeImg, // 연결된 noticeImg 모델 포함
+                    attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                    as: 'noticeimgs'
+                }
+            ],
+            group: ['clan.clanclass', 'notice.noticeId'], // 분과별로 그룹화해서 가져옴
             order: Sequelize.literal('RAND()'),
-            limit: 8,
+            limit: 12,
         });
 
         // 선택된 ID를 저장
@@ -311,6 +319,94 @@ exports.modifyProfile = async (req, res, next) => {
 
         // 4. 프론트로 전달
         return res.status(200).send({ success: 200, result: "프로필 수정 성공", imgPath: `/uploads3/${reqUserID}/${req.file.filename}` });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.sendPostPageData = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 동아리 부원인지 확인
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+        const postList = await db.post.findAll({
+            where: {
+                clanID: reqClanID,
+                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+            },
+            order: [['createdAt', 'DESC']], // 최신순 정렬
+            limit: 8, // 한 번에 최대 8개 데이터
+        });
+
+        return res.status(200).send({ success: 200, result: postList, userImg: user.userImg });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.sendNoticePageData = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 동아리 부원인지 확인
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+        const noticeList = await db.notice.findAll({
+            where: {
+                clanID: reqClanID,
+                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+            },
+            order: [['createdAt', 'DESC']], // 최신순 정렬
+            limit: 8, // 한 번에 최대 8개 데이터
+        });
+
+        return res.status(200).send({ success: 200, result: noticeList, userImg: user.userImg });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
