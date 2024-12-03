@@ -142,6 +142,14 @@ exports.uploadPost = async (req, res, next) => {
             return res.status(404).send({ success: 404, result: "유효하지 않은 결정" });
         }
 
+        if (req.body.postHead === undefined || req.body.postHead === null || req.body.postHead === '') {
+            return res.status(200).send({ success: 400, result: "제목을 작성해주세요." });
+        }
+
+        if (req.body.postBody === undefined || req.body.postBody === null || req.body.postBody === '') {
+            return res.status(200).send({ success: 400, result: "본문을 작성해주세요." });
+        } 
+
         // 8. 모든 무결성 검증 후 post 테이블 생성
         const postResult = await db.post.create({
             userId: reqUserID,

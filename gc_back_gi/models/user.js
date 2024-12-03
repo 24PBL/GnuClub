@@ -31,10 +31,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(20),
       allowNull: false
     },
-    Field: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     userImg: {
       type: DataTypes.TEXT,
       defaultValue: "/public/default_profile.png",
@@ -47,7 +43,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     collage: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'collage',
+        key: 'collageId'
+      }
     }
   }, {
     sequelize,
@@ -60,6 +60,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "userId" },
+        ]
+      },
+      {
+        name: "FK_collage_TO_User_1",
+        using: "BTREE",
+        fields: [
+          { name: "collage" },
         ]
       },
     ]

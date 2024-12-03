@@ -13,7 +13,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     clanclass: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'class',
+        key: 'classId'
+      }
     },
     clanIntro: {
       type: DataTypes.STRING(225),

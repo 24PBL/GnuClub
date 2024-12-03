@@ -22,7 +22,7 @@ exports.afterUploadImage = async (req, res, next) => {
         }
 
         // 3. 이미지 저장 경로 작성
-        const imgPath = `/uploads2/${reqUserID}/${req.file.filename}`
+        const imgPath = `/uploads2/${reqUserID}/${reqClanID}/${req.file.filename}`
 
         // 4. 프론트로 전달
         return res.status(201).send({
@@ -35,11 +35,13 @@ exports.afterUploadImage = async (req, res, next) => {
     }
 }
 
+/*
 exports.createClub = async (req, res, next) => {
-    let { clanName, clanIntro, clanclass, imgPath, recruitPeriod, people, fee, interview } = req.body;
+    const { clanName, clanIntro, clanclass, imgPath, recruitPeriod, people, fee, interview } = req.body;
     try {
         // 요청 url에서 user-id 추출
         const reqUserID = req.url.split("/")[1];
+
         const user = await db.user.findOne({ where: { userId: reqUserID } });
         if (!user) {
             return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
@@ -82,12 +84,14 @@ exports.createClub = async (req, res, next) => {
         return next(error);
     }
 }
+*/
 
+// 이미지 변경이 없을 때는 원래의 clanImg 값을 그대로 보내주면 됨.
 exports.modifyClubInfo = async (req, res, next) => {
     const reqUserID = req.url.split("/")[1];
     const reqClanID = req.url.split("/")[2];
 
-    const { recruitPeriod, people, fee, interview } = req.body
+    const { recruitPeriod, people, fee, interview, imgPath } = req.body
 
     try {
         // 1. 요청 사용자 정보 가져오기
@@ -119,11 +123,12 @@ exports.modifyClubInfo = async (req, res, next) => {
         }
 
         // 9. 모든 무결성 검증 후 이상 없으면 포스팅 수정
-        const postResult = await db.post.update({
+        const result = await db.clan.update({
             recruitPeriod: recruitPeriod,
             people: people,
             fee: fee,
-            interview: interview
+            interview: interview,
+            clanImg: imgPath,
         }, {where: { clanId: reqClanID }})
 
         return res.status(200).send({ success: 200, result: "동아리 정보 수정 성공" });
@@ -418,3 +423,173 @@ exports.decideResume = async (req, res, next) => {
         return next(error); // Express 에러 핸들러로 전달
     }
 };
+
+exports.showMemberList = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 4. 동아리 부원인지 확인
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+
+        // 부원이 아니면 볼 수 없음
+        if (!memPart) {
+            return res.status(403).send({ success: 403, result: "부원만 볼 수 있음" });
+        }
+
+        const memberList = await db.userInClan.findAll({
+            where: {
+                clanID: reqClanID,
+                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+            },
+            order: [
+                ['name', 'ASC', 'COLLATE utf8mb4_unicode_ci'] // 가-나-다 순으로 정렬
+            ],
+        });
+
+        return res.status(200).send({ success: 200, result: memberList, userImg: user.userImg });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.leaveClub = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 해당 동아리의 부원인지 검증
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+        if (!memPart) {
+            return res.status(403).send({ success: 403, result: "부원만 탈퇴할 수 있음" });
+        } 
+
+        // 4. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 5. 탈퇴
+        await db.userInClan.destroy({ where: { userId: reqUserID } });
+
+        return res.status(200).send({ success: 200, result: "탈퇴 성공" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.kickMember = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+    const reqClanID = req.url.split("/")[2];
+    const targetID = req.url.split("/")[3];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 해당 동아리의 부원인지 검증
+        const memPart = await db.userInClan.findOne({
+            where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
+        });
+        if (memPart !== 1) {
+            return res.status(403).send({ success: 403, result: "리더만 추방시킬 수 있음" });
+        } 
+
+        // 4. 동아리가 존재하는지 확인
+        const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+        if (!exClub) {
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+        }
+
+        // 5. 추방
+        await db.userInClan.destroy({ where: { userId: targetID } });
+
+        return res.status(200).send({ success: 200, result: "추방 성공" });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}
+
+exports.searchClub = async (req, res, next) => {
+    const reqUserID = req.url.split("/")[1];
+
+    try {
+        // 1. 요청 사용자 정보 가져오기
+        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        if (!user) {
+            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+        }
+
+        // 2. 현재 로그인한 사용자와 일치 여부 확인
+        if (user.userId.toString() !== req.user.id.toString()) {
+            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+        }
+
+        // 3. 검색어 확인
+        const { keyword } = req.query;
+        if (!keyword) {
+            return res.status(400).send({ success: 400, message: "검색어를 입력하세요." });
+        }
+
+        // 4. SQL 쿼리 작성
+        const sql = `
+            SELECT * 
+            FROM clan 
+            WHERE clanName LIKE ? COLLATE utf8mb4_unicode_ci 
+            OR clanclass LIKE ? COLLATE utf8mb4_unicode_ci
+        `;
+
+        const values = [`%${keyword}%`, `%${keyword}%`];
+
+        const [results] = await db.query(sql, values);
+
+        return res.status(200).send({ success: 200, data: results });
+    } catch (error) {
+        console.error(error);
+        return next(error); // Express 에러 핸들러로 전달
+    }
+}

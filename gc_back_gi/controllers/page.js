@@ -91,7 +91,7 @@ exports.sendMoreAdData = async (req, res, next) => {
         }
 
         // 3. 동아리 홍보글 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
-        let selectedIds = [];   // 이미 선택된 ID를 저장하는 배열
+        const { selectedIds = [] } = req.body; // 클라이언트에서 전송된 selectedIds
 
         const randomClubAd = await db.notice.findAll({
             where: {
@@ -114,11 +114,6 @@ exports.sendMoreAdData = async (req, res, next) => {
             order: Sequelize.literal('RAND()'),
             limit: 12,
         });
-
-        // 선택된 ID를 저장
-        selectedIds.push(...randomClubAd.flatMap(feed => 
-            feed.clan.posts.map(post => post.id)
-        ));
 
         // 4. 프론트에 데이터 전송
         return res.status(200).send({ success: 200, result: randomClubAd, userImg: user.userImg });
@@ -144,7 +139,7 @@ exports.sendMoreAnythingData = async (req, res, next) => {
         }
 
         // 3. 동아리 이모저모 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
-        let selectedIds = [];   // 이미 선택된 ID를 저장하는 배열
+        const { selectedIds = [] } = req.body; // 클라이언트에서 전송된 selectedIds
 
         const randomClubAnything = await db.post.findAll({
             where: {
@@ -159,11 +154,6 @@ exports.sendMoreAnythingData = async (req, res, next) => {
             order: Sequelize.literal('RAND()'),
             limit: 8,
         });
-
-        // 선택된 ID를 저장
-        selectedIds.push(...randomClubAnything.flatMap(feed => 
-            feed.clan.posts.map(post => post.id)
-        ));
 
         // 4. 프론트에 데이터 전송
         return res.status(200).send({ success: 200, result: randomClubAnything, userImg: user.userImg });
@@ -188,33 +178,29 @@ exports.sendFeedData = async (req, res, next) => {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
-        // 3. 내 동아리 피드들 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
-        let selectedIds = [];   // 이미 선택된 ID를 저장하는 배열
-
-        const myClubFeeds = await db.userInClan.findAll({
-            where: { userId: reqUserID },
-            include: [{
-                model: db.clan, // clan 테이블 데이터
-                include: [{
-                    model: db.post, // clan과 연결된 post 테이블 데이터
-                    as: 'posts',
-                    where: {
-                        id: { [Sequelize.Op.notIn]: selectedIds }, // 중복 방지 조건
-                    },
+        // 3. 내 동아리 피드들 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음) - 항상 8개를 보장하지는 못함(역필터링이라서), 프론트에서 length를 통해 적절히 렌더링
+        const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+        const myClubFeeds = await db.post.findAll({
+            where: {
+                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // 조건: 특정 시간 이전 게시물
+            },
+            include: [
+                {
+                    model: db.clan, // post -> clan
                     include: [{
-                        model: db.postImg, // post와 연결된 postImg 테이블 데이터
-                        as: 'postimgs'
+                        model: db.userInClan, // clan -> userInClan
+                        where: { userId: reqUserID }, // 사용자가 속한 동아리
+                        required: true, // 반드시 userInClan 조건을 만족해야 함
                     }]
-                }]
-            }],
-            order: Sequelize.literal('RAND()'),
-            limit: 8,
+                },
+                {
+                    model: db.postImg, // post -> postImg
+                    as: 'postimgs',
+                }
+            ],
+            order: [['createdAt', 'DESC']], // 최신순 정렬
+            limit: 8, // 최대 8개의 게시물
         });
-
-        // 선택된 ID를 저장
-        selectedIds.push(...myClubFeeds.flatMap(feed => 
-            feed.clan.posts.map(post => post.id)
-        ));
 
         // 4. 프론트에 데이터 전송
         return res.status(200).send({ success: 200, result: myClubFeeds, userImg: user.userImg });

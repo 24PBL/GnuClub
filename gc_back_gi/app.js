@@ -50,6 +50,8 @@ app.use('/uploads/:userId/:clanId', (req, res, next) => {
 }, express.static(path.join(__dirname, 'uploads')));
 */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads2', express.static(path.join(__dirname, 'uploads2')));
+app.use('/uploads3', express.static(path.join(__dirname, 'uploads3')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
