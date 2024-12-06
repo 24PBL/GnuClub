@@ -195,15 +195,17 @@ exports.sendFeedData = async (req, res, next) => {
         const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
         const myClubFeeds = await db.post.findAll({
             where: {
-                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // 조건: 특정 시간 이전 게시물
+                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // 조건: 특정 시간 이전 게시물
             },
             include: [
                 {
                     model: db.clan, // post -> clan
+                    as: 'clan',
                     include: [{
                         model: db.userInClan, // clan -> userInClan
                         where: { userId: reqUserID }, // 사용자가 속한 동아리
                         required: true, // 반드시 userInClan 조건을 만족해야 함
+                        as: 'userinclans'
                     }]
                 },
                 {
@@ -211,7 +213,7 @@ exports.sendFeedData = async (req, res, next) => {
                     as: 'postimgs',
                 }
             ],
-            order: [['createdAt', 'DESC']], // 최신순 정렬
+            order: [['createAt', 'DESC']], // 최신순 정렬
             limit: 8, // 최대 8개의 게시물
         });
 
@@ -287,7 +289,7 @@ exports.checkApply = async (req, res, next) => {
         }
 
         const myResumeList = await db.resume.findAll({
-            order: [['createdAt', 'ASC']],
+            order: [['createAt', 'ASC']],
             where: { userId: reqUserID },
             include: [{
                 model: db.clan, // clan 테이블 데이터
@@ -366,9 +368,9 @@ exports.sendPostPageData = async (req, res, next) => {
         const postList = await db.post.findAll({
             where: {
                 clanID: reqClanID,
-                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
-            order: [['createdAt', 'DESC']], // 최신순 정렬
+            order: [['createAt', 'DESC']], // 최신순 정렬
             limit: 8, // 한 번에 최대 8개 데이터
         });
 
@@ -410,9 +412,9 @@ exports.sendNoticePageData = async (req, res, next) => {
         const noticeList = await db.notice.findAll({
             where: {
                 clanID: reqClanID,
-                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
-            order: [['createdAt', 'DESC']], // 최신순 정렬
+            order: [['createAt', 'DESC']], // 최신순 정렬
             limit: 8, // 한 번에 최대 8개 데이터
         });
 
