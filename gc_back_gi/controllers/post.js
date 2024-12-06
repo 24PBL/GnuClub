@@ -125,16 +125,20 @@ exports.uploadPost = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "부원만 작성할 수 있음", user: user, club: exClub });
         }
 
-        // 5. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
         const imgPath = req.body.imgPath;
-        const exPostImg = await db.postImg.findOne({ where: { img: imgPath } });
-        if ( !exPostImg ) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
-        }
 
-        // 6. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
-        if ( exPostImg.userId !== parseInt(reqUserID) || exPostImg.clanId !== parseInt(reqClanID) ) {
-            return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+        if(imgPath) {
+            // 5. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
+            const exPostImg = await db.postImg.findOne({ where: { img: imgPath } });
+            
+            if ( !exPostImg ) {
+                return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
+            }
+
+            // 6. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
+            if ( exPostImg.userId !== parseInt(reqUserID) || exPostImg.clanId !== parseInt(reqClanID) ) {
+                return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+            }
         }
 
         // 7. 잘못된 전체공개, 부원공개 값
@@ -167,7 +171,7 @@ exports.uploadPost = async (req, res, next) => {
             await db.postImg.update({postId: postResult.postId}, {where: { img: imgPath }});
         }
 
-        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -336,16 +340,20 @@ exports.modifyPost = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "해당 게시글 수정 권한 없음", user: user, club: exClub });
         }
 
-        // 6. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
         const imgPath = req.body.imgPath;
-        const exPostImg = await db.postImg.findOne({ where: { img: imgPath } });
-        if ( !exPostImg ) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
-        }
 
-        // 7. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
-        if ( exPostImg.userId !== parseInt(reqUserID) || exPostImg.clanId !== parseInt(reqClanID) ) {
-            return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+        if(imgPath) {
+            // 6. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
+            const exPostImg = await db.postImg.findOne({ where: { img: imgPath } });
+            
+            if ( !exPostImg ) {
+                return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
+            }
+
+            // 7. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
+            if ( exPostImg.userId !== parseInt(reqUserID) || exPostImg.clanId !== parseInt(reqClanID) ) {
+                return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+            }
         }
 
         // 8. 잘못된 전체공개, 부원공개 값
@@ -383,7 +391,9 @@ exports.modifyPost = async (req, res, next) => {
             }
         }
 
-        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub });
+        const currPost = await db.post.findOne({ where: { postId: reqPostID } });
+
+        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, post: currPost });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달

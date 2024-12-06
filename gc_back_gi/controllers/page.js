@@ -220,7 +220,7 @@ exports.sendMypageData = async (req, res, next) => {
                 model: db.collage, // 조인된 clan 데이터 가져오기
                 as: 'collage_collage',
             }]
-        });
+         });
         if (!user) {
             return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
         }
@@ -245,13 +245,13 @@ exports.sendMypageData = async (req, res, next) => {
             }]
         });
 
-        const myPageIngo = {
+        const myPageInfo = {
             user: user,
             myClubInfo: myClub
         }
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: myPageIngo });
+        return res.status(200).send({ success: 200, result: myPageInfo });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달

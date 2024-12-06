@@ -8,6 +8,7 @@ const path = require('path');
 // 데이터베이스 연결은 models 폴더에서 각 데이터베이스에 대한 파일이 있고, 그 데이터베이스들을 모아놓은 것이 db.js,
 // 사용할 때는 db 파일에 연결된 변수를 사용(db.user, db.tempUser 등) 이때 db.user, db.tempUser에는 각 DB 테이블에 해당하는 js파일이 연결됨.
 const db = require('../models/db');
+const notice = require('../models/notice');
 
 exports.beforeNotice = async (req, res, next) => {
     const reqUserID = req.url.split("/")[1];
@@ -124,16 +125,20 @@ exports.uploadNotice = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "부원만 작성할 수 있음", user: user, club: exClub });
         }
 
-        // 5. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
         const imgPath = req.body.imgPath;
-        const exNoticeImg = await db.noticeImg.findOne({ where: { img: imgPath } });
-        if ( !exNoticeImg ) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
-        }
+        
+        if(imgPath) {
+            // 5. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
+            const exNoticeImg = await db.noticeImg.findOne({ where: { img: imgPath } });
+            
+            if ( !exNoticeImg ) {
+                return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
+            }
 
-        // 6. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
-        if ( exNoticeImg.userId !== parseInt(reqUserID) || exNoticeImg.clanId !== parseInt(reqClanID) ) {
-            return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+            // 6. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
+            if ( exNoticeImg.userId !== parseInt(reqUserID) || exNoticeImg.clanId !== parseInt(reqClanID) ) {
+                return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+            }
         }
 
         // 7. 잘못된 전체공개, 부원공개 값
@@ -158,7 +163,7 @@ exports.uploadNotice = async (req, res, next) => {
             await db.noticeImg.update({noticeId: noticetResult.noticeId}, {where: { img: imgPath }});
         }
 
-        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, notice: noticetResult });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -314,16 +319,20 @@ exports.modifyNotice = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "해당 게시글 수정 권한 없음", user: user, club: exClub });
         }
 
-        // 6. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
         const imgPath = req.body.imgPath;
-        const exNoticeImg = await db.noticeImg.findOne({ where: { img: imgPath } });
-        if ( !exNoticeImg ) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
-        }
 
-        // 7. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
-        if ( exNoticeImg.userId !== parseInt(reqUserID) || exNoticeImg.clanId !== parseInt(reqClanID) ) {
-            return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+        if(imgPath) {
+            // 6. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
+            const exNoticeImg = await db.noticeImg.findOne({ where: { img: imgPath } });
+            
+            if ( !exNoticeImg ) {
+                return res.status(404).send({ success: 404, result: "존재하지 않는 이미지 리소스", user: user, club: exClub });
+            }
+
+            // 7. 포스팅하려는 이미지가 내가 권한을 가진 이미지인지 검증
+            if ( exNoticeImg.userId !== parseInt(reqUserID) || exNoticeImg.clanId !== parseInt(reqClanID) ) {
+                return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음", user: user, club: exClub });
+            }
         }
 
         // 8. 잘못된 전체공개, 부원공개 값
@@ -359,7 +368,9 @@ exports.modifyNotice = async (req, res, next) => {
             }
         }
 
-        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub });
+        const currNotice = await db.notice.findOne({ where: { noticeId: reqNoticeID } });
+
+        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, notice: currNotice });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
