@@ -35,9 +35,8 @@ exports.afterUploadImage = async (req, res, next) => {
     }
 }
 
-/*
 exports.createClub = async (req, res, next) => {
-    const { clanName, clanIntro, clanclass, imgPath, recruitPeriod, people, fee, interview } = req.body;
+    const { clanName, clanIntro, clanclass, recruitPeriod, people, fee, interview } = req.body;
     try {
         // 요청 url에서 user-id 추출
         const reqUserID = req.url.split("/")[1];
@@ -51,6 +50,7 @@ exports.createClub = async (req, res, next) => {
             return res.status(401).send({ success: 401, result: "잘못된 접근" });
         }
 
+        /*
         if ( imgPath ) {
             const imgOwner = imgPath.split("/")[1];
 
@@ -58,14 +58,15 @@ exports.createClub = async (req, res, next) => {
                 return res.status(403).send({ success: 403, result: "해당 이미지 사용 권한 없음" });
             }
         } else {
-            imgPath = "/public/default_club_image.png"
+            const imgPath = "/public/default_club_image.png"
         }
+            */
 
         const newClub = await db.clan.create({
             clanName: clanName,
             clanIntro: clanIntro,
             clanclass: clanclass,
-            clanImg: imgPath || "/public/default_club_image.png",
+            clanImg: "/public/default_club_image.png",
             recruitPeriod: recruitPeriod,
             people: people,
             fee: fee,
@@ -84,7 +85,6 @@ exports.createClub = async (req, res, next) => {
         return next(error);
     }
 }
-*/
 
 // 이미지 변경이 없을 때는 원래의 clanImg 값을 그대로 보내주면 됨.
 exports.modifyClubInfo = async (req, res, next) => {
@@ -278,7 +278,7 @@ exports.applyList = async (req, res, next) => {
         }
 
         // 5. 신청서 리스트 데이터를 보냄(오래된 것부터 정렬)
-        const resumeList = await db.resume.findAll({ order: [['createdAt', 'ASC']], where: { clanId: reqClanID } });
+        const resumeList = await db.resume.findAll({ order: [['createAt', 'ASC']], where: { clanId: reqClanID } });
 
         // 모든 userId를 한 번에 추출
         const userIds = resumeList.map((resume) => resume.userId);
