@@ -215,7 +215,12 @@ exports.sendMypageData = async (req, res, next) => {
 
     try {
         // 1. 요청 사용자 정보 가져오기
-        const user = await db.user.findOne({ where: { userId: reqUserID } });
+        const user = await db.user.findOne({ where: { userId: reqUserID },
+            include: [{
+                model: db.collage, // 조인된 clan 데이터 가져오기
+                as: 'collage_collage',
+            }]
+        });
         if (!user) {
             return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
         }
