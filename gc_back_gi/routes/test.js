@@ -50,4 +50,16 @@ router.get("/comment/data/read", function(req, res) {
         res.send({success:200, data:result});
     })
 })
+
+router.get("/collage/data/read", function(req, res) {
+    db.collage.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
+router.get("/class/data/read", function(req, res) {
+    db.class_.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
 module.exports = router;

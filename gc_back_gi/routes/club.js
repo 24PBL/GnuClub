@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { verifyJWT } = require('../middlewares');
-const { afterUploadImage, modifyClubInfo, beforeApply, applyClub, applyList, resumeInfo, decideResume, showMemberList, leaveClub, kickMember, searchClub } = require('../controllers/club');
+const { afterUploadImage, modifyClubInfo, beforeApply, applyClub, applyList, resumeInfo, decideResume, showMemberList, leaveClub, kickMember, searchClub, createClub } = require('../controllers/club');
 
 const router = express.Router();
 
@@ -20,7 +20,8 @@ const upload = multer({
         destination(req, file, cb) {
             //cb(null, 'uploads/');
             const reqUserID = req.url.split("/")[1];
-            const uploadPath = `uploads2/${reqUserID}`;
+            const reqClanID = req.url.split("/")[2];
+            const uploadPath = `uploads2/${reqUserID}/${reqClanID}`;
             fs.mkdirSync(uploadPath, { recursive: true });
             cb(null, uploadPath);
         },
@@ -98,5 +99,8 @@ router.delete('/:userId/:clanId/leave-club', verifyJWT, kickMember);
 
 // GET /club/:userId/search-club
 router.get('/:userId/:clanId/member-list', verifyJWT, searchClub);
+
+// POST /club/:userId/create-club
+router.post('/:userId/create-club', verifyJWT, createClub);
 
 module.exports = router;
