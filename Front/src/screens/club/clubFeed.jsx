@@ -1,7 +1,35 @@
-import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect} from 'react';
+import axios from 'axios';
+
 export default function ClubFeed() {
+  const fetchUserInfo = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+    const storedUserData = await AsyncStorage.getItem('UserData');
+    console.log('Token:', token); 
+    console.log('Stored User Data:', storedUserData);
+    if (token || storedUserData) {
+        try {
+            const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
+            const Id = userInfo.userId
+            const response = await axios.get(`http://10.0.2.2:8001/page/feed/${Id}`, { 
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log('User Info:', response.data.result)
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
+    }
+};
+
+useEffect(() => {
+  fetchUserInfo(); // 컴포넌트가 렌더링될 때 사용자 정보 가져오기
+}, []);
+
     return(
     <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
          <ScrollView showsVerticalScrollIndicator={false}>
