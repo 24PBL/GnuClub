@@ -58,7 +58,8 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
     const token = await AsyncStorage.getItem('jwtToken');
     const storedUserData = await AsyncStorage.getItem('UserData');
     console.log('Token:', token); 
-    if (token) {
+    console.log('Stored User Data:', storedUserData);
+    if (token || storedUserData) {
         try {
             const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
             const Id = userInfo.userId
