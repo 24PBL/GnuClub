@@ -182,6 +182,15 @@ exports.sendFeedData = async (req, res, next) => {
             return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
+        // 3. 내 동아리 정보
+        const myClub = await db.userInClan.findAll({
+            where: { userId: reqUserID },
+            include: [{
+                model: db.clan, // 조인된 clan 데이터 가져오기
+                as: 'clan'
+            }]
+        });
+
         // 3. 내 동아리 피드들 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음) - 항상 8개를 보장하지는 못함(역필터링이라서), 프론트에서 length를 통해 적절히 렌더링
         const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
         const myClubFeeds = await db.post.findAll({
@@ -207,7 +216,7 @@ exports.sendFeedData = async (req, res, next) => {
         });
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: myClubFeeds, user: user });
+        return res.status(200).send({ success: 200, result: myClubFeeds, user: user, myClub: myClub });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
