@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { verifyJWT } = require('../middlewares');
-const { afterUploadImage, createClub, modifyClubInfo, beforeApply, applyClub, applyList, resumeInfo, decideResume } = require('../controllers/club');
+const { afterUploadImage, modifyClubInfo, beforeApply, applyClub, applyList, resumeInfo, decideResume, showMemberList, leaveClub, kickMember, searchClub } = require('../controllers/club');
 
 const router = express.Router();
 
@@ -44,9 +44,9 @@ const upload = multer({
 
 const upload2 = multer();
 
-// 동아리 생성 양식 작성 중 이미지 업로드 요청 시 업로드된 이미지에 대한 정보를 클라이언트로 보냄
-// POST /club/:userId/create-club/fill-info/upload-image
-router.post('/:userId/create-club/fill-info/upload-image', verifyJWT, (req, res, next) => {
+// 동아리 정보 수정 중 이미지 업로드 요청 시 업로드된 이미지에 대한 정보를 클라이언트로 보냄
+// POST /club/:userId/:clanId/modify-club-info/upload-image
+router.post('/:userId/:clanId/modify-club-info/upload-image', verifyJWT, (req, res, next) => {
         upload.single('img')(req, res, (err) => {
             // 이미지 업로드 실패했을 때
             if (err) {
@@ -59,11 +59,15 @@ router.post('/:userId/create-club/fill-info/upload-image', verifyJWT, (req, res,
     afterUploadImage
 );
 
+/*
 // 이미지 업로드를 포함하여 최종 동아리 생성 양식을 완성하고 생성하기를 눌렀을 때
 // POST /club/:userId/create-club/fill-info/submit
 router.post('/:userId/create-club/fill-info/submit', verifyJWT, upload2.none(), createClub);
+*/
 
 // 동아리 정보 수정을 위한 라우터
+// afterUploadImage로 이미지 수정 이후 동아리 정보 변경하는 서순
+// 이미지 변경이 없을 때는 afterUploadImage를 거치지 않고 원래의 clanImg 값을 그대로 보내주면 됨.
 // PUT /club/:userId/:clanId/modify-club-info
 router.put('/:userId/:clanId/modify-club-info', verifyJWT, upload2.none(), modifyClubInfo);
 
@@ -82,5 +86,17 @@ router.get('/:userId/:clanId/show-resume/:resumeId', verifyJWT, resumeInfo);
 
 // POST /club/:userId/:clanId/:resumeId/decide-apply
 router.post('/:userId/:clanId/:resumeId/decide-apply', verifyJWT, decideResume);
+
+// GET /club/:userId/:clanId/member-list
+router.get('/:userId/:clanId/member-list', verifyJWT, showMemberList);
+
+// DELETE /club/:userId/:clanId/leave-club
+router.delete('/:userId/:clanId/leave-club', verifyJWT, leaveClub);
+
+// DELETE /club/:userId/:clanId/:targetId/kick-member
+router.delete('/:userId/:clanId/leave-club', verifyJWT, kickMember);
+
+// GET /club/:userId/search-club
+router.get('/:userId/:clanId/member-list', verifyJWT, searchClub);
 
 module.exports = router;

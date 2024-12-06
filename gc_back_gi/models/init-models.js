@@ -40,6 +40,10 @@ function initModels(sequelize) {
   clan.hasMany(resume, { as: "resumes", foreignKey: "clanId"});
   userInClan.belongsTo(clan, { as: "clan", foreignKey: "clanId"});
   clan.hasMany(userInClan, { as: "userinclans", foreignKey: "clanId"});
+  clan.belongsTo(class_, { as: "clanclass_class", foreignKey: "clanclass"});
+  class_.hasMany(clan, { as: "clans", foreignKey: "clanclass"});
+  user.belongsTo(collage, { as: "collage_collage", foreignKey: "collage"});
+  collage.hasMany(user, { as: "users", foreignKey: "collage"});
   noticeImg.belongsTo(notice, { as: "notice", foreignKey: "noticeId"});
   notice.hasMany(noticeImg, { as: "noticeimgs", foreignKey: "noticeId"});
   comment.belongsTo(post, { as: "post", foreignKey: "postId"});

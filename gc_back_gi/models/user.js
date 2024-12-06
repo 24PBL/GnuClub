@@ -43,7 +43,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     collage: {
       type: DataTypes.BIGINT,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'collage',
+        key: 'collageId'
+      }
     }
   }, {
     sequelize,
@@ -56,6 +60,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "userId" },
+        ]
+      },
+      {
+        name: "FK_collage_TO_User_1",
+        using: "BTREE",
+        fields: [
+          { name: "collage" },
         ]
       },
     ]
