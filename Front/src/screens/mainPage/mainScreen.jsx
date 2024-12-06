@@ -59,8 +59,9 @@ const MainScreen =  ({navigation}) => {
     </View>
   <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
     <View style={styles.container}>
+      <View style={{borderTopWidth : 0.6, borderBottomWidth : 0.5, borderColor:'#0091da'}}>
       <Image style={styles.banner} src={`http://10.0.2.2:8001${banner}?v=${new Date().getTime()}`}>
-      </Image>
+      </Image></View>
 
       {/* 동아리 표시 블록*/}
       <View style={styles.section}>
@@ -95,7 +96,7 @@ const MainScreen =  ({navigation}) => {
         const imageUri = post.noticeimgs.length > 0 ? post.noticeimgs[0].img : 'https://default-image-url.com'; // 이미지가 있을 경우 첫 번째 이미지, 없으면 기본 이미지
         console.log(imageUri)
         return (
-          <View key={post.noticeId} style={{ marginRight: 20, borderWidth:1}}>
+          <View key={post.noticeId} style={{ marginRight: 20}}>
             <TouchableOpacity>
               <Image
                 source={{ uri: `http://10.0.2.2:8001${imageUri}` }}
@@ -172,8 +173,8 @@ const styles = StyleSheet.create({
     height: 150,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth : 1,
-    borderColor : '#d9d9d9'
+    borderColor : 'Red',
+    borderTopWidth : 1
 
   },
   bannerText: {
