@@ -56,7 +56,7 @@ const MainScreen =  ({navigation}) => {
     <View style={styles.logocontainer}>
     <Image style={styles.logo} source={require('../../logo/GC_LOGO.png')} />
     </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+  <ScrollView showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <View style={styles.banner}>
         <Text style={styles.bannerText}>{userData.userName}</Text>
@@ -143,9 +143,9 @@ const MainScreen =  ({navigation}) => {
 
         </View>
       </View>
-      </ScrollView>
+    </ScrollView>
     </SafeAreaView>
-    </SafeAreaProvider>
+  </SafeAreaProvider>
   );
 };
 

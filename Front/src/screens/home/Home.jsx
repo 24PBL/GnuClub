@@ -8,7 +8,7 @@ import CreatePost from '../clubDetail/CreatePost';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Club from '../club/club';
-
+import ClubFeed from "../club/clubFeed"
 
 
 
@@ -40,13 +40,13 @@ export default function HomeScreens({setIsSignedIn}){
         </View>), tabBarLabel: () => null, headerShown: false }}>
       </Tab.Screen>
 
-      <Tab.Screen name="clubDetail" component={ClubDetail} options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
+      <Tab.Screen name="ClubDetail" component={ClubDetail} options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="search-outline" size={size} color={color} />
           <Text style={{ color, fontSize: 12, marginBottom : 4 }}>찾기</Text>
         </View>), tabBarLabel: () => null, headerShown: false }}>
       </Tab.Screen>
 
-        <Tab.Screen name="club" component={Club} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
+        <Tab.Screen name="ClubFeed" component={ClubFeed} options={{tabBarIcon: ({ color, size}) => (<View style={{ alignItems: 'center', width:50}}>
           <Ionicons style={{}}name="albums-outline" size={size} color={color} />
           <Text style={{color,fontSize: 12  , textAlign:'center', marginBottom:4}}>동아리
           </Text>

@@ -17,6 +17,8 @@ import Board from './src/screens/clubDetail/Board';
 import Application from './src/screens/clubDetail/Application';
 import CreatePost from './src/screens/clubDetail/CreatePost';
 import MorePromotion from './src/screens/mainPage/morePromotion';
+import ClubFeed from './src/screens/club/clubFeed';
+
 
 
 
