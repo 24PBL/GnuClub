@@ -2,11 +2,7 @@ var Sequelize = require("sequelize");
 const initModels = require("./init-models"); // initModels 함수를 가져옴
 var sequelize;
 
-<<<<<<< HEAD
-sequelize = new Sequelize("gc2", "root", "1234", {
-=======
-sequelize = new Sequelize("db이름", "root", "db비밀번호", {
->>>>>>> 9feb921476f9590dd72794be585c7545ef971f21
+sequelize = new Sequelize("gc5", "root", "1234", {
     host: "localhost",
     port: 3306,
     dialect: "mysql",

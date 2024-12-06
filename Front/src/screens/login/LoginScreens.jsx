@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
+
 export default function LoginScreens({ navigation, setIsSignedIn }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -50,7 +51,8 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
                     Authorization: `Bearer ${jwtToken}`, 
                 }
             });
-
+            const UserData = JSON.stringify(res2.data.result.user);
+            await AsyncStorage.setItem('UserData', UserData);
             setIsSignedIn(true);
             console.log('토큰 반환 응답 : ', res2.data.result.user)
 

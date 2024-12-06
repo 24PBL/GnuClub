@@ -1,31 +1,65 @@
-import React from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Badge } from '@rneui/themed';
-import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 
 
-const MainScreen = () => {
+const MainScreen =  ({navigation}) => {
+  const [userData, setUserData] = useState(null); // 사용자 데이터 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
 
+  const morePromotion= () => {
+    navigation.navigate('MorePromotion')
+  }
+
+  // 사용자 정보 가져오기 (AsyncStorage에서)
+  const fetchUserInfo = async () => {
+    try {
+      const storedUserData = await AsyncStorage.getItem('UserData');
+      if (storedUserData) {
+        const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
+        setUserData(userInfo); // 사용자 정보 상태에 저장
+      } else {
+        console.log('사용자 정보가 저장되어 있지 않습니다.');
+      }
+    } catch (error) {
+      console.error('사용자 정보를 불러오는 중 오류 발생:', error);
+    } finally {
+      setLoading(false); // 로딩 완료
+    }
+  };
+
+  useEffect(() => {
+    fetchUserInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>로딩 중...</Text>
+      </View>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <View style={styles.container}>
+        <Text>사용자 정보를 불러오는 데 실패했습니다.</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
     <View style={styles.logocontainer}>
     <Image style={styles.logo} source={require('../../logo/GC_LOGO.png')} />
-      <View style={{ position: 'relative', alignItems: 'center', marginLeft: 'auto', marginRight : 10, marginTop:5}}>
-        <Ionicons name="notifications-outline" style={{ fontSize: 35, marginTop : 10 }} />
-        <Badge 
-            value="1" 
-            status="error" 
-            containerStyle={{ position: 'absolute', top: 5, right: -2 }}
-        />
-      </View>
     </View>
       <ScrollView showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
       <View style={styles.banner}>
-        <Text style={styles.bannerText}>userData.user</Text>
+        <Text style={styles.bannerText}>{userData.userName}</Text>
       </View>
 
       <View style={styles.section}>
@@ -60,7 +94,7 @@ const MainScreen = () => {
       <View style={styles.section}>
         <View style={{justifyContent:'space-between', flexDirection:'row'}}>
         <Text style={styles.sectionTitle}>홍보글</Text>
-        <TouchableOpacity><Text style={{color:"#0091da", marginTop:10}}>더 보기</Text></TouchableOpacity></View>
+        <TouchableOpacity onPress={morePromotion}><Text style={{color:"#0091da", marginTop:10}}>더 보기</Text></TouchableOpacity></View>
 
         <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
           <View style={{marginRight:20}}>

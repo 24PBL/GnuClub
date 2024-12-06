@@ -17,7 +17,7 @@ export default function SignUpDetails({ route, navigation }) {
   const [collage, setcollage] = useState(""); 
   const [iscollageListOpen, setIscollageListOpen] = useState(false); 
   const [major, setmajor] = useState(""); 
-  {/*const [sex, setsex] = useState(""); */}
+
   const [PError, setPError] = useState(""); 
   const [filteredMajors, setFilteredMajors] = useState([]); 
   const [isMajorListOpen, setIsMajorListOpen] = useState(false);
@@ -181,7 +181,7 @@ export default function SignUpDetails({ route, navigation }) {
 
   // 단과대학 선택 처리
   const handlecollageSelect = (selectedcollage) => {
-    const selectedIndex = collages.indexOf(selectedcollage);
+    const selectedIndex = (collages.indexOf(selectedcollage)+1);
     setcollage(selectedcollage)
     setcollageNum(selectedIndex);
     setFilteredMajors(collageMajorsMap[selectedcollage] || []); // 선택된 단과 대학의 학과 리스트로 업데이트
@@ -233,7 +233,7 @@ const handleMajorChange = (text) => {
     }
   };
 
-  const signUp = async (name, email, PW, studentId, PNumber, collage, sex, major) => {
+  const signUp = async (name, email, PW, studentId, PNumber, collage, major) => {
     console.log("함수 정상 호출")
     console.log(collage)
     try {
@@ -244,10 +244,10 @@ const handleMajorChange = (text) => {
         userNum: studentId,
         userPhone: PNumber,
         collage: collage,
-        Field : sex,
         userLesson : major
       });
       console.log('서버 응답' , response.data);
+  
       navigation.navigate("Login");
     } catch (error) {
       // 서버에서 409 상태 코드 반환
@@ -362,7 +362,7 @@ const isFormValid = () => {
       />
       <Text style={[{color : "red", marginLeft:50, marginTop:5}, getPasswordInputStyle()]}>{PwError}</Text>
       <SignUpBox 
-                  onPress={() => signUp(name, email, PW, studentId, PNumber, collageNum ,3 , major )} 
+                  onPress={() => signUp(name, email, PW, studentId, PNumber , collageNum , major )} 
                   disabled={!isFormValid()} 
                   style={{ opacity: isFormValid() ? 1 : 0.5 }} 
 >

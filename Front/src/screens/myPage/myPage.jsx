@@ -3,7 +3,6 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, ActivityIn
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
 import styled from 'styled-components/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -31,6 +30,7 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('jwtToken');
+      await AsyncStorage.removeItem('UserData');
       setIsSignedIn(false);
     } catch (error) {
       console.error('로그아웃 중 오류 발생:', error);
@@ -56,14 +56,17 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   //토큰 기반 사용자 정보 가져오기
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
+    const storedUserData = await AsyncStorage.getItem('UserData');
     console.log('Token:', token); 
     if (token) {
         try {
-            const response = await axios.get('http://10.0.2.2:8001/page/mypage/1', { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+            const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
+            const Id = userInfo.userId
+            const response = await axios.get(`http://10.0.2.2:8001/page/mypage/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
             console.log('User Info:', response.data.result.user);
-            console.log('img', response.data.result.user.userImg)
+            console.log('음?', response.data.result.user)
             setUserInfo(response.data.result.user); // 사용자 정보를 상태로 저장
             setAvatarUri(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
         } catch (err) {
@@ -77,10 +80,6 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
 useEffect(() => {
   fetchUserInfo(); // 컴포넌트가 렌더링될 때 사용자 정보 가져오기
 }, []);
-
-
-
-
 
 
 //서버에 프로필 사진 전송
@@ -172,27 +171,12 @@ if (!userInfo) {
 
 
       <View style={styles.placeholderSection}>
-        <Text style={{fontWeight:"bold", fontSize:18, marginLeft:20, marginBottom:12}}>내 동아리</Text>
-        <ScrollView style={{maxHeight:55}}horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-          <TouchableOpacity style={styles.clubBox}/>
-        </ScrollView>
         <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:25}} onPress={goToAppList}>
           <Text style={{fontSize:18, fontWeight:'regular', width:107}}>신청내역확인</Text>
           <Ionicons name="chevron-forward-outline" size={24} color="gray" />
         </TouchableOpacity>
         <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}} onPress={goToNotice}>
           <Text style={{fontSize:18, fontWeight:'regular', width:107}}>공지사항</Text>
-          <Ionicons name="chevron-forward-outline" size={24} color="gray" />
-        </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}}>
-          <Text style={{fontSize:18, fontWeight:'regular', width:107}}>알림</Text>
           <Ionicons name="chevron-forward-outline" size={24} color="gray" />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleLogout} style={{flexDirection:'row', marginLeft:20, justifyContent:'space-between', marginTop:23}}>
@@ -271,13 +255,6 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: '#999',
-  },
-  clubBox:{
-    borderRadius : 10,
-    width : 50,
-    height : 50,
-    marginLeft : 20,
-    backgroundColor : "#d9d9d9" 
   },
   toggleButton: {
     borderRadius: 10,

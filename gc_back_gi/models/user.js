@@ -31,10 +31,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(20),
       allowNull: false
     },
-    Field: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     userImg: {
       type: DataTypes.TEXT,
       defaultValue: "/public/default_profile.png",
