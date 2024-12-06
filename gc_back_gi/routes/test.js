@@ -62,4 +62,16 @@ router.get("/class/data/read", function(req, res) {
         res.send({success:200, data:result});
     })
 })
+
+router.get("/notice/data/read", function(req, res) {
+    db.notice.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
+
+router.get("/noticeimg/data/read", function(req, res) {
+    db.noticeImg.findAll().then(function(result) {
+        res.send({success:200, data:result});
+    })
+})
 module.exports = router;

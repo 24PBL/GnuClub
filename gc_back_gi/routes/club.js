@@ -77,7 +77,7 @@ router.put('/:userId/:clanId/modify-club-info', verifyJWT, upload2.none(), modif
 router.get('/:userId/:clanId/before-apply', verifyJWT, beforeApply);
 
 // POST /club/:userId/:clanId/apply-club
-router.post('/:userId/:clanId/apply-club', verifyJWT, applyClub);
+router.post('/:userId/:clanId/apply-club', verifyJWT, upload2.none(), applyClub);
 
 // GET /club/:userId/:clanId/apply-list
 router.get('/:userId/:clanId/apply-list', verifyJWT, applyList);
@@ -95,10 +95,10 @@ router.get('/:userId/:clanId/member-list', verifyJWT, showMemberList);
 router.delete('/:userId/:clanId/leave-club', verifyJWT, leaveClub);
 
 // DELETE /club/:userId/:clanId/:targetId/kick-member
-router.delete('/:userId/:clanId/leave-club', verifyJWT, kickMember);
+router.delete('/:userId/:clanId/:targetId/kick-member', verifyJWT, kickMember);
 
 // GET /club/:userId/search-club
-router.get('/:userId/:clanId/member-list', verifyJWT, searchClub);
+router.get('/:userId/search-club', verifyJWT, searchClub);
 
 // POST /club/:userId/create-club
 router.post('/:userId/create-club', verifyJWT, createClub);
