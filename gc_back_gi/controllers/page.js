@@ -18,7 +18,7 @@ exports.sendHomeData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 내 동아리 정보
@@ -87,7 +87,7 @@ exports.sendMoreAdData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 동아리 홍보글 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
@@ -116,7 +116,7 @@ exports.sendMoreAdData = async (req, res, next) => {
         });
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: randomClubAd, userImg: user.userImg });
+        return res.status(200).send({ success: 200, result: randomClubAd, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -135,7 +135,7 @@ exports.sendMoreAnythingData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 동아리 이모저모 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
@@ -156,7 +156,7 @@ exports.sendMoreAnythingData = async (req, res, next) => {
         });
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: randomClubAnything, userImg: user.userImg });
+        return res.status(200).send({ success: 200, result: randomClubAnything, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -175,7 +175,7 @@ exports.sendFeedData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 내 동아리 피드들 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음) - 항상 8개를 보장하지는 못함(역필터링이라서), 프론트에서 length를 통해 적절히 렌더링
@@ -203,7 +203,7 @@ exports.sendFeedData = async (req, res, next) => {
         });
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: myClubFeeds, userImg: user.userImg });
+        return res.status(200).send({ success: 200, result: myClubFeeds, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -222,7 +222,7 @@ exports.sendMypageData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 내 동아리 정보
@@ -259,7 +259,7 @@ exports.checkApply = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         const myResumeList = await db.resume.findAll({
@@ -272,7 +272,7 @@ exports.checkApply = async (req, res, next) => {
         });
 
         // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: myResumeList });
+        return res.status(200).send({ success: 200, result: myResumeList, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -291,12 +291,12 @@ exports.modifyProfile = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 프로필 사진 수정(테이블 수정)
         if(!req.file) {
-            res.status(400).send({ success: 400, result: "이미지 없음" });
+            res.status(400).send({ success: 400, result: "이미지 없음", user: user });
         } else {
             const imgInfo = await db.user.update({
                 userImg: `/uploads3/${reqUserID}/${req.file.filename}`,
@@ -304,7 +304,7 @@ exports.modifyProfile = async (req, res, next) => {
         }
 
         // 4. 프론트로 전달
-        return res.status(200).send({ success: 200, result: "프로필 수정 성공", imgPath: `/uploads3/${reqUserID}/${req.file.filename}` });
+        return res.status(200).send({ success: 200, result: "프로필 수정 성공", imgPath: `/uploads3/${reqUserID}/${req.file.filename}`, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -324,13 +324,13 @@ exports.sendPostPageData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 동아리가 존재하는지 확인
         const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
         if (!exClub) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리", user: user });
         }
 
         // 4. 동아리 부원인지 확인
@@ -348,7 +348,7 @@ exports.sendPostPageData = async (req, res, next) => {
             limit: 8, // 한 번에 최대 8개 데이터
         });
 
-        return res.status(200).send({ success: 200, result: postList, userImg: user.userImg });
+        return res.status(200).send({ success: 200, result: postList, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -368,13 +368,13 @@ exports.sendNoticePageData = async (req, res, next) => {
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근" });
+            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
         // 3. 동아리가 존재하는지 확인
         const exClub = await db.clan.findOne({ where: { clanId: reqClanID } });
         if (!exClub) {
-            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리" });
+            return res.status(404).send({ success: 404, result: "존재하지 않는 동아리", user: user });
         }
 
         // 4. 동아리 부원인지 확인
@@ -392,7 +392,7 @@ exports.sendNoticePageData = async (req, res, next) => {
             limit: 8, // 한 번에 최대 8개 데이터
         });
 
-        return res.status(200).send({ success: 200, result: noticeList, userImg: user.userImg });
+        return res.status(200).send({ success: 200, result: noticeList, user: user });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
