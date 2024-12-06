@@ -230,7 +230,13 @@ exports.sendMypageData = async (req, res, next) => {
             where: { userId: reqUserID },
             include: [{
                 model: db.clan, // 조인된 clan 데이터 가져오기
-                as: 'clan'
+                as: 'clan',
+                include: [
+                    {
+                        model: db.class_, // clan과 연결된 class 데이터 가져오기
+                        as: 'clanclass_class' // class 테이블의 별칭
+                    }
+                ]
             }]
         });
 
