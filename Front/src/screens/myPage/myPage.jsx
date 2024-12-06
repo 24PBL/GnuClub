@@ -67,7 +67,6 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             console.log('User Info:', response.data.result.user);
-            console.log('음?', response.data.result.user)
             setUserInfo(response.data.result.user); // 사용자 정보를 상태로 저장
             setAvatarUri(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
         } catch (err) {
@@ -162,7 +161,7 @@ if (!userInfo) {
             <Text style={styles.infoLabel}>학번: {userInfo.userNum}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>단과대학: {userInfo.collage}</Text>
+            <Text style={styles.infoLabel}>단과대학: {userInfo.collage_collage.collageName}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>학과: {userInfo.userLesson}</Text>

@@ -2,32 +2,38 @@ import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, ActivityIn
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-
+import axios from 'axios';
 
 const MainScreen =  ({navigation}) => {
-  const [userData, setUserData] = useState(null); // 사용자 데이터 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
-
+  const [userData, setuserData] = useState(null);
+  const [banner, setbanner] = useState(null);
   const morePromotion= () => {
     navigation.navigate('MorePromotion')
   }
 
   // 사용자 정보 가져오기 (AsyncStorage에서)
   const fetchUserInfo = async () => {
-    try {
-      const storedUserData = await AsyncStorage.getItem('UserData');
-      if (storedUserData) {
-        const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
-        setUserData(userInfo); // 사용자 정보 상태에 저장
-      } else {
-        console.log('사용자 정보가 저장되어 있지 않습니다.');
-      }
-    } catch (error) {
-      console.error('사용자 정보를 불러오는 중 오류 발생:', error);
-    } finally {
-      setLoading(false); // 로딩 완료
+    const token = await AsyncStorage.getItem('jwtToken');
+    const storedUserData = await AsyncStorage.getItem('UserData');
+    console.log('Token:', token); 
+    if (token || storedUserData) {
+        try {
+            const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
+            const Id = userInfo.userId
+            const response = await axios.get(`http://10.0.2.2:8001/page/home/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log(response.data.result.banner)
+          setbanner(response.data.result.banner)
+          setuserData(response.data.result.myClub.map((entry) => entry.clan)); //응답 결과에서 동아리 정보 분리
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
     }
-  };
+};
 
   useEffect(() => {
     fetchUserInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
@@ -42,14 +48,6 @@ const MainScreen =  ({navigation}) => {
     );
   }
 
-  if (!userData) {
-    return (
-      <View style={styles.container}>
-        <Text>사용자 정보를 불러오는 데 실패했습니다.</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaProvider>
     <SafeAreaView style={{flex : 1, backgroundColor : 'white'}}>
@@ -58,36 +56,25 @@ const MainScreen =  ({navigation}) => {
     </View>
   <ScrollView showsVerticalScrollIndicator={false}>
     <View style={styles.container}>
-      <View style={styles.banner}>
-        <Text style={styles.bannerText}>{userData.userName}</Text>
-      </View>
+      <Image style={styles.banner} src={`http://10.0.2.2:8001${banner}`}>
+      </Image>
 
+      {/* 동아리 표시 블록*/}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>내 동아리</Text>
-        <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
-          <View style={{marginRight:20}}>
+        <ScrollView horizontal contentContainerStyle={{flexDirection : 'row'}} showsHorizontalScrollIndicator={false}>
+          {userData.map((entry, index) => (
+          <View key={index} style={{ marginRight: 20 }}>
           <TouchableOpacity style={styles.clubBox}>
+            <Image style={styles.clubBox} src={`http://10.0.2.2:8001${entry.clanImg}`}></Image>
           </TouchableOpacity>
-          <Text style={{textAlign:'center'}}>동아리명</Text>
-          </View>
-          
-          <View style={{marginRight:20}}>
-          <TouchableOpacity style={styles.clubBox}>
-          </TouchableOpacity>
-          <Text style={{textAlign:'center'}}>동아리명</Text>
-          </View>
-          <View style={{marginRight:20}}>
-          <TouchableOpacity style={styles.clubBox}>
-          </TouchableOpacity>
-          <Text style={{textAlign:'center'}}>동아리명</Text>
-          </View>
-          <View style={{marginRight:20}}>
-          <TouchableOpacity style={styles.clubBox}>
-          </TouchableOpacity>
-          <Text style={{textAlign:'center'}}>동아리명</Text>
-          </View>
+          <Text style={{ textAlign: 'center' }}>{entry.clanName}</Text>
+        </View>
+      ))}
         </ScrollView>
       </View>
+
+
 
       <View style={{height:10, backgroundColor:'#d9d9d9'}}></View>
 
@@ -96,7 +83,7 @@ const MainScreen =  ({navigation}) => {
         <Text style={styles.sectionTitle}>홍보글</Text>
         <TouchableOpacity onPress={morePromotion}><Text style={{color:"#0091da", marginTop:10}}>더 보기</Text></TouchableOpacity></View>
 
-        <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
+        <ScrollView horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
           <View style={{marginRight:20}}>
           <TouchableOpacity style={styles.clubBox}>
           </TouchableOpacity>
@@ -173,14 +160,12 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 20,
+    borderWidth: 1
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10
-  },
-  clubContainer: {
-    flexDirection: 'row'
   },
   promoContainer: {
     flexDirection: 'row',
