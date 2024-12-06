@@ -1,4 +1,4 @@
-import { Text, Alert} from 'react-native';
+import { Text, Alert, ImageBackground, ImageBackgroundBase} from 'react-native';
 import React, { useState, useEffect} from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
