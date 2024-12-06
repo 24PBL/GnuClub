@@ -38,7 +38,8 @@ exports.sendHomeData = async (req, res, next) => {
             include: [{
                 model: db.noticeImg, // 연결된 noticeImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                as: 'noticeimgs'
+                as: 'noticeimgs',
+                required: true, // `INNER JOIN` 효과, `db.noticeImg`가 없는 데이터 제외
             }],
             order: Sequelize.literal('RAND()'), // 랜덤 정렬
             limit: 8, // 최대 8개의 레코드 가져오기
@@ -52,7 +53,8 @@ exports.sendHomeData = async (req, res, next) => {
             include: [{
                 model: db.postImg, // 연결된 noticeImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                as: 'postimgs'
+                as: 'postimgs',
+                required: true, // `INNER JOIN` 효과, `db.postImg`가 없는 데이터 제외
             }],
             order: Sequelize.literal('RAND()'), // 랜덤 정렬
             limit: 8, // 최대 8개의 레코드 가져오기
@@ -107,7 +109,8 @@ exports.sendMoreAdData = async (req, res, next) => {
                 {
                     model: db.noticeImg, // 연결된 noticeImg 모델 포함
                     attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                    as: 'noticeimgs'
+                    as: 'noticeimgs',
+                    required: true, // `INNER JOIN` 효과, `db.noticeImg`가 없는 데이터 제외
                 }
             ],
             group: ['clan.clanclass', 'notice.noticeId'], // 분과별로 그룹화해서 가져옴
@@ -149,7 +152,8 @@ exports.sendMoreAnythingData = async (req, res, next) => {
             include: [{
                 model: db.postImg, // 연결된 postImg 모델 포함
                 attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                as: 'postimgs'
+                as: 'postimgs',
+                required: true, // `INNER JOIN` 효과, `db.postImg`가 없는 데이터 제외
             }],
             order: Sequelize.literal('RAND()'),
             limit: 8,
