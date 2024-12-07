@@ -566,7 +566,7 @@ exports.kickMember = async (req, res, next) => {
         const memPart = await db.userInClan.findOne({
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
-        if (memPart !== 1) {
+        if (memPart.part !== 1) {
             return res.status(403).send({ success: 403, result: "리더만 추방시킬 수 있음", user: user, club: exClub });
         } 
 
