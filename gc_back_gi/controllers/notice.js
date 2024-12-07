@@ -158,12 +158,12 @@ exports.uploadNotice = async (req, res, next) => {
 
         // 9. noticeimg 테이블의 noticeId 값을 배정
         if (!imgPath) {
-            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub });
+            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, notice: noticetResult });
         } else {
             await db.noticeImg.update({noticeId: noticetResult.noticeId}, {where: { img: imgPath }});
+            const noticeImgInfo = await db.noticeImg.findOne({where: { img: imgPath }});
+            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, notice: noticetResult, noticeImg: noticeImgInfo });
         }
-
-        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, notice: noticetResult });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -368,7 +368,7 @@ exports.modifyNotice = async (req, res, next) => {
             }
         }
 
-        const currNotice = await db.notice.findOne({ where: { noticeId: reqNoticeID } });
+        const currNotice = await db.notice.findOne({ where: { noticeId: reqNoticeID }, include: [{model: db.noticeImg, as: 'noticeimgs',},], });
 
         return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, notice: currNotice });
     } catch (error) {

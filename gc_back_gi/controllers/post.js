@@ -164,16 +164,14 @@ exports.uploadPost = async (req, res, next) => {
             isPublic: req.body.isPublic
         })
 
-        const postImgInfo = await db.postImg.findOne({where: { postId: postResult.postId }});
-
         // 9. postimg 테이블의 postId 값을 배정
         if (!imgPath) {
-            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub });
+            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult });
         } else {
             await db.postImg.update({postId: postResult.postId}, {where: { img: imgPath }});
+            const postImgInfo = await db.postImg.findOne({where: { img: imgPath }});
+            return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult, postImg: postImgInfo });
         }
-
-        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult, postImg: postImgInfo });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -393,7 +391,7 @@ exports.modifyPost = async (req, res, next) => {
             }
         }
 
-        const currPost = await db.post.findOne({ where: { postId: reqPostID } });
+        const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
         return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, post: currPost });
     } catch (error) {

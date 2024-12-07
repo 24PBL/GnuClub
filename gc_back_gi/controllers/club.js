@@ -464,8 +464,20 @@ exports.showMemberList = async (req, res, next) => {
         const memberList = await db.userInClan.findAll({
             where: {
                 clanID: reqClanID,
-                createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                //createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
+            include: [
+                {
+                    model: db.user, // 관련된 clan 데이터를 포함
+                    as: 'user', // 관계 정의 시 설정한 별칭
+                    include: [
+                        {
+                            model: db.collage,
+                            as: "collage_collage",
+                        },
+                    ],
+                },
+            ],
             order: [
                 ['name', 'ASC', 'COLLATE utf8mb4_unicode_ci'] // 가-나-다 순으로 정렬
             ],
