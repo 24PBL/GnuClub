@@ -75,6 +75,8 @@ const CreatePost = ({ route, navigation }) => {
           placeholder="제목"
           value={title}
           onChangeText={setTitle}
+          scrollEnabled={false}
+          maxLength={50}
         />
         <View style={styles.separator} />
         <TextInput
@@ -84,6 +86,7 @@ const CreatePost = ({ route, navigation }) => {
           onChangeText={setContent}
           multiline
           scrollEnabled={false} // 스크롤 대신 길어지면 아래로 계속 쓸 수 있게 설정
+          maxLength={1000}
         />
       </View>
 

@@ -9,6 +9,7 @@ const Board = () => {
   const [announcement, setAnnouncement] = useState(route.params?.post || {});
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [isMenuVisible, setMenuVisible] = useState(false);
 
   // 댓글 추가 함수
   const handleSendComment = () => {
@@ -33,6 +34,20 @@ const Board = () => {
     </View>
   );
 
+  const toggleMenu = () => {
+    setMenuVisible(!isMenuVisible); // 메뉴 열기/닫기
+  };
+
+  const handleDelete = () => {
+    setMenuVisible(false);
+    alert("삭제");
+  };
+
+  const handleEdit = () => {
+    setMenuVisible(false);
+    alert("수정");
+  };
+
 
   // 뒤로 가기
   const handleBackPress = () => {
@@ -53,6 +68,19 @@ const Board = () => {
           <Text style={styles.headerTitle}>{headerTitle}</Text>
         </View>
       </View>
+      <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
+        <Ionicons name="ellipsis-vertical" size={24} color="white" />
+      </TouchableOpacity>      
+      {isMenuVisible && (
+        <View style={styles.menu}>
+          <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
+            <Text style={styles.menuText}>삭제</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
+            <Text style={styles.menuText}>수정</Text>
+          </TouchableOpacity>
+             </View> 
+             )}
 
       <ScrollView style={styles.contentContainer}>
         <Text style={styles.title}>{announcement.title}</Text>
@@ -85,6 +113,7 @@ const Board = () => {
               value={comment}
               onChangeText={setComment}
               placeholderTextColor="#aaa"
+              maxLength={255}
             />
             <TouchableOpacity onPress={handleSendComment} style={styles.iconWrapper}>
               <Ionicons name="arrow-up-circle-outline" size={24} color="#0091DA" />
@@ -97,7 +126,10 @@ const Board = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: 
+  { flex: 1, 
+  backgroundColor: '#fff',
+  },
   header: { backgroundColor: '#0091DA', padding: 15, flexDirection: 'row', alignItems: 'center' },
   headerTextContainer: { flexDirection: 'column', marginLeft: 10, marginTop: 10 },
   clubName: { color: 'white', fontSize: 18, marginBottom: 2 },
@@ -142,6 +174,32 @@ const styles = StyleSheet.create({
   backgroundColor: '#E0E0E0', 
   marginTop: 5,
   },
+menuButton: {
+  position: 'absolute', 
+  top: 35,            
+  right: 15,           
+},
+menu: {
+  position: 'absolute', 
+  top: 65,             
+  right: 15,           
+  backgroundColor: 'white',
+  borderRadius: 5,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5,
+  padding: 10,
+  zIndex: 1,
+},
+menuItem: {
+  paddingVertical: 10,
+},
+menuText: {
+  fontSize: 16,
+  color: '#000',
+},
 
 });
 
