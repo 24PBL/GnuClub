@@ -4,6 +4,7 @@ const db = require('../models/db');
 const { Op } = require('sequelize');
 const fs = require('fs').promises;
 const path = require('path');
+const { Sequelize } = require('sequelize');
 
 exports.afterUploadImage = async (req, res, next) => {
     const reqUserID = req.url.split("/")[1];
@@ -96,7 +97,8 @@ exports.modifyClubInfo = async (req, res, next) => {
     const reqUserID = req.url.split("/")[1];
     const reqClanID = req.url.split("/")[2];
 
-    const { recruitPeriod, people, fee, interview, imgPath } = req.body
+    const { recruitPeriod, people, fee, interview } = req.body
+    let imgPath = req.body.imgPath
 
     try {
         // 1. 요청 사용자 정보 가져오기
@@ -127,7 +129,12 @@ exports.modifyClubInfo = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "리더만 수정 가능.", user: user, club: exClub });
         }
 
-        // 9. 모든 무결성 검증 후 이상 없으면 포스팅 수정
+        const exClubImg = exClub.clanImg
+        if(!imgPath) {
+            imgPath = exClubImg
+        }
+
+        // 9. 모든 무결성 검증 후 이상 없으면 동아리 수정
         const result = await db.clan.update({
             recruitPeriod: recruitPeriod,
             people: people,
@@ -136,7 +143,9 @@ exports.modifyClubInfo = async (req, res, next) => {
             clanImg: imgPath,
         }, {where: { clanId: reqClanID }})
 
-        return res.status(200).send({ success: 200, result: "동아리 정보 수정 성공", user: user, club: exClub });
+        const afterClub = await db.clan.findOne({ where: { clanId: reqClanID } });
+
+        return res.status(200).send({ success: 200, result: "동아리 정보 수정 성공", user: user, club: afterClub });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -479,7 +488,7 @@ exports.showMemberList = async (req, res, next) => {
                 },
             ],
             order: [
-                ['name', 'ASC', 'COLLATE utf8mb4_unicode_ci'] // 가-나-다 순으로 정렬
+                [Sequelize.literal('`user`.`userName` COLLATE utf8mb4_unicode_ci'), 'ASC'], // 가-나-다 순으로 정렬
             ],
         });
 
