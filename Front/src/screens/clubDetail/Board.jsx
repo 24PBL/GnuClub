@@ -16,6 +16,7 @@ const Board = () => {
   const [comments, setComments] = useState([]);
   const [isMenuVisible, setMenuVisible] = useState(false);
 
+  const [Info, setInfo] = useState([])
   // 댓글 추가 함수
   const handleSendComment = () => {
     if (comment.trim()) {
@@ -69,7 +70,7 @@ const Board = () => {
             const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(response)
+            setInfo(response.data)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -91,7 +92,7 @@ useEffect(() => {
           <Ionicons name="chevron-back-outline" size={24} color="white" />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.clubName}></Text>
+          <Text style={styles.clubName}>{Info.club.clanName}</Text>
           <Text style={styles.headerTitle}>{headerTitle}</Text>
         </View>
       </View>
@@ -108,7 +109,9 @@ useEffect(() => {
           </TouchableOpacity>
              </View> 
              )}
-
+      <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost.postHead}</Text>
+      <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>{Info.resultPost.user.username} | {(Info.resultPost.createAt).split('T')[0]}</Text>
+      <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.resultPost.postBody}</Text>
       <ScrollView style={styles.contentContainer}>
         <Text style={styles.title}>{announcement.title}</Text>
         <Text style={styles.content}>{announcement.content}</Text>
