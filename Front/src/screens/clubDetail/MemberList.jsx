@@ -1,13 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,ScrollView, Image } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const MemberList = () => {
     const route = useRoute();
   const { clanId, userId} = route.params;
+
+  const [memInfo, setmemInfo] = useState([])
 
 //토큰 기반 사용자 정보 가져오기
 const fetchMemberList = async () => {
@@ -18,7 +21,8 @@ const fetchMemberList = async () => {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('User Info:', response);
+            console.log('반환값:', response);
+            setmemInfo(response.data.result || [])
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -32,23 +36,80 @@ useEffect(() => {
 }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{clanId}  {userId}</Text>
+    <SafeAreaView>
+    <View style={{marginBottom: 20}}>
+      <Text style={{fontSize: 30, fontWeight: 'bold', marginLeft: 30}}>멤버</Text>
     </View>
+    <ScrollView>
+
+      {memInfo.map((member, index) => (
+  <View key={index} style={styles.memberBox}>
+    {/* 사진과 이름을 나란히 배치 */}
+    <View style={styles.memberInfo}>
+      <Image 
+        style={styles.memberPhoto} 
+        source={{ uri: `http://10.0.2.2:8001${member.user.userImg}` }} 
+      />
+      <Text style={{ fontSize: 20, marginLeft: 10 }}>{member.user.userName}</Text>
+    </View>
+    
+    {/* 추방 버튼을 오른쪽 끝에 배치 */}
+    <View style={styles.kick}>
+      <Text style={styles.kickText}>추방</Text>
+    </View>
+  </View>
+))}
+
+
+      
+
+
+
+    </ScrollView>
+  </SafeAreaView>
+  
+
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-  text: {
-    fontSize: 18,
-    color: '#000000',
-  },
-});
+    memberPhoto: {
+      width: 60,
+      height: 60,
+      backgroundColor: '#d9d9d9',
+      borderRadius: 100,
+    },
+    memberBox: {
+      borderTopWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: '#d9d9d9',
+      width: '100%',
+      height: 80,
+      flexDirection: 'row', // 가로 방향 배치
+      alignItems: 'center',
+      paddingHorizontal: 10,
+    },
+    memberInfo: {
+      flexDirection: 'row', // 사진과 이름을 나란히 배치
+      alignItems: 'center', // 수직 정렬
+      flex: 1, // 공간을 차지하며 버튼과의 간격 조정
+    },
+    kick: {
+      marginLeft: 'auto', // 버튼을 오른쪽 끝에 배치
+      width: 50,
+      height: 40,
+      justifyContent: 'center',
+      borderRadius: 5,
+      backgroundColor: '#0091da',
+    },
+    kickText: {
+      textAlign: 'center',
+      fontSize: 18,
+      color: 'white',
+      fontWeight: 'bold',
+    },
+  });
+  
+  
 
 export default MemberList;
