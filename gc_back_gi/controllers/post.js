@@ -232,7 +232,7 @@ exports.sendPostData = async (req, res, next) => {
         }
 
         // 7. 포스트와 연동된 comment 객체들의 리스트를 추가
-        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+        const commentList = await db.comment.findAll({ order: [['createAt', 'DESC']],
                                                         where: { postId: reqPostID },
                                                         include: [
                                                             {
@@ -389,7 +389,7 @@ exports.modifyPost = async (req, res, next) => {
         const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
         // 12. 포스트와 연동된 comment 객체들의 리스트를 추가
-        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+        const commentList = await db.comment.findAll({ order: [['createAt', 'DESC']],
             where: { postId: reqPostID },
             include: [
                 {
@@ -521,7 +521,7 @@ exports.uploadComment = async (req, res, next) => {
         const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
         // 7. 포스트와 연동된 comment 객체들의 리스트를 추가
-        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+        const commentList = await db.comment.findAll({ order: [['createAt', 'DESC']],
             where: { postId: reqPostID },
             include: [
                 {
@@ -596,7 +596,7 @@ exports.modifyComment = async (req, res, next) => {
         const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
         // 9. 포스트와 연동된 comment 객체들의 리스트를 추가
-        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+        const commentList = await db.comment.findAll({ order: [['createAt', 'DESC']],
             where: { postId: reqPostID },
             include: [
                 {
@@ -670,7 +670,7 @@ exports.deleteComment = async (req, res, next) => {
         const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
         // 9. 포스트와 연동된 comment 객체들의 리스트를 추가
-        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+        const commentList = await db.comment.findAll({ order: [['createAt', 'DESC']],
             where: { postId: reqPostID },
             include: [
                 {

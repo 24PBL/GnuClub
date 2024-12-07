@@ -473,7 +473,7 @@ exports.showMemberList = async (req, res, next) => {
         const memberList = await db.userInClan.findAll({
             where: {
                 clanID: reqClanID,
-                //createdAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                //createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
             include: [
                 {

@@ -104,7 +104,7 @@ router.post('/:userId/:clanId/:postId/upload-comment', verifyJWT, upload2.none()
 router.put('/:userId/:clanId/:postId/:commentId/modify-comment', verifyJWT, upload2.none(), modifyComment);
 
 // 댓글을 삭제하는 라우터
-// delete /post/:userId/:clanId/:postId/delete-comment
+// delete /post/:userId/:clanId/:postId/:commentId/delete-comment
 router.delete('/:userId/:clanId/:postId/:commentId/delete-comment', verifyJWT, deleteComment);
 
 module.exports = router;
