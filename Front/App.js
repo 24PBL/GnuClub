@@ -18,6 +18,7 @@ import Application from './src/screens/clubDetail/Application';
 import CreatePost from './src/screens/clubDetail/CreatePost';
 import MorePromotion from './src/screens/mainPage/morePromotion';
 import ClubFeed from './src/screens/club/clubFeed';
+import MemberList from './src/screens/clubDetail/MemberList';
 
 
 
@@ -77,6 +78,7 @@ export default function App() {
             <RootStack.Screen name="Application" options={{ headerShown: false }} component={Application} />
             <RootStack.Screen name="CreatePost" options={{ headerShown: false }} component={CreatePost} />
             <RootStack.Screen name="MorePromotion" options={{ headerShown: false }} component={MorePromotion} />
+            <RootStack.Screen name="MemberList" options={{ headerShown: false }} component={MemberList} />
           </>
         )}
       </RootStack.Navigator>

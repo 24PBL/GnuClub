@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 
 const ClubDetail = () => {
   const [selectedTab, setSelectedTab] = useState('announcement');
@@ -15,28 +16,54 @@ const ClubDetail = () => {
   const [clubInfo, setClubInfo] = useState([]);
   const route = useRoute();
   const { clanId, userId} = route.params;
+  const [ClubPost, setClubPost] = useState([])
   const [ClubNotice, setClubNotice] = useState([])
+  const [joinCheck, setjoinCheck] = useState()
   
   const renderContent = () => {
 
     if (selectedTab === 'announcement') {
         return (
           <>
-          {ClubNotice.map(notice => (
-              <TouchableOpacity key={notice.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}}>
+  {ClubNotice.map((post) => (
+    <TouchableOpacity
+      key={post.noticeId}
+      style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#d9d9d9' }}
+    >
+      <View style={styles.header}>
+        <Text style={{ flex: 1, fontSize: 16, marginLeft: 10 }}>
+          {post.postHead}
+        </Text>
+        <Text
+          style={{
+            textAlign: 'right',
+            flex: 1,
+            marginRight: 10,
+            color: 'gray',
+          }}
+        >
+          {new Date(post.createAt).toLocaleDateString()}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  ))}
+</>
+
+        );
+    } else if (selectedTab === 'board') {
+        return (
+          <>
+          {ClubPost.map(post => (
+              <TouchableOpacity key={post.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}}>
                   <View style={styles.header}>
-                      <Text style={{ flex: 1, fontSize: 16, marginLeft:10}}>{notice.postHead}</Text>
+                      <Text style={{ flex: 1, fontSize: 16, marginLeft:10}}>{post.postHead}</Text>
                       <Text style={{ textAlign: 'right', flex: 1, marginRight: 10, color: 'gray' }}>
-                          {new Date(notice.createAt).toLocaleDateString()}
+                          {new Date(post.createAt).toLocaleDateString()}
                       </Text>
                   </View>
               </TouchableOpacity>
           ))}
       </>
-        );
-    } else if (selectedTab === 'board') {
-        return (
-            <Text>아아아아ㅏㅏㅏㅏㅏㅏㅏㅏ</Text>
         );
     }
 };
@@ -84,14 +111,20 @@ const ClubDetail = () => {
 
   const fetchClubInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
-    if (token || storedUserData) {
+    if (token) {
         try {
-            const response = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/post`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+            const response1 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/post`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setClubInfo(response.data.club)
-            console.log(response.data.result)
-            setClubNotice(response.data.result || [])
+
+            const response2 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/notice`, { 
+              headers: { Authorization: `Bearer ${token}` },
+          });
+
+            setClubInfo(response1.data.club)
+            setClubPost(response1.data.result || [])
+            setjoinCheck(response1.data.memPart)
+            setClubNotice(response2.data.result)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -115,9 +148,18 @@ useEffect(() => {
             source={{ uri: `http://10.0.2.2:8001${clubInfo.clanImg}` }}
           />
           <Text style={styles.clubName}>{clubInfo.clanName}</Text>
-          <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-            <Text style={styles.applyButtonText}>신청하기</Text>
-          </TouchableOpacity>
+          {joinCheck == null && (
+    <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+      <Text style={styles.applyButtonText}>신청하기</Text>
+    </TouchableOpacity>
+  )}
+  {joinCheck != null && (
+    <TouchableOpacity style={styles.memberList} onPress={() => navigation.navigate('MemberList', { clanId : clanId,
+      userId : userId        
+})}>
+  <Ionicons style={{}}name="people-outline" size={40}/>
+  </TouchableOpacity>
+  )}
         </View>
 
         <View style={{backgroundColor: '#d9d9d9',padding : 20,marginHorizontal : 20,borderRadius: 10,marginBottom: 20,paddingLeft: 10}}>
@@ -150,11 +192,12 @@ useEffect(() => {
 
         <View style={styles.contentContainer}>{renderContent()}</View>
 
-      {(selectedTab === 'announcement' || selectedTab === 'board') && (
-        <TouchableOpacity style={styles.writeButton} onPress={handleAddPost}>
-          <Text style={styles.writeButtonText}>글쓰기</Text>
-        </TouchableOpacity>
-      )}
+        {(selectedTab === 'announcement' || selectedTab === 'board') && joinCheck !== null && (
+  <TouchableOpacity style={styles.writeButton} onPress={handleAddPost}>
+    <Text style={styles.writeButtonText}>글쓰기</Text>
+  </TouchableOpacity>
+)}
+
     </ScrollView>
     </SafeAreaView>
   );
@@ -265,6 +308,14 @@ const styles = StyleSheet.create({
   headerImg: {
     alignItems: 'center',
     marginBottom:20,
+  },
+  memberList: {
+    position: 'absolute',
+    top: 20,
+    right: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
   }
 });
 
