@@ -109,7 +109,11 @@ const MainScreen =  ({navigation}) => {
                 style={styles.clubBox}
               />
             </TouchableOpacity>
-            <Text style={{ textAlign: 'center' }}>{post.postHead}</Text>
+            <Text style={{ textAlign: 'center'}}>
+              {post.postHead.length > 6
+                ? post.postHead.slice(0, 6) + '...'
+                : post.postHead}
+            </Text>
           </View>
         );
       })}

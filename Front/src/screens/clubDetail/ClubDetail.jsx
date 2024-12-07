@@ -10,11 +10,37 @@ const ClubDetail = () => {
   const [selectedTab, setSelectedTab] = useState('announcement');
   const [announcements, setAnnouncements] = useState([]);
   const [boardPosts, setBoardPosts] = useState([]);
-  const [clubName] = useState('동아리 이름');
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [clubInfo, setClubInfo] = useState([]);
   const route = useRoute();
   const { clanId, userId} = route.params;
-  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [ClubNotice, setClubNotice] = useState([])
+  
+  const renderContent = () => {
+
+    if (selectedTab === 'announcement') {
+        return (
+          <>
+          {ClubNotice.map(notice => (
+              <TouchableOpacity key={notice.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}}>
+                  <View style={styles.header}>
+                      <Text style={{ flex: 1, fontSize: 16, marginLeft:10}}>{notice.postHead}</Text>
+                      <Text style={{ textAlign: 'right', flex: 1, marginRight: 10, color: 'gray' }}>
+                          {new Date(notice.createAt).toLocaleDateString()}
+                      </Text>
+                  </View>
+              </TouchableOpacity>
+          ))}
+      </>
+        );
+    } else if (selectedTab === 'board') {
+        return (
+            <Text>아아아아ㅏㅏㅏㅏㅏㅏㅏㅏ</Text>
+        );
+    }
+};
+
 
 
   // 글쓰기 화면으로 이동  
@@ -53,32 +79,19 @@ const ClubDetail = () => {
     </TouchableOpacity>
   );
 
-  // 탭별 콘텐츠 렌더링
-  const renderContent = () => {
-    const data = selectedTab === 'announcement' ? announcements : boardPosts;
 
-    return (
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-      />
-    );
-  };
+
 
   const fetchClubInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
-    console.log('Token:', token); 
     if (token || storedUserData) {
         try {
-            const response1 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/post`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+            const response = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/post`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            const response2 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/notice`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
-              headers: { Authorization: `Bearer ${token}` },
-          });
-
-            console.log('받아오는 정보',JSON.stringify(response1, null, 2))
+            setClubInfo(response.data.club)
+            console.log(response.data.result)
+            setClubNotice(response.data.result || [])
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -87,32 +100,32 @@ const ClubDetail = () => {
     }
 };
 
-  useEffect(() => {
-    fetchClubInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
-  }, []);
+useEffect(() => {
+  fetchClubInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
+}, [clanId, userId]);
 
 
 
   return (
     <SafeAreaView>
-    <View>
-        <View style={styles.header}>
+    <ScrollView>
+        <View style={styles.headerImg}>
           <Image
             style={styles.clubImage}
-            source={{ uri: 'https://via.placeholder.com/100' }}
+            source={{ uri: `http://10.0.2.2:8001${clubInfo.clanImg}` }}
           />
-          <Text style={styles.clubName}>{clubName}</Text>
+          <Text style={styles.clubName}>{clubInfo.clanName}</Text>
           <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
             <Text style={styles.applyButtonText}>신청하기</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.infoBox}>
+        <View style={{backgroundColor: '#d9d9d9',padding : 20,marginHorizontal : 20,borderRadius: 10,marginBottom: 20,paddingLeft: 10}}>
           <View style={styles.infoDetails}>
-            <Text style={styles.infoText}>모집 기간:</Text>
-            <Text style={styles.infoText}>모집 인원:</Text>
-            <Text style={styles.infoText}>회비: </Text>
-            <Text style={styles.infoText}>면접: </Text>
+            <Text style={styles.infoText}>모집 기간 : {clubInfo.recruitPeriod}</Text>
+            <Text style={styles.infoText}>모집 인원 : {clubInfo.people}</Text>
+            <Text style={styles.infoText}>회비 : {clubInfo.fee}</Text>
+            <Text style={styles.infoText}>면접: {clubInfo.interview}</Text>
           </View>
         </View>
 
@@ -142,16 +155,16 @@ const ClubDetail = () => {
           <Text style={styles.writeButtonText}>글쓰기</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   header: {
-    position: 'relative',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom:30,
+    flexDirection : 'row',
   },
   clubImage: {
     width: 180,
@@ -193,9 +206,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 30,
-    fontWeight: 'bold',
+    fontWeight:'bold'
   },
   tabContainer: {
     flexDirection: 'row',
@@ -243,13 +255,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     position: 'absolute',
     right: 20,
-    bottom: 100,
+    bottom: 10,
   },
   writeButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  headerImg: {
+    alignItems: 'center',
+    marginBottom:20,
+  }
 });
 
 export default ClubDetail;
