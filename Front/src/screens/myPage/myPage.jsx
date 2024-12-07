@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyPage = ({ setIsSignedIn, navigation }) => {
 
-  const [avatarUri, setAvatarUri] = useState(null); //프로필 설정을 위한 상태
+  const [image, setimage] = useState(null); //프로필 설정을 위한 상태
   const [userInfo, setUserInfo] = useState(null); //사용자 정보를 위한 상태
   const [loading, setLoading] = useState(true); // 로딩 상태
 
@@ -39,19 +39,24 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
 
   //프로필 사진 설정
   const pickImage = async () => {
+    // 갤러리 접근 권한 요청
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+        alert('카메라 롤 권한이 필요합니다!');
+        return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
     });
 
     if (!result.canceled) {
-      setAvatarUri(result.assets[0].uri); // Update avatar with selected image
-      await uploadAvatar(result.assets[0].uri);
+        setimage(result.assets[0].uri); // 선택한 이미지의 URI 설정
+        await handleUpload()
     }
-
-  };
+};
   
   //토큰 기반 사용자 정보 가져오기
   const fetchUserInfo = async () => {
@@ -68,7 +73,7 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
             });
             console.log('User Info:', response.data.result.user);
             setUserInfo(response.data.result.user); // 사용자 정보를 상태로 저장
-            setAvatarUri(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
+            setimage(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -81,41 +86,52 @@ useEffect(() => {
   fetchUserInfo(); // 컴포넌트가 렌더링될 때 사용자 정보 가져오기
 }, []);
 
-
-//서버에 프로필 사진 전송
-const uploadAvatar = async (imageUri) => {
+const handleUpload = async () => {
+  if (!image) {
+      alert('이미지를 선택해주세요!');
+      return;
+  }
+  const storedUserData = await AsyncStorage.getItem('UserData');
   const token = await AsyncStorage.getItem('jwtToken');
+
+  // FormData 객체 생성
   const formData = new FormData();
 
-  formData.append('avatar', {
-      uri: imageUri,
-      name: 'profile.jpg', // 업로드할 파일 이름
-      type: 'image/jpeg',  // 파일 형식
-  });
+  const fileName = image.split('/').pop();
+  const fileType = fileName.split('.').pop();
 
-  console.log('FormData to upload:', formData)
-
+  formData.append('img', {
+    uri: image,
+    name: fileName,
+    type: `image/${fileType}`, // MIME 타입 설정
+});
   try {
-      const response = await axios.post('http://10.0.2.2:8001/update-avatar', formData, {
-          headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${token}`,
-          },
-      });
+      const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
+      const Id = userInfo.userId
+      console.log('이미지 경로',image)
+      const response = await axios.put(
+          `http://10.0.2.2:8001/page/modify-profile/${Id}`, // 서버 URL
+          formData,
+          {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+                  Authorization: `Bearer ${token}`, // JWT 토큰 포함
+              },
+          }
+      );
 
-      if (response.status === 200) {
-          console.log('업로드 성공:', response.data);
-
-          const newImageUrl = response.data.imageUrl;
-          setAvatarUri(newImageUrl);
-          await fetchUserInfo();
+      if (response.data.success === 200) {
+          fetchUserInfo()
+          alert('프로필 수정 성공');
       } else {
-          console.error('업로드 실패:', response.data);
+          alert('프로필 수정 실패: ' + response.data.result);
       }
   } catch (error) {
-      console.error('업로드 중 오류 발생:', error);
+      console.error(error);
+      alert('에러 발생: ' + error.message);
   }
 };
+
 
 if (loading) {
   return (
@@ -146,7 +162,7 @@ if (!userInfo) {
         <View style={styles.avatarWrapper}>
           <Image
             style={styles.avatar}
-            source={{ uri: `${avatarUri}?t=${new Date().getTime()}` }} // Updated to use selected image
+            source={{ uri: `http://10.0.2.2:8001${userInfo.userImg}` }} // Updated to use selected image
           />
           <TouchableOpacity style={styles.cameraIcon} onPress={pickImage}>
             <Ionicons name="camera-outline" size={24} color="black" />
@@ -164,7 +180,7 @@ if (!userInfo) {
             <Text style={styles.infoLabel}>단과대학: {userInfo.collage_collage.collageName}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>학과: {userInfo.userLesson}</Text>
+            <Text style={styles.infoLabel}>학과:{userInfo.userLesson}</Text>
           </View>
         </View>
       </View>

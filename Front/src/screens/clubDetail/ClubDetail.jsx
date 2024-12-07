@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const ClubDetail = () => {
   const [selectedTab, setSelectedTab] = useState('announcement');
@@ -8,6 +12,10 @@ const ClubDetail = () => {
   const [boardPosts, setBoardPosts] = useState([]);
   const [clubName] = useState('동아리 이름');
   const navigation = useNavigation();
+  const route = useRoute();
+  const { clanId, userId} = route.params;
+  const [loading, setLoading] = useState(true); // 로딩 상태
+
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
@@ -25,15 +33,13 @@ const ClubDetail = () => {
       setBoardPosts((prev) => [...prev, newPost]);
     }
   };
+  const handleApply = () => {
+    navigation.navigate('Application');
+  };
 
   // 게시물 클릭 시 상세 페이지로 이동
   const handleViewPost = (post) => {
     navigation.navigate('Board', { post, selectedTab });
-  };
-
-  // 신청하기 버튼
-  const handleApply = () => {
-    navigation.navigate('Application');
   };
 
   // 공지사항과 게시판 렌더링
@@ -49,31 +55,47 @@ const ClubDetail = () => {
 
   // 탭별 콘텐츠 렌더링
   const renderContent = () => {
-    switch (selectedTab) {
-      case 'announcement':
-        return (
-          <FlatList
-            data={announcements}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-          />
-        );
-      case 'board':
-        return (
-          <FlatList
-            data={boardPosts}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-          />
-        );
-      default:
-        return null;
-    }
+    const data = selectedTab === 'announcement' ? announcements : boardPosts;
+
+    return (
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
+    );
   };
 
+  const fetchClubInfo = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+    console.log('Token:', token); 
+    if (token || storedUserData) {
+        try {
+            const response1 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/post`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const response2 = await axios.get(`http://10.0.2.2:8001/page/${userId}/${clanId}/club/notice`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+              headers: { Authorization: `Bearer ${token}` },
+          });
+
+            console.log('받아오는 정보',JSON.stringify(response1, null, 2))
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
+    }
+};
+
+  useEffect(() => {
+    fetchClubInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
+  }, []);
+
+
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <ScrollView style={{ flex: 1 }}>
+    <SafeAreaView>
+    <View>
         <View style={styles.header}>
           <Image
             style={styles.clubImage}
@@ -87,8 +109,8 @@ const ClubDetail = () => {
 
         <View style={styles.infoBox}>
           <View style={styles.infoDetails}>
-            <Text style={styles.infoText}>모집 기간: </Text>
-            <Text style={styles.infoText}>모집 인원: </Text>
+            <Text style={styles.infoText}>모집 기간:</Text>
+            <Text style={styles.infoText}>모집 인원:</Text>
             <Text style={styles.infoText}>회비: </Text>
             <Text style={styles.infoText}>면접: </Text>
           </View>
@@ -114,7 +136,6 @@ const ClubDetail = () => {
         </View>
 
         <View style={styles.contentContainer}>{renderContent()}</View>
-      </ScrollView>
 
       {(selectedTab === 'announcement' || selectedTab === 'board') && (
         <TouchableOpacity style={styles.writeButton} onPress={handleAddPost}>
@@ -122,6 +143,7 @@ const ClubDetail = () => {
         </TouchableOpacity>
       )}
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -189,6 +211,9 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 16,
     color: '#888',
+  },
+  contentContainer: {
+    flex: 1,
   },
   post: {
     padding: 15,

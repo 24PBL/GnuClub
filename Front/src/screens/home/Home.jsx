@@ -3,12 +3,13 @@ import { Ionicons } from '@expo/vector-icons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MainScreen from "../mainPage/mainScreen";
 import MyPageScreen from '../myPage/myPage';
-import ClubDetail from '../clubDetail/Application';
+import Application from '../clubDetail/Application';
 import CreatePost from '../clubDetail/CreatePost';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Club from '../club/club';
 import ClubFeed from "../club/clubFeed"
+import ClubDetail from '../clubDetail/ClubDetail';
 
 
 

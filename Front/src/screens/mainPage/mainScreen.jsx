@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
@@ -10,9 +10,11 @@ const MainScreen =  ({navigation}) => {
   const [banner, setbanner] = useState(null);
   const [PostImg, setPostImg] = useState(null);
   const [NoticeImg, setNoticeImg] = useState(null);
+  const [userId, setuserId] = useState(null);
   const morePromotion= () => {
     navigation.navigate('MorePromotion')
   }
+
 
   // 사용자 정보 가져오기 (AsyncStorage에서)
   const fetchUserInfo = async () => {
@@ -23,6 +25,7 @@ const MainScreen =  ({navigation}) => {
         try {
             const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
             const Id = userInfo.userId
+            setuserId(Id)
             const response = await axios.get(`http://10.0.2.2:8001/page/home/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -47,7 +50,7 @@ const MainScreen =  ({navigation}) => {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>로딩 중...</Text>
+        <Text style={{fontWeight:'bold', fontSize:30}}>로딩 중...</Text>
       </View>
     );
   }
@@ -67,15 +70,18 @@ const MainScreen =  ({navigation}) => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>내 동아리</Text>
         <ScrollView horizontal contentContainerStyle={{flexDirection : 'row'}} showsHorizontalScrollIndicator={false}>
+
           {userData.map((entry, index) => (
           <View key={index} style={{ marginRight: 20 }}>
-          <TouchableOpacity style={styles.clubBox}>
+          <TouchableOpacity style={styles.clubBox} onPress={() => navigation.navigate('ClubDetail', { clanId : entry.clanId,
+                                                                                                      userId : userId        
+          })}>
             <Image style={styles.clubBox} src={`http://10.0.2.2:8001${entry.clanImg}`}></Image>
           </TouchableOpacity>
           <Text style={{ textAlign: 'center' }}>{entry.clanName}</Text>
         </View>
       ))}
-        </ScrollView>
+        </ScrollView>  
       </View>
 
 

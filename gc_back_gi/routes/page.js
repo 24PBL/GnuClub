@@ -69,6 +69,7 @@ router.get('/check-apply/:userId', verifyJWT, checkApply);
 // 마이페이지에서 프로필 사진 수정
 // PUT /page/modify-profile/:userId
 router.put('/modify-profile/:userId', verifyJWT, (req, res, next) => {
+    console.log('Received userId:', req.params.userId);
         upload.single('img')(req, res, (err) => {
             // 이미지 업로드 실패했을 때
             if (err) {
