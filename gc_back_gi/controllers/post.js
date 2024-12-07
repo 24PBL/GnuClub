@@ -237,7 +237,7 @@ exports.sendPostData = async (req, res, next) => {
                                                         include: [
                                                             {
                                                                 model: db.user,
-                                                                attributes: ['userId', 'username', 'userImg'],
+                                                                attributes: ['userId', 'userName', 'userImg'],
                                                                 as: 'user'
                                                             }
                                                         ]});
@@ -284,10 +284,7 @@ exports.modifyImg = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "해당 게시글 수정 권한 없음", user: user, club: exClub });
         }
 
-        // 6. 과거 이미지 정보 임시 저장
-        const pastPostImg = await db.postImg.findOne({ where: { postId: reqPostID } });
-
-        // 7. 모든 무결성 검증 후 postimg 테이블의 이미지 저장 경로 수정
+        // 6. 모든 무결성 검증 후 postimg 테이블의 이미지 저장 경로 수정
         const imgInfo = await db.postImg.update({
             img: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`,
         }, {where: { postId: reqPostID }} );
@@ -295,9 +292,7 @@ exports.modifyImg = async (req, res, next) => {
         // 8. 프론트로 전달
         return res.status(201).send({
             success: 200,
-            result: { img: req.file, imgPath: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`, pastImgPath: pastPostImg.img },
-            user: user, club: exClub
-        });
+            result: { imgPath: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`,user: user, club: exClub, post: exPost} });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -309,7 +304,7 @@ exports.modifyPost = async (req, res, next) => {
     const reqClanID = req.url.split("/")[2];
     const reqPostID = req.url.split("/")[3];
 
-    const { postHead, postBody, isPublic, pastImgPath } = req.body
+    const { postHead, postBody, isPublic, imgPath } = req.body
 
     try {
         // 1. 요청 사용자 정보 가져오기
@@ -339,8 +334,6 @@ exports.modifyPost = async (req, res, next) => {
         if (exPost.userId !== parseInt(reqUserID) || exPost.clanId !== parseInt(reqClanID)) {
             return res.status(403).send({ success: 403, result: "해당 게시글 수정 권한 없음", user: user, club: exClub });
         }
-
-        const imgPath = req.body.imgPath;
 
         if(imgPath) {
             // 6. 없는 이미지 데이터 사용(악의적인 url 사용 방지)
@@ -375,25 +368,38 @@ exports.modifyPost = async (req, res, next) => {
 
         // 10. postimg 테이블의 수정 사항 반영
         if (!imgPath) {
+            const pastImg = await db.postImg.findOne({where: { postId: reqPostID }});
+
+            // 11. 과거 이미지파일 삭제
+            if(pastImg) {
+                const filePath = path.join(__dirname, '../', pastImg.img);
+                try {
+                    await fs.unlink(filePath);
+                } catch (err) {
+                    console.error('파일 삭제 중 오류 발생:', err);
+                    return res.status(500).send({ success: 500, result: "파일 삭제 중 오류가 발생했습니다.", user: user, club: exClub });
+                }
+            }
+            
             await db.postImg.destroy({where: { postId: reqPostID }});
         } else {
             await db.postImg.update({ img: imgPath }, {where: { postId: reqPostID }});
         }
 
-        // 11. 과거 이미지파일 삭제
-        if(pastImgPath) {
-            const filePath = path.join(__dirname, '../', pastImgPath);
-            try {
-                await fs.unlink(filePath);
-            } catch (err) {
-                console.error('파일 삭제 중 오류 발생:', err);
-                return res.status(500).send({ success: 500, result: "파일 삭제 중 오류가 발생했습니다.", user: user, club: exClub });
-            }
-        }
-
         const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
-        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, post: currPost });
+        // 12. 포스트와 연동된 comment 객체들의 리스트를 추가
+        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+            where: { postId: reqPostID },
+            include: [
+                {
+                    model: db.user,
+                    attributes: ['userId', 'userName', 'userImg'],
+                    as: 'user'
+                }
+            ]});
+
+        return res.status(200).send({ success: 200, result: "포스팅 수정 성공", user: user, club: exClub, post: currPost, comment: commentList });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -512,7 +518,20 @@ exports.uploadComment = async (req, res, next) => {
             comment: comment
         })
 
-        return res.status(201).send({ success: 201, result: "댓글 작성 성공", user: user, club: exClub, post: exPost });
+        const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
+
+        // 7. 포스트와 연동된 comment 객체들의 리스트를 추가
+        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+            where: { postId: reqPostID },
+            include: [
+                {
+                    model: db.user,
+                    attributes: ['userId', 'userName', 'userImg'],
+                    as: 'user'
+                }
+            ]});
+
+        return res.status(201).send({ success: 201, result: "댓글 작성 성공", user: user, club: exClub, post: currPost, comment: commentList });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -574,8 +593,20 @@ exports.modifyComment = async (req, res, next) => {
         // 8. 모든 무결성 검증 후 이상 없으면 포스팅 수정
         const commentResult = await db.comment.update({ comment: comment }, {where: { commentId: reqCommentID }});
 
+        const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
 
-        return res.status(200).send({ success: 200, result: "댓글 수정 성공", user: user, club: exClub, post: exPost });
+        // 9. 포스트와 연동된 comment 객체들의 리스트를 추가
+        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+            where: { postId: reqPostID },
+            include: [
+                {
+                    model: db.user,
+                    attributes: ['userId', 'userName', 'userImg'],
+                    as: 'user'
+                }
+            ]});
+
+        return res.status(200).send({ success: 200, result: "댓글 수정 성공", user: user, club: exClub, post: currPost, comment: commentList });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
@@ -636,7 +667,20 @@ exports.deleteComment = async (req, res, next) => {
 
         await db.comment.destroy({ where: { commentId: reqCommentID } });
 
-        return res.status(200).send({ success: 200, result: "댓글 삭제 성공", user: user, club: exClub, post: exPost });
+        const currPost = await db.post.findOne({ where: { postId: reqPostID }, include: [{model: db.postImg, as: 'postimgs',},], });
+
+        // 9. 포스트와 연동된 comment 객체들의 리스트를 추가
+        const commentList = await db.comment.findAll({ order: [['createdAt', 'DESC']],
+            where: { postId: reqPostID },
+            include: [
+                {
+                    model: db.user,
+                    attributes: ['userId', 'userName', 'userImg'],
+                    as: 'user'
+                }
+            ]});
+
+        return res.status(200).send({ success: 200, result: "댓글 삭제 성공", user: user, club: exClub, post: currPost, comment: commentList });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달

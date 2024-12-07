@@ -264,10 +264,7 @@ exports.modifyImg = async (req, res, next) => {
             return res.status(403).send({ success: 403, result: "해당 게시글 수정 권한 없음", user: user, club: exClub });
         }
 
-        // 6. 과거 이미지 정보 임시 저장
-        const pastNoticeImg = await db.noticeImg.findOne({ where: { noticeId: reqNoticeID } });
-
-        // 7. 모든 무결성 검증 후 noticeimg 테이블의 이미지 저장 경로 수정
+        // 6. 모든 무결성 검증 후 noticeimg 테이블의 이미지 저장 경로 수정
         const imgInfo = await db.noticeImg.update({
             img: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`,
         }, {where: { noticeId: reqNoticeID }} );
@@ -275,7 +272,7 @@ exports.modifyImg = async (req, res, next) => {
         // 8. 프론트로 전달
         return res.status(201).send({
             success: 200,
-            result: { img: req.file, imgPath: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`, pastImgPath: pastNoticeImg.img, user: user, club: exClub },
+            result: { imgPath: `/uploads/${reqUserID}/${reqClanID}/${req.file.filename}`, user: user, club: exClub, notice: exNotice },
         });
     } catch (error) {
         console.error(error);
@@ -288,7 +285,7 @@ exports.modifyNotice = async (req, res, next) => {
     const reqClanID = req.url.split("/")[2];
     const reqNoticeID = req.url.split("/")[3];
 
-    const { postHead, postBody, isPublic, pastImgPath } = req.body
+    const { postHead, postBody, isPublic, imgPath } = req.body
 
     try {
         // 1. 요청 사용자 정보 가져오기
@@ -352,20 +349,22 @@ exports.modifyNotice = async (req, res, next) => {
 
         // 10. noticeimg 테이블의 수정 사항 반영
         if (!imgPath) {
+            const pastImg = await db.noticeImg.findOne({where: { noticeId: reqNoticeID }});
+
+            // 11. 과거 이미지파일 삭제
+            if(pastImg) {
+                const filePath = path.join(__dirname, '../', pastImg.img);
+                try {
+                    await fs.unlink(filePath);
+                } catch (err) {
+                    console.error('파일 삭제 중 오류 발생:', err);
+                    return res.status(500).send({ success: 500, result: "파일 삭제 중 오류가 발생했습니다.", user: user, club: exClub });
+                }
+            }
+            
             await db.noticeImg.destroy({where: { noticeId: reqNoticeID }});
         } else {
             await db.noticeImg.update({ img: imgPath }, {where: { noticeId: reqNoticeID }});
-        }
-
-        // 11. 과거 이미지파일 삭제
-        if(pastImgPath) {
-            const filePath = path.join(__dirname, '../', pastImgPath);
-            try {
-                await fs.unlink(filePath);
-            } catch (err) {
-                console.error('파일 삭제 중 오류 발생:', err);
-                return res.status(500).send({ success: 500, result: "파일 삭제 중 오류가 발생했습니다.", user: user, club: exClub });
-            }
         }
 
         const currNotice = await db.notice.findOne({ where: { noticeId: reqNoticeID }, include: [{model: db.noticeImg, as: 'noticeimgs',},], });

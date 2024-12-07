@@ -81,11 +81,11 @@ router.put('/modify-profile/:userId', verifyJWT, (req, res, next) => {
     modifyProfile
 );
 
-// 공지사항 글들을 포함한 동아리 메인 페이지를 제공(동아리 정보도 함께 포함) - ?lastTimestamp=값 해서 쿼리문 보내주셔야 해요
+// 게시판 글들을 포함한 동아리 메인 페이지를 제공(동아리 정보도 함께 포함) - ?lastTimestamp=값 해서 쿼리문 보내주셔야 해요
 // GET /page/:userId/:clanId/club/post
 router.get('/:userId/:clanId/club/post', verifyJWT, sendPostPageData);
 
-// 게시판 글들을 포함한 동아리 메인 페이지를 제공(동아리 정보도 함께 포함) - ?lastTimestamp=값 해서 쿼리문 보내주셔야 해요
+// 공지사항 글들을 포함한 동아리 메인 페이지를 제공(동아리 정보도 함께 포함) - ?lastTimestamp=값 해서 쿼리문 보내주셔야 해요
 // GET /page/:userId/:clanId/club/notice
 router.get('/:userId/:clanId/club/notice', verifyJWT, sendNoticePageData);
 
