@@ -198,7 +198,8 @@ exports.sendNoticeData = async (req, res, next) => {
                                                    include: [
                                                     {
                                                         model: db.user,
-                                                        attributes: ['userId', 'username', 'userImg']
+                                                        attributes: ['userId', 'username', 'userImg'],
+                                                        as: 'user'
                                                     }
                                                 ] });
 
