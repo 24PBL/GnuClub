@@ -16,14 +16,10 @@ const Board = () => {
   const [comments, setComments] = useState([]);
   const [isMenuVisible, setMenuVisible] = useState(false);
 
+
+
+
   const [Info, setInfo] = useState([])
-  // 댓글 추가 함수
-  const handleSendComment = () => {
-    if (comment.trim()) {
-      setComments((prevComments) => [...prevComments, { id: Date.now().toString(), text: comment }]);
-      setComment('');
-    }
-  };
 
   // 댓글 렌더링
   const renderComment = ({ item }) => (
@@ -71,7 +67,8 @@ const Board = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setInfo(response.data)
-            console.log(response.data.resultPost.postImg)
+            setComments(response.data.resultComment || [])
+            console.log(response.data.resultComment || [])
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -139,14 +136,18 @@ return (
 
         <View style={styles.separator} />
 
-        {/* 댓글 영역 (게시판에서만 댓글 보이도록) */}
-        {route.params?.selectedTab === 'board' && (
-          <FlatList
-            data={comments}
-            renderItem={renderComment}
-            keyExtractor={(item) => item.id}
-          />
-        )}
+        {comments.map((item) => (
+        <View key={item.commentId} style={styles.commentContainer}>
+          <View style={styles.authorSection}>
+            <Image
+              source={{ uri: `http://10.0.2.2:8001${item.user.userImg}` }}
+              style={styles.authorImage}
+            />
+            <Text style={styles.authorName}>{item.user.userName}</Text>
+          </View>
+          <Text style={styles.commentText}>{item.comment}</Text>
+        </View>
+      ))}
       </ScrollView>
 
       {/* 댓글 입력 필드와 전송 버튼 */}
@@ -248,6 +249,39 @@ menuText: {
   fontSize: 16,
   color: '#000',
 },
+commentContainer: {
+  flexDirection: 'row',
+  marginVertical: 5,
+  paddingHorizontal: 10,
+  borderColor:'#d9d9d9',
+  borderWidth:1,
+  borderRadius:10
+},
+authorSection: {
+  width: 100,
+  alignItems: 'center',
+  marginLeft:-30
+},
+authorImage: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  marginBottom: 5,
+  borderWidth:1,
+  borderColor:'gray'
+},
+authorName: {
+  textAlign: 'center',
+  fontSize: 12,
+  color: '#333',
+  fontWeight:'bold'
+},
+commentText: {
+  flex: 1,
+  alignSelf: 'center',
+  marginHorizontal: 10,
+  fontSize: 13
+}
 
 });
 
