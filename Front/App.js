@@ -24,6 +24,7 @@ import MemberList from './src/screens/clubDetail/MemberList';
 
 
 
+
 const RootStack = createNativeStackNavigator();
 
 export default function App() {
@@ -74,7 +75,6 @@ export default function App() {
             <RootStack.Screen name="AppList" options={{ headerShown: false }} component={AppList} />
             <RootStack.Screen name="Notice" options={{ headerShown: false }} component={Notice} />
             <RootStack.Screen name="ClubDetail" options={{ headerShown: false }} component={ClubDetail} />
-            <RootStack.Screen name="Board" options={{ headerShown: false }} component={Board} />
             <RootStack.Screen name="Application" options={{ headerShown: false }} component={Application} />
             <RootStack.Screen name="CreatePost" options={{ headerShown: false }} component={CreatePost} />
             <RootStack.Screen name="MorePromotion" options={{ headerShown: false }} component={MorePromotion} />

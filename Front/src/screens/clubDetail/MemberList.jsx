@@ -11,6 +11,7 @@ const MemberList = () => {
   const { clanId, userId} = route.params;
 
   const [memInfo, setmemInfo] = useState([])
+  const [Part, setPart] = useState([])
 
 //토큰 기반 사용자 정보 가져오기
 const fetchMemberList = async () => {
@@ -21,7 +22,7 @@ const fetchMemberList = async () => {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('반환값:', response);
+            setPart(response.data.memPart.part)
             setmemInfo(response.data.result || [])
         } catch (err) {
             console.error('Failed to fetch user info:', err);
@@ -50,13 +51,15 @@ useEffect(() => {
         style={styles.memberPhoto} 
         source={{ uri: `http://10.0.2.2:8001${member.user.userImg}` }} 
       />
-      <Text style={{ fontSize: 20, marginLeft: 10 }}>{member.user.userName}</Text>
+      <Text style={{ fontSize: 20, marginLeft: 10, fontWeight:'bold' }}>{member.user.userName}</Text>
     </View>
     
     {/* 추방 버튼을 오른쪽 끝에 배치 */}
+    {Part == 1 && member.user.userId != userId &&(
     <View style={styles.kick}>
       <Text style={styles.kickText}>추방</Text>
     </View>
+    )}
   </View>
 ))}
 

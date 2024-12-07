@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ComplexAnimationBuilder } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const Board = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { clanId, userId, postId} = route.params;
   const [announcement, setAnnouncement] = useState(route.params?.post || {});
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -57,14 +62,36 @@ const Board = () => {
   // 공지사항 또는 게시판 제목을 동적으로 설정
   const headerTitle = route.params?.selectedTab === 'announcement' ? '공지사항' : '게시판';
 
+  const fetchPostInfo = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+    if (token) {
+        try {
+            const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}`, { 
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            console.log(response)
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
+    }
+};
+
+useEffect(() => {
+  fetchPostInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
+}, [clanId, userId, postId]);
+
+
   return (
+    <SafeAreaView flex={1}>
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackPress}>
           <Ionicons name="chevron-back-outline" size={24} color="white" />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.clubName}>{`동아리 이름`}</Text>
+          <Text style={styles.clubName}></Text>
           <Text style={styles.headerTitle}>{headerTitle}</Text>
         </View>
       </View>
@@ -122,6 +149,7 @@ const Board = () => {
         </View>
       )}
     </View>
+    </SafeAreaView>
   );
 };
 

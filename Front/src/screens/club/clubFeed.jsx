@@ -10,6 +10,7 @@ export default function ClubFeed() {
   const [clubPost, setclubPost] = useState([]);
   const [loading, setLoading] = useState(true); // 로딩 상태
 
+
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
     const storedUserData = await AsyncStorage.getItem('UserData');

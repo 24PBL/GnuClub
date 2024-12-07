@@ -54,7 +54,9 @@ const ClubDetail = () => {
         return (
           <>
           {ClubPost.map(post => (
-              <TouchableOpacity key={post.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}}>
+              <TouchableOpacity key={post.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}} onPress={() => navigation.navigate('Board', { clanId : clanId,
+                userId : userId, postId : post.postId        
+})}>
                   <View style={styles.header}>
                       <Text style={{ flex: 1, fontSize: 16, marginLeft:10}}>{post.postHead}</Text>
                       <Text style={{ textAlign: 'right', flex: 1, marginRight: 10, color: 'gray' }}>
