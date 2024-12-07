@@ -164,6 +164,8 @@ exports.uploadPost = async (req, res, next) => {
             isPublic: req.body.isPublic
         })
 
+        const postImgInfo = await db.postImg.findOne({where: { postId: postResult.postId }});
+
         // 9. postimg 테이블의 postId 값을 배정
         if (!imgPath) {
             return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub });
@@ -171,7 +173,7 @@ exports.uploadPost = async (req, res, next) => {
             await db.postImg.update({postId: postResult.postId}, {where: { img: imgPath }});
         }
 
-        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult });
+        return res.status(200).send({ success: 200, result: "포스팅 성공", user: user, club: exClub, post: postResult, postImg: postImgInfo });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
