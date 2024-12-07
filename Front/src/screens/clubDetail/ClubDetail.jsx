@@ -142,7 +142,7 @@ useEffect(() => {
 
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{backgroundColor:'white', flex:1}}>
     <ScrollView>
         <View style={styles.headerImg}>
           <Image

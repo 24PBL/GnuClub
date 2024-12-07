@@ -71,6 +71,7 @@ const Board = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setInfo(response.data)
+            console.log(response.data.resultPost.postImg)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -84,15 +85,20 @@ useEffect(() => {
 }, [clanId, userId, postId]);
 
 
-  return (
-    <SafeAreaView flex={1}>
+return (
+  <SafeAreaView flex={1}>
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackPress}>
           <Ionicons name="chevron-back-outline" size={24} color="white" />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.clubName}>{Info.club.clanName}</Text>
+          {/* Info가 로드된 후에만 clanName을 렌더링 */}
+          {Info?.club?.clanName ? (
+            <Text style={styles.clubName}>{Info.club.clanName}</Text>
+          ) : (
+            <Text style={styles.clubName}>클럽 이름 로딩 중...</Text> // 로딩 중일 때 표시할 텍스트
+          )}
           <Text style={styles.headerTitle}>{headerTitle}</Text>
         </View>
       </View>
@@ -107,19 +113,29 @@ useEffect(() => {
           <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
             <Text style={styles.menuText}>수정</Text>
           </TouchableOpacity>
-             </View> 
-             )}
-      <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost.postHead}</Text>
-      <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>{Info.resultPost.user.username} | {(Info.resultPost.createAt).split('T')[0]}</Text>
-      <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.resultPost.postBody}</Text>
-      <ScrollView style={styles.contentContainer}>
-        <Text style={styles.title}>{announcement.title}</Text>
-        <Text style={styles.content}>{announcement.content}</Text>
+        </View> 
+      )}
+      
+      {/* 게시물 내용 */}
+      
 
-        {/* 이미지가 있을 경우 이미지 영역을 렌더링 */}
-        {announcement.imageUri ? (
-          <Image source={{ uri: announcement.imageUri }} style={styles.image} />
-        ) : null}
+      <ScrollView style={styles.contentContainer}>
+      <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost?.postHead}</Text>
+      <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>
+        {Info.resultPost?.user?.username} | {(Info.resultPost?.createAt)?.split('T')[0]}
+      </Text>
+      <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.resultPost?.postBody}</Text>
+      <Image 
+  source={{ uri: Info.resultPost?.postImg?.img ? `http://10.0.2.2:8001${Info.resultPost.postImg.img}` : null }}
+  style={{
+    marginTop: 5,
+    width: '90%',
+    height: 200,
+    alignSelf: 'center',
+    borderRadius: 15,
+  }}
+/>
+
 
         <View style={styles.separator} />
 
@@ -152,8 +168,9 @@ useEffect(() => {
         </View>
       )}
     </View>
-    </SafeAreaView>
-  );
+  </SafeAreaView>
+);
+
 };
 
 const styles = StyleSheet.create({
