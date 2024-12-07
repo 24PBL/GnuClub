@@ -492,7 +492,7 @@ exports.showMemberList = async (req, res, next) => {
             ],
         });
 
-        return res.status(200).send({ success: 200, result: memberList, user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: memberList, user: user, club: exClub, memPart: memPart });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
