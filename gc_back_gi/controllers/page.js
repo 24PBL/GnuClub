@@ -368,10 +368,10 @@ exports.sendPostPageData = async (req, res, next) => {
         const postList = await db.post.findAll({
             where: {
                 clanID: reqClanID,
-                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                //createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
             order: [['createAt', 'DESC']], // 최신순 정렬
-            limit: 8, // 한 번에 최대 8개 데이터
+            //limit: 8, // 한 번에 최대 8개 데이터
         });
 
         return res.status(200).send({ success: 200, result: postList, user: user, club: exClub, memPart: memPart });
@@ -412,10 +412,10 @@ exports.sendNoticePageData = async (req, res, next) => {
         const noticeList = await db.notice.findAll({
             where: {
                 clanID: reqClanID,
-                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
+                //createAt: { [Sequelize.Op.lt]: lastTimestamp }, // lastTimestamp 이전 데이터만 가져오기
             },
             order: [['createAt', 'DESC']], // 최신순 정렬
-            limit: 8, // 한 번에 최대 8개 데이터
+            //limit: 8, // 한 번에 최대 8개 데이터
         });
 
         return res.status(200).send({ success: 200, result: noticeList, user: user, club: exClub, memPart: memPart });
