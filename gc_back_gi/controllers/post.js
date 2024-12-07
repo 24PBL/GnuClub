@@ -440,8 +440,8 @@ exports.deletePost = async (req, res, next) => {
         });
 
         // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인(리더는 모든 글 삭제 가능)
-        if (exPost.userId !== parseInt(reqUserID) || exPost.clanId !== parseInt(reqClanID)) {
-            if(memPart !== 1) {
+        if(memPart.part !== 1) {
+            if (exPost.userId !== parseInt(reqUserID) || exPost.clanId !== parseInt(reqClanID)) {
                 return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음", user: user, club: exClub });
             }
         }
@@ -504,6 +504,10 @@ exports.uploadComment = async (req, res, next) => {
         const memPart = await db.userInClan.findOne({
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
+
+        if (!memPart) {
+            return res.status(403).send({ success: 404, result: "부원만 작성 가능", user: user, club: exClub });
+        }
 
         // 5. 포스팅이 전체 공개인지 부원 공개인지 확인 후 부원 공개면 부원인지 아닌지 판정
         if( exPost.isPublic === 0 && !memPart ) {
@@ -660,7 +664,7 @@ exports.deleteComment = async (req, res, next) => {
 
         // 7. 삭제하려는 댓글에 대한 권한을 가지고 있는지 확인(리더는 모든 댓글 삭제 가능 + 포스팅 작성자도 댓글 삭제 가능)
         if (exComment.userId !== parseInt(reqUserID) || exComment.commentId !== parseInt(reqCommentID)) {
-            if(memPart !== 1 && exPost.userId !== parseInt(reqUserID)) {
+            if(memPart.part !== 1 && exPost.userId !== parseInt(reqUserID)) {
                 return res.status(403).send({ success: 403, result: "해당 댓글 삭제 권한 없음", user: user, club: exClub, post: exPost });
             }
         }

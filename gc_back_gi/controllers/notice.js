@@ -407,8 +407,8 @@ exports.deleteNotice = async (req, res, next) => {
         }
 
         // 5. 삭제하려는 포스팅에 대한 권한을 가지고 있는지 확인(리더는 모든 글 삭제 가능)
-        if (exNotice.userId !== parseInt(reqUserID) || exNotice.clanId !== parseInt(reqClanID)) {
-            if(memPart !== 1) {
+        if(memPart.part !== 1) {
+            if (exNotice.userId !== parseInt(reqUserID) || exNotice.clanId !== parseInt(reqClanID)) {       
                 return res.status(403).send({ success: 403, result: "해당 게시글 삭제 권한 없음", user: user, club: exClub });
             }
         }
