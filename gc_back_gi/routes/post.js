@@ -8,6 +8,7 @@ const { isLoggedIn, verifyJWT } = require('../middlewares');
 
 const router = express.Router();
 
+
 try {
     fs.readdirSync('uploads');
 } catch (error) {

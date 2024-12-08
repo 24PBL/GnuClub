@@ -22,7 +22,6 @@ const ClubDetail = () => {
   const [Part, setPart] = useState('')
   
   const renderContent = () => {
-
     if (selectedTab === 'announcement') {
         return (
           <>

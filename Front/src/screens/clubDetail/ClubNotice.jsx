@@ -51,7 +51,7 @@ const ClubNotice = () => {
             const response = await axios.get(`http://10.0.2.2:8001/notice/${userId}/${clanId}/${noticeId}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+            console.log('여긴되나')
             const response1 = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
