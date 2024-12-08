@@ -572,7 +572,7 @@ exports.kickMember = async (req, res, next) => {
 
         // 5. 추방
         //await db.userInClan.destroy({ where: { userId: targetID } });
-        await db.userInClan.destroy({ where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] } });
+        await db.userInClan.destroy({ where: { [Op.and]: [{ userId: targetID }, { clanId: reqClanID }] } });
 
         return res.status(200).send({ success: 200, result: "추방 성공", user: user, club: exClub });
     } catch (error) {
