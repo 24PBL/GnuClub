@@ -81,10 +81,10 @@ exports.sendMoreAdData = async (req, res, next) => {
     const reqUserID = req.url.split("/")[2];
 
     try {
-        // 1. 요청 사용자 정보 가져오기
+        // 1. 사용자 정보 가져오기
         const user = await db.user.findOne({ where: { userId: reqUserID } });
         if (!user) {
-            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+            return res.status(404).send({ success: 404, message: "사용자를 찾을 수 없습니다." });
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
@@ -92,14 +92,9 @@ exports.sendMoreAdData = async (req, res, next) => {
             return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
         }
 
-        // 3. 동아리 홍보글 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
-        const { selectedIds = [] } = req.body; // 클라이언트에서 전송된 selectedIds
-
+        // 3. 데이터 조회 및 분과별 그룹화
         const randomClubAd = await db.notice.findAll({
-            where: {
-                isPublic: 1,
-                id: { [Sequelize.Op.notIn]: selectedIds }, // 이전에 선택된 ID 제외
-            },
+            where: { isPublic: 1 },
             include: [
                 {
                     model: db.clan,
@@ -107,24 +102,38 @@ exports.sendMoreAdData = async (req, res, next) => {
                     as: 'clan',
                 },
                 {
-                    model: db.noticeImg, // 연결된 noticeImg 모델 포함
-                    attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
+                    model: db.noticeImg,
+                    attributes: ['imgId', 'img'],
                     as: 'noticeimgs',
                     required: true, // `INNER JOIN` 효과, `db.noticeImg`가 없는 데이터 제외
-                }
+                },
             ],
-            group: ['clan.clanclass', 'notice.noticeId'], // 분과별로 그룹화해서 가져옴
-            order: Sequelize.literal('RAND()'),
-            limit: 12,
+            //order: [['createAt', 'DESC']], // 최신 순으로 정렬
         });
 
-        // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: randomClubAd, user: user });
+        // 4. 분과별로 데이터 그룹화
+        const resultAdData = randomClubAd.reduce((result, ad) => {
+            const clanClass = ad.clan?.clanclass || '기타'; // 분과 정보 없으면 '기타'로 설정
+            if (!result[clanClass]) {
+                result[clanClass] = [];
+            }
+            if (result[clanClass].length < 6) { // 최대 6개 제한
+                result[clanClass].push(ad);
+            }
+            return result;
+        }, {});
+
+        // 5. 결과 반환
+        return res.status(200).send({
+            success: 200,
+            user: user,
+            result: resultAdData,
+        });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
     }
-}
+};
 
 exports.sendMoreAnythingData = async (req, res, next) => {
     const reqUserID = req.url.split("/")[2];
@@ -133,39 +142,58 @@ exports.sendMoreAnythingData = async (req, res, next) => {
         // 1. 요청 사용자 정보 가져오기
         const user = await db.user.findOne({ where: { userId: reqUserID } });
         if (!user) {
-            return res.status(404).send({ success: 404, result: "사용자를 찾을 수 없습니다" });
+            return res.status(404).send({ success: 404, message: "사용자를 찾을 수 없습니다" });
         }
 
         // 2. 현재 로그인한 사용자와 일치 여부 확인
         if (user.userId.toString() !== req.user.id.toString()) {
-            return res.status(401).send({ success: 401, result: "잘못된 접근", user: user });
+            return res.status(401).send({ success: 401, message: "잘못된 접근", user });
         }
 
-        // 3. 동아리 이모저모 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음)
-        const { selectedIds = [] } = req.body; // 클라이언트에서 전송된 selectedIds
-
-        const randomClubAnything = await db.post.findAll({
+        // 3. 모든 게시글 데이터 가져오기
+        const allPosts = await db.post.findAll({
             where: {
                 isPublic: 1,
-                id: { [Sequelize.Op.notIn]: selectedIds }, // 이전에 선택된 ID 제외
             },
-            include: [{
-                model: db.postImg, // 연결된 postImg 모델 포함
-                attributes: ['imgId', 'img'], // 필요한 필드만 가져오기
-                as: 'postimgs',
-                required: true, // `INNER JOIN` 효과, `db.postImg`가 없는 데이터 제외
-            }],
-            order: Sequelize.literal('RAND()'),
-            limit: 8,
+            include: [
+                {
+                    model: db.postImg,
+                    attributes: ['imgId', 'img'],
+                    as: 'postimgs',
+                    required: true,
+                },
+                {
+                    model: db.clan,
+                    attributes: ['clanclass'], // 분과 정보 포함
+                    as: 'clan',
+                },
+            ],
+            order: Sequelize.literal('RAND()'), // 랜덤 정렬
         });
 
-        // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: randomClubAnything, user: user });
+        // 5. 분과별로 데이터 그룹화
+        const resultAnyData = allPosts.reduce((result, post) => {
+            const clanClass = post.clan?.clanclass || '기타'; // 분과 정보 없으면 '기타'로 처리
+            if (!result[clanClass]) {
+                result[clanClass] = [];
+            }
+            if (result[clanClass].length < 6) { // 각 분과에서 최대 6개 제한
+                result[clanClass].push(post);
+            }
+            return result;
+        }, {});
+
+        // 6. 결과 반환
+        return res.status(200).send({
+            success: 200,
+            user: user,
+            result: resultAnyData,
+        });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
     }
-}
+};
 
 exports.sendFeedData = async (req, res, next) => {
     const reqUserID = req.url.split("/")[2];
