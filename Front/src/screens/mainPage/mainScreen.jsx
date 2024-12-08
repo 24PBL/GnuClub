@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
+import { useIsFocused } from '@react-navigation/native';
 
 const MainScreen =  ({navigation}) => {
   const [loading, setLoading] = useState(true); // 로딩 상태
@@ -11,6 +12,8 @@ const MainScreen =  ({navigation}) => {
   const [PostImg, setPostImg] = useState(null);
   const [NoticeImg, setNoticeImg] = useState(null);
   const [userId, setuserId] = useState(null);
+  const isFocused = useIsFocused();
+  
   const morePromotion= () => {
     navigation.navigate('MorePromotion')
   }
@@ -42,9 +45,12 @@ const MainScreen =  ({navigation}) => {
     }
 };
 
-  useEffect(() => {
-    fetchUserInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
-  }, []);
+useEffect(() => {
+  if (isFocused) {
+    fetchUserInfo(); // 화면 활성화 시 데이터 가져오기
+  }
+}, [isFocused]); // isFocused가 변경될 때 실행
+
 
   if (loading) {
     return (
