@@ -364,7 +364,7 @@ exports.sendPostPageData = async (req, res, next) => {
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
 
-        const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+        //const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
         const postList = await db.post.findAll({
             where: {
                 clanID: reqClanID,
@@ -408,7 +408,7 @@ exports.sendNoticePageData = async (req, res, next) => {
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
 
-        const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+        //const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
         const noticeList = await db.notice.findAll({
             where: {
                 clanID: reqClanID,
