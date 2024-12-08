@@ -206,7 +206,7 @@ exports.sendPostData = async (req, res, next) => {
                                                include: [
                                                 {
                                                     model: db.user,
-                                                    attributes: ['userId', 'username', 'userImg'],
+                                                    attributes: ['userId', 'userName', 'userImg'],
                                                     as: 'user'
                                                 }
                                             ] });
