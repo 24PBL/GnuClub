@@ -233,7 +233,7 @@ exports.applyClub = async (req, res, next) => {
         const exResume = await db.resume.findOne({
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
-        if (exResume) {
+        if (exResume && exResume.result == 3) {
             return res.status(403).send({ success: 403, result: "이미 제출함. 승인 대기 중", user: user, club: exClub, exApply: 1 });
         }
 
