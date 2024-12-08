@@ -43,7 +43,6 @@ const submit = async () => {
     }, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(response)
     navigation.navigate('ClubDetail', { clanId: clanId, userId: userId });
   } catch (error) {
     console.log(error);

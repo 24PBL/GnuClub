@@ -79,9 +79,11 @@ const ClubDetail = () => {
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
+    console.log(selectedTab)
     navigation.navigate('CreatePost', {
       postType: selectedTab,
-      onSavePost: handleSavePost,
+      userId : userId,
+      clanId : clanId
     });
   };
 

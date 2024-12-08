@@ -10,9 +10,6 @@ export default function MorePromotion() {
     <View name={'공연 분과'}>
         <View style={{justifyContent:'space-between', flexDirection:'row', height:70, marginBottom:10}}>
             <Text style={styles.clubLabel}>공연분과</Text>
-            <TouchableOpacity>
-            <Text style={{marginTop:45, marginRight:10, color:'#0091da'}}>더보기</Text>
-            </TouchableOpacity>
         </View>
         <View flexDirection={'row'} style={{alignItems:'center', justifyContent:'space-between'}}>
 
@@ -56,9 +53,6 @@ export default function MorePromotion() {
     <View name={'봉사 분과'} style={{marginTop:15}}>
         <View style={{justifyContent:'space-between', flexDirection:'row', height:70, marginBottom:10}}>
             <Text style={styles.clubLabel}>봉사분과</Text>
-            <TouchableOpacity>
-            <Text style={{marginTop:45, marginRight:10, color:'#0091da'}}>더보기</Text>
-            </TouchableOpacity>
         </View>
         <View flexDirection={'row'} style={{alignItems:'center', justifyContent:'space-between'}}>
 
@@ -102,9 +96,6 @@ export default function MorePromotion() {
     <View name={'문화 분과'} style={{marginTop:15}}>
         <View style={{justifyContent:'space-between', flexDirection:'row', height:70, marginBottom:10}}>
             <Text style={styles.clubLabel}>문화분과</Text>
-            <TouchableOpacity>
-            <Text style={{marginTop:45, marginRight:10, color:'#0091da'}}>더보기</Text>
-            </TouchableOpacity>
         </View>
         <View flexDirection={'row'} style={{alignItems:'center', justifyContent:'space-between'}}>
 

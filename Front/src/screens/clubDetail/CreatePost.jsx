@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const CreatePost = ({ route, navigation }) => {
-  const { postType, onSavePost } = route.params;  // postType ('announcement' or 'board')과 onSavePost 함수
+  const { postType, userId, clanId } = route.params;  // postType ('announcement' or 'board')과 onSavePost 함수
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -38,24 +41,33 @@ const CreatePost = ({ route, navigation }) => {
   };
 
   // '완료' 버튼 클릭 시
-  const handleSavePost = () => {
+  const handleSavePost = async () => {
     if (!title || !content) {
       Alert.alert('입력 오류', '제목과 내용을 모두 입력해주세요.');
-      return;
+    } else{
+      if (postType == 'board'){
+          const token = await AsyncStorage.getItem('jwtToken');
+          if (token) {
+              try {
+                  const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/create-post/upload-post`, {
+                      headers: { Authorization: `Bearer ${token}` },
+                  });
+                  console.log('User Info:', response.data.result.user);
+
+              } catch (err) {
+                  console.error('Failed to fetch user info:', err);
+              } finally {
+                setLoading(false);
+              }
+      };
+      } else if(postType == 'announcement'){
+  
+      }
     }
-
-    const newPost = {
-      id: Math.random().toString(),
-      title,
-      content,
-      imageUri: selectedImages[0], // 첫 번째 이미지만 저장, 여러 이미지는 다르게 처리 가능
-    };
-
-    onSavePost(newPost);  // 부모 화면에서 받아온 onSavePost 함수 호출
-    navigation.goBack();  
   };
 
   return (
+    <SafeAreaView flex={1} backgroundColor={'white'}>
     <View style={styles.container}>
       {/* 상단 헤더 */}
       <View style={styles.header}>
@@ -88,6 +100,7 @@ const CreatePost = ({ route, navigation }) => {
           scrollEnabled={false} // 스크롤 대신 길어지면 아래로 계속 쓸 수 있게 설정
           maxLength={1000}
         />
+        <Text></Text>
       </View>
 
       {/* 선택된 이미지 미리보기 (스크롤 가능) */}
@@ -96,7 +109,7 @@ const CreatePost = ({ route, navigation }) => {
           <View key={index} style={styles.imageWrapper}>
             <Image source={{ uri: imageUri }} style={styles.previewImage} />
             <TouchableOpacity style={styles.removeImageButton} onPress={() => removeImage(imageUri)}>
-              <Ionicons name="close-circle" size={24} color="red" />
+              <Ionicons name="close-circle" size={24} color="red"/>
             </TouchableOpacity>
           </View>
         ))}
@@ -107,6 +120,7 @@ const CreatePost = ({ route, navigation }) => {
         <Ionicons name="camera-outline" size={36} color="black" />
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 };
 
