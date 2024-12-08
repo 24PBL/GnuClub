@@ -224,7 +224,7 @@ exports.sendNoticeData = async (req, res, next) => {
         }
 
         // 7. 모든 무결성 검증 후 이상 없으면 프론트에 해당 포스트 데이터 전달
-        return res.status(200).send({ success: 200, result: exNotice, user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: exNotice, user: user, club: exClub, memPart: memPart });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
