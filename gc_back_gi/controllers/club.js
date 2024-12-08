@@ -372,8 +372,15 @@ exports.resumeInfo = async (req, res, next) => {
             return res.status(404).send({ success: 404, result: "존재하지 않는 신청서", user: user, club: exClub });
         }
 
+        const resumeUser = await db.user.findOne({ where: { userId: resume.userId }, include: [
+            {
+                model: db.collage,
+                as: "collage_collage",
+            },
+        ], });
+
         // 6. 입부 신청서 상세 정보를 위한 데이터 전송
-        return res.status(200).send({ success: 200, result: resume, user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: resume, user: user, club: exClub, resumeUser: resumeUser });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
