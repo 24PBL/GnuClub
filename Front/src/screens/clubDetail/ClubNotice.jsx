@@ -51,15 +51,10 @@ const ClubNotice = () => {
             const response = await axios.get(`http://10.0.2.2:8001/notice/${userId}/${clanId}/${noticeId}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('여긴되나')
-            const response1 = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
-                headers: { Authorization: `Bearer ${token}` },
-            });
 
-            setPart(response1.data.memPart.part)
+
+            setPart(response.data.memPart?.part || []);
             setInfo(response.data)
-            console.log('내 동아리 권한' ,response1.data.memPart.part)
-            console.log('공지사항 정보',response.data)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {

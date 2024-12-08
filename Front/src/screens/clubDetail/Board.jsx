@@ -52,15 +52,10 @@ const Board = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            const response1 = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
-              headers: { Authorization: `Bearer ${token}` },
-          });
-
-            setPart(response1.data.memPart.part)
+            setPart(response.data.memPart.part)
 
             setInfo(response.data)
             setComments(response.data.resultComment || [])
-            console.log(response.data.resultComment || [])
           
         } catch (err) {
             console.error('Failed to fetch user info:', err);
