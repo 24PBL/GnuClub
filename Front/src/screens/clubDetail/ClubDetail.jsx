@@ -93,7 +93,9 @@ const ClubDetail = () => {
     }
   };
   const handleApply = () => {
-    navigation.navigate('Application');
+    navigation.navigate('Application', { clanId : clanId,
+      userId : userId        
+})
   };
 
   // 게시물 클릭 시 상세 페이지로 이동

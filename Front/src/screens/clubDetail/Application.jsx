@@ -3,24 +3,25 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput} from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useRoute } from '@react-navigation/native';
+
 
 const Application = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState({});
   const [loading, setLoading] = useState(true);
+  const [text, setText] = useState('');
+  const route = useRoute();
+  const { clanId, userId} = route.params;
+
 
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
-    const storedUserData = await AsyncStorage.getItem('UserData');
     console.log('Token:', token); 
-    console.log('Stored User Data:', storedUserData);
-    if (token || storedUserData) {
+    if (token) {
         try {
-            const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
-            const Id = userInfo.userId
-            const response = await axios.get(`http://10.0.2.2:8001/page/mypage/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
+            const response = await axios.get(`http://10.0.2.2:8001/page/mypage/${userId}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('User Info:', response.data.result.user);
             setUserInfo(response.data.result.user)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
@@ -34,10 +35,38 @@ useEffect(() => {
   fetchUserInfo(); // 컴포넌트가 렌더링될 때 사용자 정보 가져오기
 }, []);
 
+const submit = async () => {
+  const token = await AsyncStorage.getItem('jwtToken');
+  try {
+    const response = await axios.post(`http://10.0.2.2:8001/club/${userId}/${clanId}/apply-club`, {
+      etc: text
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    navigation.navigate('ClubDetail', { clanId: clanId, userId: userId });
+  } catch (error) {
+    console.log(error);
+    // 서버에서 받은 에러 메세지 확인
+    if (error.response) {
+      // 서버가 응답한 경우
+      console.error('Server response:', error.response.data.result);
+      alert(error.response.data.result); // 사용자에게 경고 메시지 표시
+    } else if (error.request) {
+      // 서버가 응답하지 않은 경우
+      console.error('No response:', error.request);
+      alert('서버와의 연결이 실패했습니다. 나중에 다시 시도해주세요.');
+    } else {
+      console.error('Error:', error.message);
+      alert('알 수 없는 오류가 발생했습니다.');
+    }
+  }
+};
+
+
   return (
     <SafeAreaView style={{flex:1,backgroundColor:'white'}}>
 
-      <TouchableOpacity style={{backgroundColor:'#0091da', width:70, height:35, borderRadius:10, justifyContent:'center', alignItems:'center', alignSelf:'flex-end', marginRight:30, marginTop:10}}>
+      <TouchableOpacity onPress={()=>{submit()}} style={{backgroundColor:'#0091da', width:70, height:35, borderRadius:10, justifyContent:'center', alignItems:'center', alignSelf:'flex-end', marginRight:30, marginTop:10}}>
         <Text style={{fontSize:16, color:'white', marginLeft:2}}>신청하기</Text>
         </TouchableOpacity>
       <View style={{alignItems : 'center', justifyContent:'center', marginTop:40}}>
@@ -70,9 +99,9 @@ useEffect(() => {
 
         <View style={{marginBottom : 10}}>
           <Text style={styles.inputLabel}>하고싶은 말</Text>
-          <View style={styles.userSay}><TextInput style={styles.SaySize} multiline={true}></TextInput></View>
+          <View style={styles.userSay}><TextInput style={styles.SaySize} multiline={true} onChangeText={setText}
+                    value={text}></TextInput></View>
         </View>
-
       </View>
     </SafeAreaView>
   );

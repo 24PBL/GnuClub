@@ -4,9 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Search = () => {
     const [text, setText] = useState('');
+    const [clubList, setclubList] = useState([]);
+    const [Id, setId] = useState([]);
+    const navigation = useNavigation();
 
     const handleSearch = async () => {
         const token = await AsyncStorage.getItem('jwtToken');
@@ -18,7 +22,8 @@ const Search = () => {
                 const response = await axios.get(`http://10.0.2.2:8001/club/${Id}/search-club?keyword=${text}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log(JSON.stringify(response.data, null, 2));
+                setId(Id)
+                setclubList(response.data.clubList)
 
             } catch (err) {
                 console.error('Failed to fetch search results:', err);
@@ -27,7 +32,7 @@ const Search = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView flex={1} backgroundColor={'white'}>
             <View style={styles.container}>
                 <Ionicons name="search-outline" size={33} style={styles.iconStyle} />
                 <TextInput 
@@ -41,14 +46,19 @@ const Search = () => {
                     <Text style={styles.searchButtonText}>검색</Text>
                 </TouchableOpacity>
             </View>
+            {clubList.map((club) => (
+        <TouchableOpacity 
+        onPress={() => navigation.navigate('ClubDetail', { 
+            clanId : club.clanId,
+            userId : Id})} key={club.clanId} style={{ borderWidth: 0.3, width: '90%', alignSelf: 'center', marginTop: 30, height: 100, flexDirection: 'row', borderRadius:10}}>
+          <Image source={{ uri: `http://10.0.2.2:8001${club.clanImg}` }} style={{ width: 98, height: 98, borderRadius: 10, borderWidth:0.5, }} />
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ width: 120, fontWeight: 'bold' }}>{club.clanName}</Text>
+            <Text style={{ width: 200 }}>{club.clanIntro}</Text>
+          </View>
+        </TouchableOpacity>
+      ))}
 
-            <View style={{borderWidth:1, width:'90%', alignSelf:'center', marginTop:30, height:100, flexDirection:'row'}}>
-            <Image style={{width:100, height:100, borderWidth:1, borderRadius:10}}></Image>
-            <View style={{marginLeft:10}}>
-                <Text style={{width:120, borderWidth:1, fontWeight:'bold'}}>밴드이름</Text>
-                <Text style={{width:200, borderWidth:1, height:100}}>소개</Text>
-            </View>
-            </View>
         </SafeAreaView>
     );
 };
