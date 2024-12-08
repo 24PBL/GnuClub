@@ -530,7 +530,7 @@ exports.leaveClub = async (req, res, next) => {
         } 
 
         // 5. 탈퇴
-        await db.userInClan.destroy({ where: { userId: reqUserID } });
+        await db.userInClan.destroy({ where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] } });
 
         return res.status(200).send({ success: 200, result: "탈퇴 성공", user: user, club: exClub });
     } catch (error) {
@@ -571,7 +571,8 @@ exports.kickMember = async (req, res, next) => {
         } 
 
         // 5. 추방
-        await db.userInClan.destroy({ where: { userId: targetID } });
+        await db.userInClan.destroy({ where: { [Op.and]: [{ userId: targetID }, { clanId: reqClanID }] } });
+        //await db.userInClan.destroy({ where: { userId: targetID } });
 
         return res.status(200).send({ success: 200, result: "추방 성공", user: user, club: exClub });
     } catch (error) {
