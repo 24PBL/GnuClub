@@ -19,6 +19,7 @@ const ClubDetail = () => {
   const [ClubPost, setClubPost] = useState([])
   const [ClubNotice, setClubNotice] = useState([])
   const [joinCheck, setjoinCheck] = useState()
+  const [Part, setPart] = useState('')
   
   const renderContent = () => {
 
@@ -136,6 +137,8 @@ const ClubDetail = () => {
             setjoinCheck(response1.data.memPart)
 
             setClubNotice(response2.data.result)
+
+            setPart(response1.data.memPart.part)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -171,6 +174,15 @@ useEffect(() => {
   <Ionicons style={{}}name="people-outline" size={40}/>
   </TouchableOpacity>
   )}
+
+{Part == 1 && (
+    <TouchableOpacity style={styles.ApplyList} onPress={() => navigation.navigate('ApplyList', { clanId : clanId,
+      userId : userId        
+})}>
+  <Ionicons style={{}}name="clipboard-outline" size={40}/>
+  </TouchableOpacity>
+  )}
+
         </View>
 
         <View style={{backgroundColor: '#d9d9d9',padding : 20,marginHorizontal : 20,borderRadius: 10,marginBottom: 20,paddingLeft: 10}}>
@@ -324,6 +336,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  ApplyList: {
+    position: 'absolute',
+    top: 20,
+    right: 60,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,

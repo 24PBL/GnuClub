@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -43,6 +43,7 @@ const submit = async () => {
     }, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    console.log(response)
     navigation.navigate('ClubDetail', { clanId: clanId, userId: userId });
   } catch (error) {
     console.log(error);
@@ -50,7 +51,13 @@ const submit = async () => {
     if (error.response) {
       // 서버가 응답한 경우
       console.error('Server response:', error.response.data.result);
-      alert(error.response.data.result); // 사용자에게 경고 메시지 표시
+      Alert.alert(
+        "중복 신청", // 제목
+        '승인 대기 중 상태 입니다.', // 메시지
+        [
+          { text: "확인", onPress: () => console.log("확인 클릭") },
+        ]
+      );
     } else if (error.request) {
       // 서버가 응답하지 않은 경우
       console.error('No response:', error.request);
