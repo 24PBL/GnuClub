@@ -15,6 +15,7 @@ const Board = () => {
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [Part, setPart] = useState([])
 
 
 
@@ -50,9 +51,17 @@ const Board = () => {
             const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
+
+            const response1 = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
+              headers: { Authorization: `Bearer ${token}` },
+          });
+
+            setPart(response1.data.memPart.part)
+
             setInfo(response.data)
             setComments(response.data.resultComment || [])
             console.log(response.data.resultComment || [])
+          
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -83,17 +92,22 @@ return (
           <Text style={styles.headerTitle}>게시판</Text>
         </View>
       </View>
-      <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
+
+      {((Part === 1) || (Info.resultPost?.user?.userName === Info.user?.userName)) &&(
+        <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
         <Ionicons name="ellipsis-vertical" size={24} color="white" />
-      </TouchableOpacity>      
+      </TouchableOpacity>  
+      )} 
+
       {isMenuVisible && (
         <View style={styles.menu}>
           <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
             <Text style={styles.menuText}>삭제</Text>
           </TouchableOpacity>
+          { Info.resultPost?.user?.userName === Info.user?.userName &&(
           <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
             <Text style={styles.menuText}>수정</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
         </View> 
       )}
       
@@ -103,7 +117,7 @@ return (
       <ScrollView style={styles.contentContainer}>
       <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost?.postHead}</Text>
       <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>
-        {Info.resultPost?.user?.username} | {(Info.resultPost?.createAt)?.split('T')[0]}
+        {Info.resultPost?.user?.userName} | {(Info.resultPost?.createAt)?.split('T')[0]}
       </Text>
       <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.resultPost?.postBody}</Text>
       <Image 
@@ -133,24 +147,6 @@ return (
         </View>
       ))}
       </ScrollView>
-
-  
-        <View style={styles.commentInputContainer}>
-          <View style={styles.commentInputWrapper}>
-            <TextInput
-              style={styles.commentInput}
-              placeholder="댓글을 입력해주세요."
-              value={comment}
-              onChangeText={setComment}
-              placeholderTextColor="#aaa"
-              maxLength={255}
-            />
-            <TouchableOpacity onPress={handleSendComment} style={styles.iconWrapper}>
-              <Ionicons name="arrow-up-circle-outline" size={24} color="#0091DA" />
-            </TouchableOpacity>
-
-          </View>
-        </View>
     </View>
   </SafeAreaView>
 );

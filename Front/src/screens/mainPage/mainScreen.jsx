@@ -29,7 +29,7 @@ const MainScreen =  ({navigation}) => {
             const response = await axios.get(`http://10.0.2.2:8001/page/home/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(response.data.result.randomClubAd)
+            console.log(JSON.stringify(response.data.result, null, 2))
           setbanner(response.data.result.banner)
           setuserData(response.data.result.myClub.map((entry) => entry.clan)); //응답 결과에서 동아리 정보 분리
           setPostImg(response.data.result.randomClubAnything)

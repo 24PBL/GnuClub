@@ -58,6 +58,7 @@ const ClubNotice = () => {
 
             setPart(response1.data.memPart.part)
             setInfo(response.data)
+            console.log('내 동아리 권한' ,response1.data.memPart.part)
             console.log('공지사항 정보',response.data)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
@@ -69,7 +70,7 @@ const ClubNotice = () => {
 
 useEffect(() => {
   fetchPostInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
-}, [clanId, userId, noticeId]);
+}, [clanId, userId, noticeId, Part]);
 
 
 return (
@@ -90,20 +91,23 @@ return (
         </View>
       </View>
 
-      {isMenuVisible && Part === 1 || Info.result?.user?.username === Info.user?.userName &&(
-        <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
-        <Ionicons name="ellipsis-vertical" size={24} color="white" />
-      </TouchableOpacity>  
-      )}
+      {((Part === 1) || (Info.result?.user?.userName === Info.user?.userName)) && (
+  <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
+    <Ionicons name="ellipsis-vertical" size={24} color="white" />
+  </TouchableOpacity>
+)}
+
 
 {isMenuVisible &&(
 <View style={styles.menu}>
+    
           <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
             <Text style={styles.menuText}>삭제</Text>
           </TouchableOpacity>
+          { Info.result?.user?.userName === Info.user?.userName &&(
           <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
             <Text style={styles.menuText}>수정</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
         </View>)}
       
       {/* 게시물 내용 */}
@@ -113,7 +117,7 @@ return (
 
       <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.result?.postHead}</Text>
       <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>
-        {Info.result?.user?.username} | {(Info.result?.createAt)?.split('T')[0]}
+        {Info.result?.user?.userName} | {(Info.result?.createAt)?.split('T')[0]}
       </Text>
       <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.result?.postBody}</Text>
       <Image 

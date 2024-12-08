@@ -19,6 +19,7 @@ import MorePromotion from './src/screens/mainPage/morePromotion';
 import ClubFeed from './src/screens/club/clubFeed';
 import MemberList from './src/screens/clubDetail/MemberList';
 import ClubNotice from './src/screens/clubDetail/ClubNotice'
+import Board from './src/screens/clubDetail/Board'
 
 
 
@@ -81,6 +82,7 @@ export default function App() {
             <RootStack.Screen name="MorePromotion" options={{ headerShown: false }} component={MorePromotion} />
             <RootStack.Screen name="MemberList" options={{ headerShown: false }} component={MemberList} />
             <RootStack.Screen name="ClubNotice" options={{ headerShown: false }} component={ClubNotice} />
+            <RootStack.Screen name="Board" options={{ headerShown: false }} component={Board} />
             
        </>
         )}
