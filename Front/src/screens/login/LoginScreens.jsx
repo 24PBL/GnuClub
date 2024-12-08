@@ -54,7 +54,6 @@ export default function LoginScreens({ navigation, setIsSignedIn }) {
             const UserData = JSON.stringify(res2.data.result.user);
             await AsyncStorage.setItem('UserData', UserData);
             setIsSignedIn(true);
-            console.log('토큰 반환 응답 : ', res2.data.result.user)
 
 
         
