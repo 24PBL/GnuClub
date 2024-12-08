@@ -314,12 +314,13 @@ exports.applyList = async (req, res, next) => {
                 }, {});
         });
 
-        // userImg를 resume 객체에 추가
-        resumeList.forEach((resume) => {
-            resume.userImg = userInfoMap[resume.userId] || null; // 이미지가 없을 경우 null
-        });
+        // 6. 신청서 데이터에 사용자 이미지(userImg) 추가
+        const resultList = resumeList.map((resume) => ({
+            ...resume.get(), // 신청서 데이터 복사
+            userImg: userInfoMap[resume.userId] || null, // userImg가 없으면 null 처리
+        }));
 
-        return res.status(200).send({ success: 200, result: resumeList, user: user, club: exClub });
+        return res.status(200).send({ success: 200, result: resultList, user: user, club: exClub });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
