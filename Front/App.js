@@ -13,12 +13,13 @@ import findPW2 from './src/screens/findPW/findPW2';
 import AppList from './src/screens/myPage/AppList';
 import Notice from './src/screens/myPage/Notice';
 import ClubDetail from './src/screens/clubDetail/ClubDetail';
-import Board from './src/screens/clubDetail/Board';
 import Application from './src/screens/clubDetail/Application';
 import CreatePost from './src/screens/clubDetail/CreatePost';
 import MorePromotion from './src/screens/mainPage/morePromotion';
 import ClubFeed from './src/screens/club/clubFeed';
 import MemberList from './src/screens/clubDetail/MemberList';
+import ClubNotice from './src/screens/clubDetail/ClubNotice'
+
 
 
 
@@ -79,7 +80,9 @@ export default function App() {
             <RootStack.Screen name="CreatePost" options={{ headerShown: false }} component={CreatePost} />
             <RootStack.Screen name="MorePromotion" options={{ headerShown: false }} component={MorePromotion} />
             <RootStack.Screen name="MemberList" options={{ headerShown: false }} component={MemberList} />
-          </>
+            <RootStack.Screen name="ClubNotice" options={{ headerShown: false }} component={ClubNotice} />
+            
+       </>
         )}
       </RootStack.Navigator>
     </NavigationContainer>

@@ -7,19 +7,19 @@ import { ComplexAnimationBuilder } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const Board = () => {
+const ClubNotice = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { clanId, userId, postId} = route.params;
+  const { clanId, userId, noticeId} = route.params;
   const [announcement, setAnnouncement] = useState(route.params?.post || {});
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [Part, setPart] = useState([]);
 
 
 
 
   const [Info, setInfo] = useState([])
+
 
 
   const toggleMenu = () => {
@@ -43,16 +43,22 @@ const Board = () => {
   };
 
 
+
   const fetchPostInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
     if (token) {
         try {
-            const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}`, { 
+            const response = await axios.get(`http://10.0.2.2:8001/notice/${userId}/${clanId}/${noticeId}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
+
+            const response1 = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setPart(response1.data.memPart.part)
             setInfo(response.data)
-            setComments(response.data.resultComment || [])
-            console.log(response.data.resultComment || [])
+            console.log('공지사항 정보',response.data)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -63,7 +69,7 @@ const Board = () => {
 
 useEffect(() => {
   fetchPostInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
-}, [clanId, userId, postId]);
+}, [clanId, userId, noticeId]);
 
 
 return (
@@ -80,34 +86,38 @@ return (
           ) : (
             <Text style={styles.clubName}>클럽 이름 로딩 중...</Text> // 로딩 중일 때 표시할 텍스트
           )}
-          <Text style={styles.headerTitle}>게시판</Text>
+          <Text style={styles.headerTitle}>공지사항</Text>
         </View>
       </View>
-      <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
+
+      {isMenuVisible && Part === 1 || Info.result?.user?.username === Info.user?.userName &&(
+        <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
         <Ionicons name="ellipsis-vertical" size={24} color="white" />
-      </TouchableOpacity>      
-      {isMenuVisible && (
-        <View style={styles.menu}>
+      </TouchableOpacity>  
+      )}
+
+{isMenuVisible &&(
+<View style={styles.menu}>
           <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
             <Text style={styles.menuText}>삭제</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
             <Text style={styles.menuText}>수정</Text>
           </TouchableOpacity>
-        </View> 
-      )}
+        </View>)}
       
       {/* 게시물 내용 */}
       
 
       <ScrollView style={styles.contentContainer}>
-      <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost?.postHead}</Text>
+
+      <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.result?.postHead}</Text>
       <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>
-        {Info.resultPost?.user?.username} | {(Info.resultPost?.createAt)?.split('T')[0]}
+        {Info.result?.user?.username} | {(Info.result?.createAt)?.split('T')[0]}
       </Text>
-      <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.resultPost?.postBody}</Text>
+      <Text style={{fontSize:18, width:'85%', alignSelf:'center'}}>{Info.result?.postBody}</Text>
       <Image 
-  source={{ uri: Info.resultPost?.postImg?.img ? `http://10.0.2.2:8001${Info.resultPost.postImg.img}` : null }}
+  source={{ uri: Info.result?.noticeImg?.img ? `http://10.0.2.2:8001${Info.result.noticeImg.img}` : null }}
   style={{
     marginTop: 5,
     width: '90%',
@@ -117,40 +127,7 @@ return (
   }}
 />
 
-
-        <View style={styles.separator} />
-
-        {comments.map((item) => (
-        <View key={item.commentId} style={styles.commentContainer}>
-          <View style={styles.authorSection}>
-            <Image
-              source={{ uri: `http://10.0.2.2:8001${item.user.userImg}` }}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>{item.user.userName}</Text>
-          </View>
-          <Text style={styles.commentText}>{item.comment}</Text>
-        </View>
-      ))}
       </ScrollView>
-
-  
-        <View style={styles.commentInputContainer}>
-          <View style={styles.commentInputWrapper}>
-            <TextInput
-              style={styles.commentInput}
-              placeholder="댓글을 입력해주세요."
-              value={comment}
-              onChangeText={setComment}
-              placeholderTextColor="#aaa"
-              maxLength={255}
-            />
-            <TouchableOpacity onPress={handleSendComment} style={styles.iconWrapper}>
-              <Ionicons name="arrow-up-circle-outline" size={24} color="#0091DA" />
-            </TouchableOpacity>
-
-          </View>
-        </View>
     </View>
   </SafeAreaView>
 );
@@ -171,40 +148,8 @@ const styles = StyleSheet.create({
   content: { fontSize: 16, lineHeight: 24, color: '#000000', marginBottom: 20 },
   image: { width: '100%', height: 200, resizeMode: 'cover', borderRadius: 10, marginBottom: 20 },
   separator: { height: 1, backgroundColor: '#E0E0E0', marginVertical: 20 },
-  commentInputContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    //borderTopWidth: 1,
-    //borderTopColor: '#E0E0E0',
-  },
-  commentInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0', 
-    borderRadius: 20,
-    paddingHorizontal: 10,
-  },
-  commentInput: {
-    flex: 1,
-    height: 40,
-    fontSize: 14,
-    paddingHorizontal: 10,
-    color: '#000',
-  },
   iconWrapper: {
     padding: 5,
-  },
-  commentRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 15 },
-  commentContent: { marginLeft: 7 },
-  commentName: { fontWeight: 'bold', fontSize: 14, marginTop: 3 },
-  commentText: { fontSize: 14, color: '#555', marginTop: 10 },
-  commentWrapper: {
-  marginBottom: 10, // 댓글 간 간격
-  },
-  commentSeparator: {
-  height: 1,
-  backgroundColor: '#E0E0E0', 
-  marginTop: 5,
   },
 menuButton: {
   position: 'absolute', 
@@ -232,14 +177,6 @@ menuText: {
   fontSize: 16,
   color: '#000',
 },
-commentContainer: {
-  flexDirection: 'row',
-  marginVertical: 5,
-  paddingHorizontal: 10,
-  borderColor:'#d9d9d9',
-  borderWidth:1,
-  borderRadius:10
-},
 authorSection: {
   width: 100,
   alignItems: 'center',
@@ -258,14 +195,8 @@ authorName: {
   fontSize: 12,
   color: '#333',
   fontWeight:'bold'
-},
-commentText: {
-  flex: 1,
-  alignSelf: 'center',
-  marginHorizontal: 10,
-  fontSize: 13
 }
 
 });
 
-export default Board;
+export default ClubNotice;

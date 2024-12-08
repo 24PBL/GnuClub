@@ -29,7 +29,11 @@ const ClubDetail = () => {
     <TouchableOpacity
       key={post.noticeId}
       style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#d9d9d9' }}
-    >
+      onPress={() => navigation.navigate('ClubNotice', { 
+        clanId: clanId,
+        userId: userId, 
+        noticeId: post.noticeId        
+      })}>
       <View style={styles.header}>
         <Text style={{ flex: 1, fontSize: 16, marginLeft: 10 }}>
           {post.postHead}
@@ -124,8 +128,11 @@ const ClubDetail = () => {
           });
 
             setClubInfo(response1.data.club)
+
             setClubPost(response1.data.result || [])
+
             setjoinCheck(response1.data.memPart)
+
             setClubNotice(response2.data.result)
         } catch (err) {
             console.error('Failed to fetch user info:', err);

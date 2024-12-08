@@ -10,6 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Club from '../club/club';
 import ClubFeed from "../club/clubFeed"
 import Board from '../clubDetail/Board';
+import ClubNotice from '../clubDetail/ClubNotice'
+
+
 
 
 
@@ -41,7 +44,7 @@ export default function HomeScreens({setIsSignedIn}){
         </View>), tabBarLabel: () => null, headerShown: false }}>
       </Tab.Screen>
 
-      <Tab.Screen name="Board" component={Board} options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
+      <Tab.Screen name="CreatePost" component={CreatePost} options={{ tabBarIcon: ({ color, size }) => (<View style={{ alignItems: 'center', width:50 }}>
           <Ionicons style={{}}name="search-outline" size={size} color={color} />
           <Text style={{ color, fontSize: 12, marginBottom : 4 }}>찾기</Text>
         </View>), tabBarLabel: () => null, headerShown: false }}>
