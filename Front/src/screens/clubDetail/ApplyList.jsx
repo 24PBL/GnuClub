@@ -8,11 +8,12 @@ import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 
+
 const ApplyList = () => {
     const route = useRoute();
   const { clanId, userId} = route.params;
   const [Apply, setApply] = useState([]);
-
+  const navigation = useNavigation();
 //토큰 기반 사용자 정보 가져오기
 const fetchApplyList = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
@@ -22,7 +23,7 @@ const fetchApplyList = async () => {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/apply-list`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(JSON.stringify(response.data, null, 3))
+            console.log(JSON.stringify(response.data.result, null, 3))
             setApply(response.data.result)
         } catch (err) {
             console.error('Failed to fetch user info:', err);
@@ -43,16 +44,27 @@ useEffect(() => {
     </View>
     <ScrollView>
 
+    <>
+      {Apply.map((item) => {
+        if (item.result === 3) {
+          return (
+            <TouchableOpacity key={item.idx} style={styles.peopleBox} onPress={() => navigation.navigate('Apply', { clanId : clanId,
+                userId : userId, resumeId : item.idx       
+          })}>
+              <View style={styles.peopleInfo}>
+                <Image 
+                  style={styles.peoplePhoto}
+                  source={{ uri: `http://10.0.2.2:8001${item.userImg}` }} 
+                />
+                <Text style={{ fontSize: 20, marginLeft: 10, fontWeight: 'bold' }}>{item.userName}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }
+        return null; // 결과가 3이 아닌 항목은 표시하지 않음
+      })}
+    </>
 
-    <TouchableOpacity style={styles.peopleBox}>
-    <View style={styles.peopleInfo}>
-      <Image 
-        style={styles.peoplePhoto} 
-        source={{ }} 
-      />
-      <Text style={{ fontSize: 20, marginLeft: 10, fontWeight:'bold' }}>이름</Text>
-    </View>
-    </TouchableOpacity>
 
 
 
@@ -67,8 +79,8 @@ const styles = StyleSheet.create({
     peoplePhoto: {
       width: 60,
       height: 60,
-      backgroundColor: '#d9d9d9',
       borderRadius: 100,
+      backgroundColor:'gray'
     },
     peopleBox: {
       borderTopWidth: 1,
