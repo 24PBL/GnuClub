@@ -611,80 +611,14 @@ exports.searchClub = async (req, res, next) => {
             },
         });
 
-        // 2. class_ 테이블에서 검색
-        const classes = await db.class_.findAll({
-            where: {
-                className: { [Op.like]: searchKeyword },
-            },
-            include: [
-                {
-                    model: db.clan, // 관련된 clan 데이터를 포함
-                    as: 'clans', // 관계 정의 시 설정한 별칭
-                },
-            ],
-        });
-
-        // 중복 제거 함수
-        function removeDuplicates(array, key) {
-            if (!array || !Array.isArray(array)) return []; // 배열이 없거나 잘못된 경우 방어 코드
-            const seen = new Set();
-            return array.filter(item => {
-                const uniqueKey = item[key];
-                if (seen.has(uniqueKey)) {
-                    return false;
-                }
-                seen.add(uniqueKey);
-                return true;
-            });
-        }
-
-        // 데이터 병합
-        const combinedResults = [
-            ...clans.map(clan => ({
-            ...clan.get(), // clan 데이터 전체 포함
-            type: 'clan',
-            relatedClass: null, // 관계된 class 데이터 없음
-        })),
-            ...classes.flatMap(cls => [
-                {
-                    ...cls.get(), // class 데이터 전체 포함
-                    type: 'class',
-                    relatedClass: cls.clans.map(clan => ({
-                        ...clan.get(), // clan 데이터 전체 포함
-                    })),
-                },
-            ]),
-        ];
-
-        // 중복 제거
-        const uniqueResults = combinedResults.filter(
-            (item, index, self) =>
-                index === self.findIndex(t => t.id === item.id && t.type === item.type)
-        );
-
-        // 데이터 정리
-        const cleanedData = uniqueResults.map(item => {
-            if (item.type === 'class') {
-                return {
-                    ...item,
-                    clans: removeDuplicates(item.clans, 'clanId'),
-                    relatedClass: removeDuplicates(item.relatedClass, 'clanId'),
-                };
-            }
-            return item; // 'clan' 타입은 그대로 유지
-        });
-
-        // 데이터에서 clans만 추출
-        const clansOnly = cleanedData.map(item => item.clans).flat(); // 모든 clans를 하나의 배열로 합침
-
-        if (!clansOnly || clansOnly.length === 0) {
+        if (!clans || clans.length === 0) {
             return res.status(404).send({ success: 404, message: "결과를 찾을 수 없습니다.", user: user });
         }
 
         // 결과 반환
         return res.status(200).send({
             success: 200,
-            clubList: clansOnly,
+            clubList: clans,
             user: user
         }); 
     } catch (error) {
