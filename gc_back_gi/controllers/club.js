@@ -234,7 +234,7 @@ exports.applyClub = async (req, res, next) => {
             where: { [Op.and]: [{ userId: reqUserID }, { clanId: reqClanID }] },
         });
         if (exResume) {
-            return res.status(403).send({ success: 403, result: "이미 제출함. 승인 대기 중", user: user, club: exClub });
+            return res.status(403).send({ success: 403, result: "이미 제출함. 승인 대기 중", user: user, club: exClub, exApply: 1 });
         }
 
 
