@@ -20,7 +20,7 @@ const ClubDetail = () => {
   const { clanId, userId} = route.params;
   const [ClubPost, setClubPost] = useState([])
   const [ClubNotice, setClubNotice] = useState([])
-  const [joinCheck, setjoinCheck] = useState()
+  const [joinCheck, setjoinCheck] = useState(null)
   const [Part, setPart] = useState('')
   const isFocused = useIsFocused();
   
@@ -32,11 +32,18 @@ const ClubDetail = () => {
     <TouchableOpacity
       key={post.noticeId}
       style={{ borderBottomWidth: 1, borderTopWidth: 1, borderColor: '#d9d9d9' }}
-      onPress={() => navigation.navigate('ClubNotice', { 
-        clanId: clanId,
-        userId: userId, 
-        noticeId: post.noticeId        
-      })}>
+      onPress={() => {
+        if (post.isPublic === 0 && joinCheck === null) {
+          alert('비공개 게시물입니다. 가입 후 접근할 수 있습니다.');
+        } else {
+          navigation.navigate('ClubNotice', { 
+            clanId: clanId,
+            userId: userId,
+            noticeId: post.postId        
+          });
+        }
+      }}
+      >
       <View style={styles.header}>
         <Text style={{ flex: 1, fontSize: 16, marginLeft: 10 }}>
           {post.postHead}
@@ -61,9 +68,18 @@ const ClubDetail = () => {
         return (
           <>
           {ClubPost.map(post => (
-              <TouchableOpacity key={post.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}} onPress={() => navigation.navigate('Board', { clanId : clanId,
-                userId : userId, postId : post.postId        
-})}>
+              <TouchableOpacity key={post.postId} style={{borderBottomWidth:1, borderTopWidth:1, borderColor:'#d9d9d9'}} onPress={() => {
+                if (post.isPublic === 0 && joinCheck === null) {
+                  alert('비공개 게시물입니다. 가입 후 접근할 수 있습니다.');
+                } else {
+                  navigation.navigate('Board', { 
+                    clanId: clanId,
+                    userId: userId,
+                    postId: post.postId        
+                  });
+                }
+              }}
+              >
                   <View style={styles.header}>
                       <Text style={{ flex: 1, fontSize: 16, marginLeft:10}}>{post.postHead}</Text>
                       <Text style={{ textAlign: 'right', flex: 1, marginRight: 10, color: 'gray' }}>
@@ -81,6 +97,7 @@ const ClubDetail = () => {
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
+    console.log(ClubPost)
     navigation.navigate('CreatePost', {
       postType: selectedTab,
       userId : userId,

@@ -58,14 +58,11 @@ const lastPostTime = lastPost ? new Date(lastPost.createAt).toISOString().split(
 };
 
 const handleScroll = (event) => {
-  console.log('되긴함?')
-  const contentHeight = event.nativeEvent.contentSize.height; // 전체 콘텐츠 높이
-  const contentOffsetY = event.nativeEvent.contentOffset.y; // 현재 스크롤 위치
-  const layoutHeight = event.nativeEvent.layoutMeasurement.height; // 화면에 표시된 높이
+  const { contentSize, contentOffset, layoutMeasurement } = event.nativeEvent;
 
-  // 스크롤이 거의 끝에 도달하면 실행
-  if (contentOffsetY + layoutHeight >= contentHeight - 20) {
-    moreInfo(); // 추가 데이터 로드
+  if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 20) {
+    console.log('스크롤 끝에 도달');
+    moreInfo();
   }
 };
 
@@ -104,7 +101,13 @@ useEffect(() => {
     return(
     <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
 
-         <ScrollView showsVerticalScrollIndicator={false} onScroll={handleScroll} scrollEventThrottle={16} nestedScrollEnabled={true} >
+<ScrollView
+  showsVerticalScrollIndicator={false}
+  onScroll={handleScroll}
+  scrollEventThrottle={16}
+  nestedScrollEnabled={false}
+  keyboardShouldPersistTaps="handled"
+>
       <View>
         <View style={styles.section}>
         <Text style={styles.sectionTitle}>동아리</Text>
