@@ -134,10 +134,6 @@ return (
           <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
             <Text style={styles.menuText}>삭제</Text>
           </TouchableOpacity>
-          { Info.result?.user?.userName === Info.user?.userName &&(
-          <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
-            <Text style={styles.menuText}>수정</Text>
-          </TouchableOpacity>)}
         </View>)}
       
       {/* 게시물 내용 */}
