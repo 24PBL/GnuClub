@@ -39,7 +39,7 @@ const ClubDetail = () => {
           navigation.navigate('ClubNotice', { 
             clanId: clanId,
             userId: userId,
-            noticeId: post.postId        
+            noticeId: post.noticeId       
           });
         }
       }}
@@ -75,7 +75,7 @@ const ClubDetail = () => {
                   navigation.navigate('Board', { 
                     clanId: clanId,
                     userId: userId,
-                    postId: post.postId        
+                    postId: post.postId       
                   });
                 }
               }}
@@ -97,7 +97,7 @@ const ClubDetail = () => {
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
-    console.log(ClubPost)
+    console.log(ClubNotice[0].noticeId)
     navigation.navigate('CreatePost', {
       postType: selectedTab,
       userId : userId,
