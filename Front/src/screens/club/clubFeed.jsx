@@ -3,13 +3,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect} from 'react';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function ClubFeed() {
 
   const [clubData, setclubData] = useState([]);
   const [clubPost, setclubPost] = useState([]);
   const [loading, setLoading] = useState(true); // 로딩 상태
-
+  const [id, setid] = useState('')
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
@@ -18,10 +22,11 @@ export default function ClubFeed() {
         try {
             const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
             const Id = userInfo.userId
+            setid(Id)
             const response = await axios.get(`http://10.0.2.2:8001/page/feed/${Id}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('내 동아리 정보:', response.data.result[0])
+            console.log('내 동아리 정보:', JSON.stringify(response.data.result, null, 2))
             setclubData(response.data.myClub)
             setclubPost(response.data.result)
         } catch (err) {
@@ -41,6 +46,12 @@ useEffect(() => {
   });
 }, []);
 
+useEffect(() => {
+  if (isFocused) {
+    fetchUserInfo(); // 화면 활성화 시 데이터 가져오기
+  }
+}, [isFocused]); // isFocused가 변경될 때 실행
+
 
 
 useEffect(() => {
@@ -49,14 +60,22 @@ useEffect(() => {
 
     return(
     <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
+
          <ScrollView showsVerticalScrollIndicator={false}>
+      <View>
         <View style={styles.section}>
         <Text style={styles.sectionTitle}>동아리</Text>
+
+    
         <ScrollView style={styles.clubContainer} horizontal contentContainerStyle={{ flexDirection: 'row' }} showsHorizontalScrollIndicator={false}>
         <View style={{ flexDirection: 'row', marginVertical: 10 }}>
           {clubData.map((club, index) => (
             <View key={index} style={{ marginRight: 20 }}>
-              <TouchableOpacity style={styles.clubBox}>
+              <TouchableOpacity style={styles.clubBox}
+               onPress={() => navigation.navigate('ClubDetail', { clanId : club.clan.clanId,
+                userId : id       
+          })}
+              >
                 <Image 
                   source={{ uri: `http://10.0.2.2:8001${club.clan.clanImg}` }} 
                   style={styles.clubBox}
@@ -66,18 +85,21 @@ useEffect(() => {
             </View>
           ))}
         </View>
-
-        </ScrollView>
+      </ScrollView>
       </View>
+        </View>
 
       <View>
-
+        
+      <View style={{ height: 10, backgroundColor: '#d9d9d9' }}></View>
 
       <View>
       {clubPost.map((post, index) => (
-        <TouchableOpacity key={index}>
-          {/* 구분선 */}
-          <View style={{ height: 10, backgroundColor: '#d9d9d9' }}></View>
+        <TouchableOpacity key={index} onPress={() => navigation.navigate('Board', { clanId : post.clan.clanId,
+          userId : id, postId : post.postId        
+})}>
+
+    
 
           {/* 동아리 이름 및 이미지 */}
           <View style={{ flexDirection: 'row' }}>
@@ -104,6 +126,7 @@ useEffect(() => {
             )}
             <Text style={styles.Post}>{post.postBody}</Text>
           </View>
+          <View style={{ height: 10, backgroundColor: '#d9d9d9' }}></View>
         </TouchableOpacity>
       ))}
     </View>
@@ -120,7 +143,8 @@ const styles = StyleSheet.create ({
         width:70, 
         height:70, 
         borderRadius:10, 
-        backgroundColor:'#d9d9d9'
+        backgroundColor:'#d9d9d9',
+        borderWidth : 0.5
     },section: {
         padding: 20,
       },
@@ -139,11 +163,13 @@ const styles = StyleSheet.create ({
         backgroundColor:'#d9d9d9',
         marginLeft : 25,
         marginTop : 10,
-        marginBottom : 15
+        marginBottom : 15,
+        borderWidth : 0.5
       },
       ClubName:{
         marginTop:35,
-        marginLeft:10
+        marginLeft:10,
+        fontWeight:'bold'
       },
       ClubPostTitle:{
         fontWeight:'bold',

@@ -57,7 +57,7 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={{backgroundColor:'white', position:'absolute', top:400, left:300}}>
         <ActivityIndicator size="large" color="#0000ff" />
         <Text style={{fontWeight:'bold', fontSize:30}}>로딩 중...</Text>
       </View>
@@ -111,7 +111,9 @@ useEffect(() => {
         const imageUri = post.noticeimgs.length > 0 ? post.noticeimgs[0].img : 'https://default-image-url.com'; // 이미지가 있을 경우 첫 번째 이미지, 없으면 기본 이미지
         return (
           <View key={post.noticeId} style={{ marginRight: 20}}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ClubNotice', { clanId : post.clanId,
+                userId : userId, noticeId : post.noticeId        
+})}>
               <Image
                 source={{ uri: `http://10.0.2.2:8001${imageUri}` }}
                 style={styles.clubBox}
@@ -143,7 +145,6 @@ useEffect(() => {
 
     return (
       <View key={post.postId} style={{ marginBottom: 20 }}>
-        <Text style={{ fontWeight: 'bold', marginLeft: 40 }}>{post.postHead}</Text>
         {post.postimgs.map((img, imgIndex) => {
           const imgUri = img.img; // img.img 속성에 접근
           return (
@@ -155,14 +156,19 @@ useEffect(() => {
                 marginTop: 12,
                 marginBottom: 10,
               }}
+              onPress={() => navigation.navigate('Board', { clanId : post.clanId,
+                userId : userId, postId : post.postId        
+})}
             >
               <Image
                 style={styles.clubPhoto}
                 source={{ uri: `http://10.0.2.2:8001${imgUri}` || 'https://default-image-url.com' }} // 기본 이미지 URL 처리
               />
+              <Text style={{ fontWeight: 'bold', alignSelf:'flex-end', fontSize:18, marginRight:40}}>{post.postHead}</Text>
             </TouchableOpacity>
           );
-        })}
+        }
+        )}
       </View>
     );
   })}
@@ -226,7 +232,8 @@ const styles = StyleSheet.create({
     width : 300,
     height : 120,
     borderRadius : 10,
-    backgroundColor : '#d9d9d9'
+    backgroundColor : '#d9d9d9',
+    borderWidth:0.5
   },
 
 });

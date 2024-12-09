@@ -16,7 +16,6 @@ const Application = ({ navigation }) => {
 
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
-    console.log('Token:', token); 
     if (token) {
         try {
             const response = await axios.get(`http://10.0.2.2:8001/page/mypage/${userId}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함

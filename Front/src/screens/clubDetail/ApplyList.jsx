@@ -16,14 +16,12 @@ const ApplyList = () => {
   const navigation = useNavigation();
 //토큰 기반 사용자 정보 가져오기
 const fetchApplyList = async () => {
-    const token = await AsyncStorage.getItem('jwtToken');
-    console.log('Token:', token); 
+    const token = await AsyncStorage.getItem('jwtToken'); 
     if (token) {
         try {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/apply-list`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(JSON.stringify(response.data.result, null, 3))
             setApply(response.data.result)
         } catch (err) {
             console.error('Failed to fetch user info:', err);

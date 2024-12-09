@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image,Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -13,6 +13,8 @@ const Search = () => {
     const navigation = useNavigation();
 
     const handleSearch = async () => {
+        if(text==null || text==''){Alert.alert('검색', '동아리를 검색해주세요.')}
+        else{
         const token = await AsyncStorage.getItem('jwtToken');
         const storedUserData = await AsyncStorage.getItem('UserData');
         if (token && storedUserData) {
@@ -29,7 +31,7 @@ const Search = () => {
                 console.error('Failed to fetch search results:', err);
             }
         }
-    };
+    }};
 
     return (
         <SafeAreaView flex={1} backgroundColor={'white'}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,6 +36,24 @@ const ClubNotice = () => {
     }
 };
 
+const deleteNotice = () => {
+  Alert.alert(
+    '게시물 삭제',
+    `게시물을 삭제 하시겠습니까?`,
+    [
+      {
+        text: '확인',
+        onPress: () => deleteinfo(),
+      },
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+    ],
+    { cancelable: false }
+  );
+};
+
 
   const toggleMenu = () => {
     setMenuVisible(!isMenuVisible); // 메뉴 열기/닫기
@@ -43,7 +61,7 @@ const ClubNotice = () => {
 
   const handleDelete = () => {
     setMenuVisible(false);
-    deleteinfo();
+    deleteNotice()
   };
 
   const handleEdit = () => {

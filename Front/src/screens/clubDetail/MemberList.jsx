@@ -89,7 +89,6 @@ const confirmLeave = () => {
 //토큰 기반 사용자 정보 가져오기
 const fetchMemberList = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
-    console.log('Token:', token); 
     if (token) {
         try {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/member-list`, { 

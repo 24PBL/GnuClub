@@ -234,8 +234,6 @@ const handleMajorChange = (text) => {
   };
 
   const signUp = async (name, email, PW, studentId, PNumber, collage, major) => {
-    console.log("함수 정상 호출")
-    console.log(collage)
     try {
       const response = await axios.post('http://10.0.2.2:8001/auth/join/fill-user-info', {
         userName: name,
@@ -246,7 +244,6 @@ const handleMajorChange = (text) => {
         collage: collage,
         userLesson : major
       });
-      console.log('서버 응답' , response.data);
   
       navigation.navigate("Login");
     } catch (error) {

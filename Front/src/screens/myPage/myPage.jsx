@@ -62,8 +62,6 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
   const fetchUserInfo = async () => {
     const token = await AsyncStorage.getItem('jwtToken');
     const storedUserData = await AsyncStorage.getItem('UserData');
-    console.log('Token:', token); 
-    console.log('Stored User Data:', storedUserData);
     if (token || storedUserData) {
         try {
             const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
@@ -71,7 +69,6 @@ const MyPage = ({ setIsSignedIn, navigation }) => {
             const response = await axios.get(`http://10.0.2.2:8001/page/mypage/${Id}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('User Info:', response.data.result.user);
             setUserInfo(response.data.result.user); // 사용자 정보를 상태로 저장
             setimage(`http://10.0.2.2:8001${response.data.result.user.userImg}`); // 서버의 이미지 URL
         } catch (err) {
@@ -108,7 +105,6 @@ const handleUpload = async () => {
   try {
       const userInfo = JSON.parse(storedUserData); // 저장된 JSON 데이터를 객체로 변환
       const Id = userInfo.userId
-      console.log('이미지 경로',image)
       const response = await axios.put(
           `http://10.0.2.2:8001/page/modify-profile/${Id}`, // 서버 URL
           formData,

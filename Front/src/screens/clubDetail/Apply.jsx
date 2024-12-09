@@ -22,7 +22,6 @@ const Application = ({ navigation }) => {
             const response = await axios.get(`http://10.0.2.2:8001/club/${userId}/${clanId}/show-resume/${resumeId}`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log(JSON.stringify(response.data.result, null, 2));
             setappInfo(response.data)
         } catch (err) {
             console.error('Failed to fetch user info:', err);

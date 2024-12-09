@@ -40,7 +40,6 @@ export default function MorePromotion() {
                 const response = await axios.get(`http://10.0.2.2:8001/page/home/${Id}/more-club-ad`, { //차후 수정 예정 이거 데이터가 안옮겨져서 임시로 1로 함
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log(JSON.stringify(response.data.result, null, 2))
                 setid(Id)
                 setad(response.data.result)
             } catch (err) {
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
         width:100,
         height:100,
         borderRadius:10,
-        backgroundColor:'#d9d9d9',
+        borderWidth:0.5
     },
     PostTitle:{ 
         width:95,

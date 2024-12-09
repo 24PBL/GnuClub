@@ -31,7 +31,6 @@ const CreatePost = ({ route, navigation }) => {
     });
   
     if (!result.canceled) {
-      console.log('이미지 선택 완료', result.assets[0].uri);
       setSelectedImages([result.assets[0].uri]);  // 이미지 선택 후 상태 업데이트
     } else {
       console.log('이미지 선택 취소');
@@ -114,8 +113,6 @@ const CreatePost = ({ route, navigation }) => {
         alert('이미지를 선택해주세요!');
         return;
     }
-    console.log('되고는 있니')
-    console.log(postType)
     const token = await AsyncStorage.getItem('jwtToken');
     const imageUri = selectedImages[0]
 

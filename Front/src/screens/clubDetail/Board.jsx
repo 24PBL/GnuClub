@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Alert, TextInput} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ComplexAnimationBuilder } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+
+
 
 const Board = () => {
   const navigation = useNavigation();
@@ -16,6 +18,9 @@ const Board = () => {
   const [comments, setComments] = useState([]);
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [Part, setPart] = useState([])
+  const [text, settext] = useState(null)
+  const scrollViewRef = useRef(null);
+
 
 
 
@@ -29,7 +34,7 @@ const Board = () => {
 
   const handleDelete = () => {
     setMenuVisible(false);
-    alert("삭제");
+    deleteNotice()
   };
 
   const handleEdit = () => {
@@ -44,6 +49,101 @@ const Board = () => {
       clanId : clanId, userId : userId
     });
   };
+
+  const deleteinfo = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+    if (token) {
+        try {
+            const response = await axios.delete(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}/delete-post`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            navigation.navigate('ClubDetail',{
+              clanId : clanId, userId : userId
+            });
+
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
+    }
+};
+
+const deletecomment = async (commentId) => {
+  const token = await AsyncStorage.getItem('jwtToken');
+  if (token) {
+      try {
+          // 댓글 삭제 요청
+          const response = await axios.delete(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}/${commentId}/delete-comment`, {
+              headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // 삭제된 댓글을 상태에서 제거하기 (삭제된 commentId와 일치하지 않는 댓글만 필터링)
+          setComments((prevComments) => prevComments.filter(comment => comment.commentId !== commentId));
+
+      } catch (err) {
+          console.error('댓글 삭제 실패:', err);
+      }
+  }
+};
+
+
+const deleteNotice = () => {
+  Alert.alert(
+    '게시물 삭제',
+    `게시물을 삭제 하시겠습니까?`,
+    [
+      {
+        text: '확인',
+        onPress: () => deleteinfo(),
+      },
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+    ],
+    { cancelable: false }
+  );
+};
+
+
+const sendComment = async () => {
+  if (text == null || text === '') {
+    Alert.alert('댓글 입력', '빈칸을 채워주세요.');
+  } else {
+    const token = await AsyncStorage.getItem('jwtToken');
+    if (token) {
+      try {
+        // 댓글 업로드
+        const response = await axios.post(
+          `http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}/upload-comment`,
+          { comment: text },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        // 서버에서 최신 댓글 목록을 가져와 상태 업데이트
+        const fetchResponse = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/${postId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setComments(fetchResponse.data.resultComment || []); // 댓글 목록 업데이트
+        settext(''); // 댓글 입력 필드 초기화
+
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollToEnd({ animated: true });
+        }
+
+      } catch (err) {
+        console.error('댓글 작성 실패:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }
+};
+
+
+
 
 
   const fetchPostInfo = async () => {
@@ -70,6 +170,7 @@ const Board = () => {
 useEffect(() => {
   fetchPostInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
 }, [clanId, userId, postId]);
+
 
 
 return (
@@ -111,7 +212,7 @@ return (
       {/* 게시물 내용 */}
       
 
-      <ScrollView style={styles.contentContainer}>
+      <ScrollView style={styles.contentContainer} ref={scrollViewRef}>
       <Text style={{fontWeight:'bold', fontSize:25, marginLeft:30, marginTop:20}}>{Info.resultPost?.postHead}</Text>
       <Text style={{opacity:0.4, fontWeight:'bold', marginTop:5, width:'85%', alignSelf:'center', textAlign:'right'}}>
         {Info.resultPost?.user?.userName} | {(Info.resultPost?.createAt)?.split('T')[0]}
@@ -131,19 +232,36 @@ return (
 
         <View style={styles.separator} />
 
-        {comments.map((item) => (
-        <View key={item.commentId} style={styles.commentContainer}>
-          <View style={styles.authorSection}>
-            <Image
-              source={{ uri: `http://10.0.2.2:8001${item.user.userImg}` }}
-              style={styles.authorImage}
-            />
-            <Text style={styles.authorName}>{item.user.userName}</Text>
-          </View>
-          <Text style={styles.commentText}>{item.comment}</Text>
-        </View>
-      ))}
+        {comments.slice().reverse().map((item) => ( // slice()로 배열을 복사한 후 reverse() 사용
+  <View key={item.commentId} style={styles.commentContainer}>
+    <View style={styles.authorSection}>
+      <Image
+        source={{ uri: `http://10.0.2.2:8001${item.user.userImg}` }}
+        style={styles.authorImage}
+      />
+    </View>
+    <View>
+      <View flexDirection={'row'} width={250}>
+        <Text style={styles.authorName}>{item.user.userName}</Text>
+        {((item.user.userId === userId) || (item.userId === userId) || (Part === 1)) && (
+          <TouchableOpacity onPress={() => deletecomment(item.commentId)}>
+            <Text style={{ fontSize: 12, color: '#0091da' }}>삭제</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <Text style={styles.commentText}>{item.comment}</Text>
+    </View>
+  </View>
+))}
+<View style={{paddingBottom:20}}></View>
+
       </ScrollView>
+      <View style={{width:'100%',bottom:0, borderWidth:0.5, height:70, flexDirection:'row', backgroundColor:'white'}}>
+      <View style={{borderWidth:0.5, borderRadius:50, width:'80%', marginLeft:5, height:60, alignSelf:'center', justifyContent:'center'}} >
+        <TextInput fontSize={15} placeholder='댓글을 입력해주세요.' style={{marginLeft:20, width:290}} numberOfLines={1} onChangeText={settext} value={text}></TextInput>
+      </View>
+      <TouchableOpacity style={{borderRadius:100, width:50, height:50, backgroundColor:"#0091da", marginTop:5, marginLeft:20}} onPress={sendComment}><Ionicons marginTop={10} marginLeft={8} name="paper-plane" size={30} color={'white'}/></TouchableOpacity>
+      </View>
     </View>
   </SafeAreaView>
 );
@@ -230,8 +348,8 @@ commentContainer: {
   marginVertical: 5,
   paddingHorizontal: 10,
   borderColor:'#d9d9d9',
-  borderWidth:1,
-  borderRadius:10
+  borderTopWidth : 1,
+  borderBottomWidth : 1
 },
 authorSection: {
   width: 100,
@@ -239,24 +357,23 @@ authorSection: {
   marginLeft:-30
 },
 authorImage: {
-  width: 50,
-  height: 50,
+  width: 35,
+  height: 35,
   borderRadius: 25,
   marginBottom: 5,
   borderWidth:1,
   borderColor:'gray'
 },
 authorName: {
-  textAlign: 'center',
   fontSize: 12,
   color: '#333',
-  fontWeight:'bold'
+  fontWeight:'bold',
+  width:'100%',
+  height:20,
 },
 commentText: {
-  flex: 1,
-  alignSelf: 'center',
-  marginHorizontal: 10,
-  fontSize: 13
+  fontSize: 13,
+  
 }
 
 });

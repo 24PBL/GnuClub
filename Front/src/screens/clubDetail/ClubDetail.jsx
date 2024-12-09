@@ -81,7 +81,6 @@ const ClubDetail = () => {
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
-    console.log(selectedTab)
     navigation.navigate('CreatePost', {
       postType: selectedTab,
       userId : userId,
@@ -142,7 +141,7 @@ const ClubDetail = () => {
 
             setClubNotice(response2.data.result)
 
-            setPart(response1.data.memPart.part)
+            setPart(response1.data.memPart?.part || [])
         } catch (err) {
             console.error('Failed to fetch user info:', err);
         } finally {
@@ -163,6 +162,7 @@ useEffect(() => {
 
 
   return (
+    <View flex={1}>
     <SafeAreaView style={{backgroundColor:'white', flex:1}}>
     <ScrollView>
         <View style={styles.headerImg}>
@@ -223,15 +223,14 @@ useEffect(() => {
         </View>
 
         <View style={styles.contentContainer}>{renderContent()}</View>
-
-        {(selectedTab === 'announcement' || selectedTab === 'board') && joinCheck !== null && (
+    </ScrollView>
+    </SafeAreaView>
+    {(selectedTab === 'announcement' || selectedTab === 'board') && joinCheck !== null && (
   <TouchableOpacity style={styles.writeButton} onPress={handleAddPost}>
     <Text style={styles.writeButtonText}>글쓰기</Text>
   </TouchableOpacity>
 )}
-
-    </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -330,7 +329,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     position: 'absolute',
     right: 20,
-    bottom: 10,
+    bottom: 80,
   },
   writeButtonText: {
     color: 'white',
