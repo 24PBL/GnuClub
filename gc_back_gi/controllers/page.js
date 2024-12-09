@@ -219,39 +219,78 @@ exports.sendFeedData = async (req, res, next) => {
             }]
         });
 
-        // 3. 내 동아리 피드들 정보를 8개씩 보냄(8개 안되면 되는만큼 보내짐, 중복 안되도록 해놓음) - 항상 8개를 보장하지는 못함(역필터링이라서), 프론트에서 length를 통해 적절히 렌더링
+        // 4. 내 동아리 피드들 정보를 8개씩 보냄
         const lastTimestamp = req.query.lastTimestamp || new Date().toISOString(); // 기본값: 현재 시간
+
+        // 'lastTimestamp' 이후 게시물들
         const myClubFeeds = await db.post.findAll({
             where: {
-                createAt: { [Sequelize.Op.lt]: lastTimestamp }, // 조건: 특정 시간 이전 게시물
+                createAt: { [Sequelize.Op.gte]: lastTimestamp },
             },
             include: [
                 {
-                    model: db.clan, // post -> clan
+                    model: db.clan,
                     as: 'clan',
+                    required: true,
                     include: [{
-                        model: db.userInClan, // clan -> userInClan
-                        where: { userId: reqUserID }, // 사용자가 속한 동아리
-                        required: true, // 반드시 userInClan 조건을 만족해야 함
+                        model: db.userInClan,
+                        where: { userId: reqUserID },
+                        required: true,
                         as: 'userinclans'
                     }]
                 },
                 {
-                    model: db.postImg, // post -> postImg
+                    model: db.postImg,
                     as: 'postimgs',
                 }
             ],
-            order: [['createAt', 'DESC']], // 최신순 정렬
-            limit: 8, // 최대 8개의 게시물
+            order: [['createAt', 'DESC']],
         });
 
-        // 4. 프론트에 데이터 전송
-        return res.status(200).send({ success: 200, result: myClubFeeds, user: user, myClub: myClub });
+        // 'lastTimestamp' 이전 게시물들
+        const newMyClubFeeds = await db.post.findAll({
+            where: {
+                createAt: { [Sequelize.Op.lt]: lastTimestamp },
+            },
+            include: [
+                {
+                    model: db.clan,
+                    as: 'clan',
+                    include: [{
+                        model: db.userInClan,
+                        where: { userId: reqUserID },
+                        required: true,
+                        as: 'userinclans'
+                    }]
+                },
+                {
+                    model: db.postImg,
+                    as: 'postimgs',
+                }
+            ],
+            order: [['createAt', 'DESC']],
+            limit: 8,
+        });
+
+        // 기존 myClubFeeds와 newMyClubFeeds를 합치기
+        const combinedFeeds = myClubFeeds.concat(newMyClubFeeds);
+
+        // 중복된 게시물 제거 (Map을 사용하여 중복 제거)
+        const uniqueFeedsMap = new Map();
+        combinedFeeds.forEach(feed => {
+            uniqueFeedsMap.set(feed.postId, feed); // feed.id를 키로 사용하여 중복을 제거
+        });
+
+        // Map에서 값만 추출하여 배열로 변환
+        const uniqueFeeds = Array.from(uniqueFeedsMap.values());
+
+        // 5. 프론트에 데이터 전송
+        return res.status(200).send({ success: 200, result: uniqueFeeds, user: user, myClub: myClub });
     } catch (error) {
         console.error(error);
         return next(error); // Express 에러 핸들러로 전달
     }
-}
+};
 
 exports.sendMypageData = async (req, res, next) => {
     const reqUserID = req.url.split("/")[2];
