@@ -40,7 +40,6 @@ export default function MorePost() {
                 const response = await axios.get(`http://10.0.2.2:8001/page/home/${Id}/more-club-anything`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log(JSON.stringify(response.data.result, null, 2))
                 setid(Id)
                 setad(response.data.result)
             } catch (err) {
