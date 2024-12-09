@@ -26,7 +26,6 @@ export default function ClubFeed() {
             const response = await axios.get(`http://10.0.2.2:8001/page/feed/${Id}`, { 
                 headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('내 동아리 정보:', JSON.stringify(response.data.result, null, 2))
             setclubData(response.data.myClub)
             setclubPost(response.data.result)
         } catch (err) {
@@ -47,7 +46,6 @@ const lastPostTime = lastPost ? new Date(lastPost.createAt).toISOString().split(
           const response = await axios.get(`http://10.0.2.2:8001/page/feed/${id}?lastTimestamp=${lastPostTime}`, { 
               headers: { Authorization: `Bearer ${token}` },
           });
-          console.log('내 동아리 정보:', JSON.stringify(response.data.result, null, 2))
           setclubPost(response.data.result)
       } catch (err) {
           console.error('Failed to fetch user info:', err);

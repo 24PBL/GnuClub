@@ -97,7 +97,6 @@ const ClubDetail = () => {
 
   // 글쓰기 화면으로 이동  
   const handleAddPost = () => {
-    console.log(ClubNotice[0].noticeId)
     navigation.navigate('CreatePost', {
       postType: selectedTab,
       userId : userId,
