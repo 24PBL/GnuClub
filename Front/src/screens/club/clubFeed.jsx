@@ -42,7 +42,6 @@ const moreInfo = async () => {
   const lastPost = clubPost[clubPost.length - 1]; // 마지막 요소
 const lastPostTime = lastPost ? new Date(lastPost.createAt).toISOString().split('T')[0] : null; // 작성시간 추출
   const token = await AsyncStorage.getItem('jwtToken');
-  console.log('되긴함?')
   if (token) {
       try {
           const response = await axios.get(`http://10.0.2.2:8001/page/feed/${id}?lastTimestamp=${lastPostTime}`, { 
