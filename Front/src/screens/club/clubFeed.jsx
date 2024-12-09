@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, } from 'react';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { useIsFocused } from '@react-navigation/native';
@@ -36,15 +36,59 @@ export default function ClubFeed() {
         }
     }
 };
+
+
+const moreInfo = async () => {
+  const lastPost = clubPost[clubPost.length - 1]; // 마지막 요소
+const lastPostTime = lastPost ? new Date(lastPost.createAt).toISOString().split('T')[0] : null; // 작성시간 추출
+  const token = await AsyncStorage.getItem('jwtToken');
+  console.log('되긴함?')
+  if (token) {
+      try {
+          const response = await axios.get(`http://10.0.2.2:8001/page/feed/${id}?lastTimestamp=${lastPostTime}`, { 
+              headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log('내 동아리 정보:', JSON.stringify(response.data.result, null, 2))
+          setclubPost(response.data.result)
+      } catch (err) {
+          console.error('Failed to fetch user info:', err);
+      } finally {
+        setLoading(false);
+      }
+  }
+};
+
+const handleScroll = (event) => {
+  console.log('되긴함?')
+  const contentHeight = event.nativeEvent.contentSize.height; // 전체 콘텐츠 높이
+  const contentOffsetY = event.nativeEvent.contentOffset.y; // 현재 스크롤 위치
+  const layoutHeight = event.nativeEvent.layoutMeasurement.height; // 화면에 표시된 높이
+
+  // 스크롤이 거의 끝에 도달하면 실행
+  if (contentOffsetY + layoutHeight >= contentHeight - 20) {
+    moreInfo(); // 추가 데이터 로드
+  }
+};
+
+
+
 useEffect(() => {
-  // postimgs 배열이 존재하고, Img 속성이 있다면 GET 요청을 보냄
-  clubPost.forEach((post) => {
-    if (post.postimgs && post.postimgs.length > 0 && post.postimgs[0].Img) {
-      fetchImageData(post.postimgs[0].img); // 이미지 URL을 통해 GET 요청
-      console.log(post.postimgs[0].img)
+  // 클럽 데이터를 가져오는 비동기 작업
+  const fetchImages = async () => {
+    const images = clubPost
+      .filter((post) => post.postimgs && post.postimgs.length > 0)
+      .map((post) => post.postimgs[0].img);
+
+    for (const img of images) {
+      console.log(img); // 이미지 URL 출력 (필요시 이미지 가져오기 로직 추가)
     }
-  });
-}, []);
+  };
+
+  if (clubPost.length > 0) {
+    fetchImages(); // clubPost가 변경될 때만 실행
+  }
+}, [clubPost]);
+
 
 useEffect(() => {
   if (isFocused) {
@@ -56,12 +100,12 @@ useEffect(() => {
 
 useEffect(() => {
   fetchUserInfo(); // 컴포넌트가 렌더링될 때 사용자 정보 가져오기
-}, []);
+}, [clubPost]);
 
     return(
     <SafeAreaView style={{flex:1, backgroundColor:'white'}}>
 
-         <ScrollView showsVerticalScrollIndicator={false}>
+         <ScrollView showsVerticalScrollIndicator={false} onScroll={handleScroll} scrollEventThrottle={16} nestedScrollEnabled={true} >
       <View>
         <View style={styles.section}>
         <Text style={styles.sectionTitle}>동아리</Text>

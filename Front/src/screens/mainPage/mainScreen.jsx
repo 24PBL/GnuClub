@@ -57,8 +57,8 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <View style={{backgroundColor:'white', position:'absolute', top:400, left:300}}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={{position:'absolute', top:400, left:150}}>
+        <ActivityIndicator size="large" color="#0091da" />
         <Text style={{fontWeight:'bold', fontSize:30}}>로딩 중...</Text>
       </View>
     );

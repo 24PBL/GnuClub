@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Alert, TextInput} from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, Alert, TextInput, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +20,7 @@ const Board = () => {
   const [Part, setPart] = useState([])
   const [text, settext] = useState(null)
   const scrollViewRef = useRef(null);
+ 
 
 
 
@@ -68,6 +69,7 @@ const Board = () => {
         }
     }
 };
+
 
 const deletecomment = async (commentId) => {
   const token = await AsyncStorage.getItem('jwtToken');
@@ -202,10 +204,6 @@ return (
           <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
             <Text style={styles.menuText}>삭제</Text>
           </TouchableOpacity>
-          { Info.resultPost?.user?.userName === Info.user?.userName &&(
-          <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
-            <Text style={styles.menuText}>수정</Text>
-          </TouchableOpacity>)}
         </View> 
       )}
       
