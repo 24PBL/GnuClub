@@ -6,6 +6,8 @@ import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { useIsFocused } from '@react-navigation/native';
+
 
 const ClubDetail = () => {
   const [selectedTab, setSelectedTab] = useState('announcement');
@@ -20,6 +22,7 @@ const ClubDetail = () => {
   const [ClubNotice, setClubNotice] = useState([])
   const [joinCheck, setjoinCheck] = useState()
   const [Part, setPart] = useState('')
+  const isFocused = useIsFocused();
   
   const renderContent = () => {
     if (selectedTab === 'announcement') {
@@ -152,6 +155,11 @@ useEffect(() => {
   fetchClubInfo(); // 컴포넌트 렌더링 시 사용자 정보 가져오기
 }, [clanId, userId]);
 
+useEffect(() => {
+  if (isFocused) {
+    fetchClubInfo(); // 화면 활성화 시 데이터 가져오기
+  }
+}, [isFocused]); // isFocused가 변경될 때 실행
 
 
   return (

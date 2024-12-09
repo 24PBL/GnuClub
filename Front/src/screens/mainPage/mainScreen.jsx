@@ -18,6 +18,11 @@ const MainScreen =  ({navigation}) => {
     navigation.navigate('MorePromotion')
   }
 
+  const morePost= () => {
+    navigation.navigate('MorePost')
+  }
+
+
 
   // 사용자 정보 가져오기 (AsyncStorage에서)
   const fetchUserInfo = async () => {
@@ -126,7 +131,7 @@ useEffect(() => {
       <View style={styles.section}>
       <View style={{justifyContent:'space-between', flexDirection:'row'}}>
         <Text style={styles.sectionTitle}>동아리 이모저모</Text>
-        <TouchableOpacity><Text style={{color:"#0091da", marginLeft:-40, marginTop:10}}>더 보기</Text></TouchableOpacity>
+        <TouchableOpacity onPress={morePost}><Text style={{color:"#0091da", marginLeft:-40, marginTop:10}}>더 보기</Text></TouchableOpacity>
         </View>
 
        <View>

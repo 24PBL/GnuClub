@@ -22,6 +22,7 @@ import ClubNotice from './src/screens/clubDetail/ClubNotice'
 import Board from './src/screens/clubDetail/Board'
 import ApplyList from './src/screens/clubDetail/ApplyList'
 import Apply from './src/screens/clubDetail/Apply'
+import MorePost from './src/screens/mainPage/morePost'
 
 
 
@@ -86,6 +87,7 @@ export default function App() {
             <RootStack.Screen name="Board" options={{ headerShown: false }} component={Board} />
             <RootStack.Screen name="ApplyList" options={{ headerShown: false }} component={ApplyList} />
             <RootStack.Screen name="Apply" options={{ headerShown: false }} component={Apply} />
+            <RootStack.Screen name="MorePost" options={{ headerShown: false }} component={MorePost} />
        </>
         )}
       </RootStack.Navigator>

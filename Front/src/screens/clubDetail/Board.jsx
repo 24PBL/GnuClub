@@ -40,7 +40,9 @@ const Board = () => {
 
   // 뒤로 가기
   const handleBackPress = () => {
-    navigation.goBack();
+    navigation.navigate('ClubDetail',{
+      clanId : clanId, userId : userId
+    });
   };
 
 
@@ -52,7 +54,7 @@ const Board = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            setPart(response.data.memPart.part)
+            setPart(response.data.memPart?.part || [])
 
             setInfo(response.data)
             setComments(response.data.resultComment || [])

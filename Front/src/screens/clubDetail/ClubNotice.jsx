@@ -15,11 +15,26 @@ const ClubNotice = () => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [Part, setPart] = useState([]);
 
-
-
-
   const [Info, setInfo] = useState([])
 
+  const deleteinfo = async () => {
+    const token = await AsyncStorage.getItem('jwtToken');
+    if (token) {
+        try {
+            const response = await axios.delete(`http://10.0.2.2:8001/notice/${userId}/${clanId}/${noticeId}/delete-notice`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            navigation.navigate('ClubDetail',{
+              clanId : clanId, userId : userId
+            });
+
+        } catch (err) {
+            console.error('Failed to fetch user info:', err);
+        } finally {
+          setLoading(false);
+        }
+    }
+};
 
 
   const toggleMenu = () => {
@@ -28,7 +43,7 @@ const ClubNotice = () => {
 
   const handleDelete = () => {
     setMenuVisible(false);
-    alert("삭제");
+    deleteinfo();
   };
 
   const handleEdit = () => {
@@ -39,7 +54,9 @@ const ClubNotice = () => {
 
   // 뒤로 가기
   const handleBackPress = () => {
-    navigation.goBack();
+    navigation.navigate('ClubDetail',{
+      clanId : clanId, userId : userId
+    });
   };
 
 

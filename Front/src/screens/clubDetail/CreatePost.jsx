@@ -1,31 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Alert, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
+
 const CreatePost = ({ route, navigation }) => {
   const { postType, userId, clanId } = route.params;  // postType ('announcement' or 'board')과 onSavePost 함수
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedImages, setSelectedImages] = useState([]); 
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [finalImage, setfinalImage] = useState('')
+  const [isPublic, setIsPublic] = useState(1);
 
-  // 이미지 선택 함수
+  // 토글 상태 변경 함수
+  const toggleSwitch = () => {
+    setIsPublic(previousState => (previousState === 1 ? 0 : 1)); // 공개 -> 비공개, 비공개 -> 공개
+  };
+
+
   const pickImages = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true, // 다중 선택 가능
+      allowsMultipleSelection: false, // 다중 선택 비활성화
       allowsEditing: true,
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setSelectedImages((prevImages) => [...prevImages, ...result.assets.map((asset) => asset.uri)]);
+      console.log('이미지 선택 완료', result.assets[0].uri);
+      setSelectedImages([result.assets[0].uri]);  // 이미지 선택 후 상태 업데이트
+    } else {
+      console.log('이미지 선택 취소');
     }
   };
+  
+  useEffect(() => {
+    if (selectedImages.length > 0) {
+      handleUpload(); // selectedImages가 변경되면 handleUpload 호출
+    }
+  }, [selectedImages]); // selectedImages가 변경될 때마다 실행
+
 
   // 이미지 삭제 함수
   const removeImage = (imageUri) => {
@@ -45,14 +63,41 @@ const CreatePost = ({ route, navigation }) => {
     if (!title || !content) {
       Alert.alert('입력 오류', '제목과 내용을 모두 입력해주세요.');
     } else{
-      if (postType == 'board'){
           const token = await AsyncStorage.getItem('jwtToken');
           if (token) {
               try {
-                  const response = await axios.get(`http://10.0.2.2:8001/post/${userId}/${clanId}/create-post/upload-post`, {
+                if (postType === 'board'){
+
+                  const response = await axios.post(`http://10.0.2.2:8001/post/${userId}/${clanId}/create-post/upload-post`,{
+                      postHead : title,
+                      postBody : content,
+                      ...(finalImage !== '' && { imgPath: finalImage }),
+                      isPublic : isPublic
+                  } ,{
                       headers: { Authorization: `Bearer ${token}` },
-                  });
-                  console.log('User Info:', response.data.result.user);
+
+                  }); navigation.navigate('Board', { clanId : clanId,
+                    userId : userId, postId : response.data.post.postId        
+              })
+                  
+
+                } else if(postType === 'announcement'){
+
+                  const response = await axios.post(`http://10.0.2.2:8001/notice/${userId}/${clanId}/create-notice/upload-notice`, {
+                    postHead : title,
+                    postBody : content,
+                    ...(finalImage !== '' && { imgPath: finalImage }),
+                    isPublic : isPublic
+
+                },{
+                    headers: { Authorization: `Bearer ${token}` },
+
+                });
+                navigation.navigate('ClubNotice', { clanId : clanId,
+                  userId : userId, noticeId : response.data.notice.noticeId        
+            })
+
+                }
 
               } catch (err) {
                   console.error('Failed to fetch user info:', err);
@@ -60,11 +105,71 @@ const CreatePost = ({ route, navigation }) => {
                 setLoading(false);
               }
       };
-      } else if(postType == 'announcement'){
-  
-      }
+
     }
   };
+
+  const handleUpload = async () => {
+    if (!selectedImages) {
+        alert('이미지를 선택해주세요!');
+        return;
+    }
+    console.log('되고는 있니')
+    console.log(postType)
+    const token = await AsyncStorage.getItem('jwtToken');
+    const imageUri = selectedImages[0]
+
+    // FormData 객체 생성
+    const formData = new FormData();
+    // 이미지 경로에서 파일 이름 추출
+
+    const fileName = imageUri.split('/').pop();  // 경로에서 마지막 부분을 파일명으로 사용
+    const fileType = fileName.split('.').pop();  // 확장자 추출
+    formData.append('img', {
+        uri: imageUri,  // file:// 경로 그대로 사용
+        name: fileName,
+        type: `image/${fileType}`, // MIME 타입 설정
+    });
+
+    try {      
+        let response;
+        if (postType === 'board') {
+            response = await axios.post(
+                `http://10.0.2.2:8001/post/${userId}/${clanId}/create-post/upload-image`, // 서버 URL
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`, // JWT 토큰 포함
+                    },
+                }
+            ); setfinalImage(response.data.result.imgPath)
+        } else if (postType === 'announcement') {
+            response = await axios.post(
+                `http://10.0.2.2:8001/notice/${userId}/${clanId}/create-notice/upload-image`, // 서버 URL
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`, // JWT 토큰 포함
+                    },
+                }
+            ); setfinalImage(response.data.result.imgPath)
+        }
+
+        if (response.data.success === 201) {
+        } else {
+            alert('실패: ' + response.data.result);
+        }
+    } catch (error) {
+        console.error(error);
+        alert('에러 발생: ' + error.message);
+    }
+};
+
+  
+
+
 
   return (
     <SafeAreaView flex={1} backgroundColor={'white'}>
@@ -80,6 +185,17 @@ const CreatePost = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
 
+      <View>
+      <View style={styles.toggleswitchContainer}>
+        <Text style={{fontWeight:'bold'}}>비공개</Text>
+        <Switch
+          value={isPublic === 1} // 1이면 true (공개), 0이면 false (비공개)
+          onValueChange={toggleSwitch}
+        />
+        <Text style={{fontWeight:'bold'}}>공개</Text>
+      </View>
+      </View>
+
       {/* 제목 입력란 */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -89,6 +205,7 @@ const CreatePost = ({ route, navigation }) => {
           onChangeText={setTitle}
           scrollEnabled={false}
           maxLength={50}
+          numberOfLines={1}
         />
         <View style={styles.separator} />
         <TextInput
@@ -100,9 +217,7 @@ const CreatePost = ({ route, navigation }) => {
           scrollEnabled={false} // 스크롤 대신 길어지면 아래로 계속 쓸 수 있게 설정
           maxLength={1000}
         />
-        <Text></Text>
       </View>
-
       {/* 선택된 이미지 미리보기 (스크롤 가능) */}
       <View style={styles.imagePreviewContainer}>
         {selectedImages.map((imageUri, index) => (
@@ -154,19 +269,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
-  inputContainer: {
-    marginVertical: 20,
-  },
   titleInput: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    width : 370,
   },
   contentInput: {
     fontSize: 16,
     color: '#000000',
     textAlignVertical: 'top',
-    minHeight: 100, // 기본 높이 설정
+    minHeight: 100, // 기본 높이 설정,
   },
   separator: {
     height: 1,
@@ -199,6 +312,11 @@ const styles = StyleSheet.create({
     top: -2,
     right: -9,
   },
+  toggleswitchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf:'center',
+  }
 });
 
 export default CreatePost;
